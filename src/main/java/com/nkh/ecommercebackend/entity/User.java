@@ -20,8 +20,9 @@ public class User implements Serializable {
     @Column(name = "id", updatable = false, nullable = false, unique = true)
     private Integer id;
 
+    @Column(name = "username",updatable = true, nullable = false, unique = true)
     private String username;
-
+    
     private String password;
 
     private String email;

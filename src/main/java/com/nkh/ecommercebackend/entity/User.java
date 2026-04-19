@@ -17,7 +17,7 @@ import java.util.Date;
 @Table(name = "user")
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
     private Integer id;
 
@@ -49,4 +49,5 @@ public class User implements Serializable {
 
     @Column(name = "is_verified",nullable = false)
     private Boolean isVerified;
+
 }

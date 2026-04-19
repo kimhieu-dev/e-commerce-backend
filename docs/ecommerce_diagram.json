@@ -87,6 +87,20 @@
           "increment": false,
           "comment": "",
           "size": 50
+        },
+        {
+          "id": "bug0ui0MOnIKtT6WzEwPM",
+          "name": "deleted",
+          "type": "BOOLEAN",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
         }
       ],
       "comment": "",
@@ -328,7 +342,7 @@
         },
         {
           "id": "IxJBkdyf5gAHgBXzuvgdJ",
-          "name": "date_of_birth",
+          "name": "date_birth",
           "type": "DATE",
           "default": "",
           "check": "",
@@ -368,14 +382,69 @@
           "values": []
         },
         {
-          "id": "ud0kiuoHsFZQfWlXyO0Nr",
-          "name": "last_login_at",
+          "id": "nOmqBWPxl_7FnXo2XUq0x",
+          "name": "created_at",
           "type": "DATETIME",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "4JvzwV-iU5KWiSagvC0AA",
+          "name": "created_by",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 50
+        },
+        {
+          "id": "IdjlCiexILgwCPIHWR8mF",
+          "name": "updated_at",
+          "type": "DATETIME",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "GvYBtRyOL069Y4hfbcIC7",
+          "name": "updated_by",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 50,
+          "values": []
+        },
+        {
+          "id": "_bKF38oACyI7nxAYO-USd",
+          "name": "deleted",
+          "type": "BOOLEAN",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
           "increment": false,
           "comment": "",
           "size": "",
@@ -1828,8 +1897,8 @@
     {
       "id": "zcxFUCELyCx7znmXQ-wxW",
       "name": "tracking_log",
-      "x": 174.83566676943468,
-      "y": -434.80721604334605,
+      "x": 236.25459512925937,
+      "y": -369.54960466103245,
       "locked": false,
       "fields": [
         {

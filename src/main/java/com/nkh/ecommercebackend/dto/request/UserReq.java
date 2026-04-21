@@ -1,13 +1,8 @@
 package com.nkh.ecommercebackend.dto.request;
 
 import com.nkh.ecommercebackend.common.Gender;
-import com.nkh.ecommercebackend.common.UserStatus;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,7 +14,7 @@ import java.util.Date;
 public class UserReq implements Serializable {
 
     @NotBlank
-    @Size(min = 6, max = 12,message = "Username less than 50")
+    @Size(min = 6, max = 12, message = "Username less than 50")
     private String username;
 
     @NotBlank

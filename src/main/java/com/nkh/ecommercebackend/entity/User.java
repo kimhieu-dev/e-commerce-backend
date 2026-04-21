@@ -1,6 +1,5 @@
 package com.nkh.ecommercebackend.entity;
 
-import ch.qos.logback.core.boolex.EvaluationException;
 import com.nkh.ecommercebackend.common.Gender;
 import com.nkh.ecommercebackend.common.UserStatus;
 import jakarta.persistence.*;
@@ -8,6 +7,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,9 +17,9 @@ import java.util.Date;
 @Table(name = "user")
 public class User extends BaseEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
-    private Integer id;
+    private UUID id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -45,9 +45,12 @@ public class User extends BaseEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)
-    private UserStatus userStatus;
+    private UserStatus status;
 
     @Column(name = "is_verified",nullable = false)
     private Boolean isVerified;
+
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
 
 }

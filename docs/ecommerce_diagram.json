@@ -3,8 +3,8 @@
     {
       "id": "cfQfLwIStS_wutbkuvSEc",
       "name": "cart",
-      "x": 1015.88513314858,
-      "y": -754.9594742630226,
+      "x": 1132.9029461388106,
+      "y": -637.9416612727922,
       "locked": false,
       "fields": [
         {
@@ -245,8 +245,8 @@
     {
       "id": "j9Nn7UoHvINvEL0uLvb2N",
       "name": "user",
-      "x": -113.34133126267272,
-      "y": -903.7440624582492,
+      "x": -14.80001506037354,
+      "y": -977.6500496099736,
       "locked": false,
       "fields": [
         {
@@ -489,19 +489,6 @@
           "size": 255
         },
         {
-          "id": "f-VPcHpObyK6Uun22ONhR",
-          "name": "description",
-          "type": "LONGTEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": 65535
-        },
-        {
           "id": "Fx2g2qxBcUL7AXf0rVHdx",
           "name": "base_price",
           "type": "DECIMAL",
@@ -541,54 +528,6 @@
           "values": []
         },
         {
-          "id": "hs0Xo4jk9WqAEkQNuEiKP",
-          "name": "weight",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": ""
-        },
-        {
-          "id": "mCUTEOdyh0xqF7r0wzqng",
-          "name": "length",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": ""
-        },
-        {
-          "id": "GZUTlYaQJoYLyhAip5qLT",
-          "name": "width",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": ""
-        },
-        {
-          "id": "vqMOEI0F1-46Fkuqssby4",
-          "name": "height",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": ""
-        },
-        {
           "id": "x2C69SSTpxS4qO4YPkYiS",
           "name": "created_at",
           "type": "DATETIME",
@@ -605,7 +544,7 @@
         {
           "id": "T_URrtxPElMRK886SWDbE",
           "name": "created_by",
-          "type": "DATETIME",
+          "type": "VARCHAR",
           "default": "",
           "check": "",
           "primary": false,
@@ -613,7 +552,7 @@
           "notNull": true,
           "increment": false,
           "comment": "",
-          "size": "",
+          "size": 50,
           "values": []
         },
         {
@@ -633,7 +572,7 @@
         {
           "id": "R4YcJ07j5cR5y86dIvRxi",
           "name": "updated_by",
-          "type": "DATETIME",
+          "type": "VARCHAR",
           "default": "",
           "check": "",
           "primary": false,
@@ -641,7 +580,7 @@
           "notNull": true,
           "increment": false,
           "comment": "",
-          "size": "",
+          "size": 50,
           "values": []
         },
         {
@@ -666,8 +605,8 @@
     {
       "id": "axNslygLG9uFGoo3kQMHf",
       "name": "inventory",
-      "x": -676.2630950959932,
-      "y": 868.7480304460946,
+      "x": -220.5095076603593,
+      "y": 951.8922659917846,
       "locked": false,
       "fields": [
         {
@@ -801,8 +740,8 @@
     {
       "id": "yd6ud4nxFT8_7G4mmJ61w",
       "name": "order",
-      "x": -814.4062543326314,
-      "y": 115.18871532466471,
+      "x": -614.244205796711,
+      "y": 109.02988306202076,
       "locked": false,
       "fields": [
         {
@@ -817,6 +756,19 @@
           "increment": true,
           "comment": "",
           "id": "S04Fn1pf63Zt2S5_JEoEm"
+        },
+        {
+          "id": "T0q2w9aQ5Hf84nq4Ut6cW",
+          "name": "tracking_number",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 255
         },
         {
           "id": "EPQY_4H26VWVNkEtH-1N2",
@@ -847,20 +799,6 @@
           "values": []
         },
         {
-          "id": "SkOhOY0Xz0aUvPzBXIATa",
-          "name": "address_id",
-          "type": "INTEGER",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": "",
-          "values": []
-        },
-        {
           "id": "AaH6b7Vv0CFEX6yLZobrC",
           "name": "status",
           "type": "ENUM",
@@ -874,45 +812,6 @@
           "values": []
         },
         {
-          "id": "Q7tYq2Ncw-8Y5xNENc37S",
-          "name": "total_price",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": "19,2"
-        },
-        {
-          "id": "ZhzmqqeQlOLV9pPIWr52r",
-          "name": "shipping_fee",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": "19,2"
-        },
-        {
-          "id": "p_26EiNTlqvwVnlbnErI3",
-          "name": "discount_amount",
-          "type": "DECIMAL",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": "19,2"
-        },
-        {
           "id": "-cLbskH1i354bERSKvDe3",
           "name": "grand_total",
           "type": "DECIMAL",
@@ -924,33 +823,6 @@
           "increment": false,
           "comment": "",
           "size": "19.2"
-        },
-        {
-          "id": "T0q2w9aQ5Hf84nq4Ut6cW",
-          "name": "tracking_number",
-          "type": "VARCHAR",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": 255
-        },
-        {
-          "id": "_pFpY7S4OsftVUp8AD2fE",
-          "name": "estimated_delivery_date",
-          "type": "DATETIME",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "comment": "",
-          "size": "",
-          "values": []
         },
         {
           "id": "eKfkXrBOurrU9u0sWRpep",
@@ -1090,6 +962,18 @@
           "values": []
         },
         {
+          "id": "OeHaJWusyHMLTgM41CjxC",
+          "name": "price",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
           "id": "kNw-f_CPa0Phtv-egqmRv",
           "name": "created_at",
           "type": "DATETIME",
@@ -1111,8 +995,8 @@
     {
       "id": "F8-48F56IgKnTQVlQTQiJ",
       "name": "role",
-      "x": -2134.2845389928907,
-      "y": -452.07500136992064,
+      "x": -1986.4725646894417,
+      "y": -424.36025618802387,
       "locked": false,
       "fields": [
         {
@@ -1217,7 +1101,7 @@
     {
       "id": "hk_1I0CowKINDz81dVFgd",
       "name": "user_role",
-      "x": -1542.4448107117837,
+      "x": -1388.474004145691,
       "y": -500.18533062344835,
       "locked": false,
       "fields": [
@@ -1284,8 +1168,8 @@
     {
       "id": "wtX93-elVzKu3cZ4QZ5nV",
       "name": "address",
-      "x": -2205.048298549806,
-      "y": 578.9905747093133,
+      "x": -2174.254137236587,
+      "y": 825.3438652150612,
       "locked": false,
       "fields": [
         {
@@ -1455,8 +1339,8 @@
     {
       "id": "4qpQ-ZyHlinak3kbQcPjx",
       "name": "user_address",
-      "x": -2089.3687511977687,
-      "y": -743.5648196849342,
+      "x": -2021.621596308688,
+      "y": -737.4059874222907,
       "locked": false,
       "fields": [
         {
@@ -1830,8 +1714,8 @@
     {
       "id": "i_4ziCvWTgtYclmQkInvL",
       "name": "user_payment",
-      "x": -1121.702308138952,
-      "y": -334.68639126983425,
+      "x": -980.0491660981468,
+      "y": -331.6069751385125,
       "locked": false,
       "fields": [
         {
@@ -1897,8 +1781,8 @@
     {
       "id": "zcxFUCELyCx7znmXQ-wxW",
       "name": "tracking_log",
-      "x": 236.25459512925937,
-      "y": -369.54960466103245,
+      "x": 297.8429177556964,
+      "y": -366.4701885297107,
       "locked": false,
       "fields": [
         {
@@ -2016,8 +1900,8 @@
     {
       "id": "tIOIzWQS20iNb7o4NdCYX",
       "name": "notification_queue",
-      "x": 486.2091903870611,
-      "y": 10.344768966554284,
+      "x": 495.44743878102656,
+      "y": 78.09192385563506,
       "locked": false,
       "fields": [
         {
@@ -2144,6 +2028,209 @@
           "id": "lMNs8g9Kfw67dnTzvTMT0",
           "name": "created_at",
           "type": "DATETIME",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a"
+    },
+    {
+      "id": "kw0DFZqDteaiTCLARUlQS",
+      "name": "product_detail",
+      "x": 1515.0393180075155,
+      "y": 1011.7651813533973,
+      "locked": false,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": false,
+          "unsigned": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": "tpnYZC8pfiu-DcTPWxGs4"
+        },
+        {
+          "id": "4tp3C1ZLugkIrFdMcPxZX",
+          "name": "product_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "TCI8SbyhYwvdeKP9VtLTO",
+          "name": "description",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 3000
+        },
+        {
+          "id": "zJm84BOqzJG2hTmsFIaIm",
+          "name": "weight",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "1rmDpep_SLnD6iM1rX8ur",
+          "name": "length",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "dXDoDMWDBOVc4QGcY-znx",
+          "name": "width",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "GKRF-oC0xM-8gjzLMcJzh",
+          "name": "height",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a"
+    },
+    {
+      "id": "TIoZx8eKJ-IuXQ03jPZ6m",
+      "name": "order_detail",
+      "x": -1065.8800587082076,
+      "y": 429.4531481317453,
+      "locked": false,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": false,
+          "unsigned": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": "kLXOgdFxF2QXXYEFWGu4j"
+        },
+        {
+          "id": "303mSFvcK4FxP0AnlO33Z",
+          "name": "order_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "SJQGSfb7WO2evZXnLNMIw",
+          "name": "address_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "moJz8gAywAqpTqQnTuTTt",
+          "name": "total_price",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "VJCts2apWHZkSfm8VU8-R",
+          "name": "shipping_fee",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "xJyQr_WidkwlrFSbwlz0T",
+          "name": "discount_amount",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "bGo0idCxQlHVSBhncEJ1D",
+          "name": "estimated_delivery_date",
+          "type": "DATE",
           "default": "",
           "check": "",
           "primary": false,
@@ -2350,17 +2437,6 @@
     },
     {
       "startTableId": "yd6ud4nxFT8_7G4mmJ61w",
-      "startFieldId": "SkOhOY0Xz0aUvPzBXIATa",
-      "endTableId": "wtX93-elVzKu3cZ4QZ5nV",
-      "endFieldId": "4lqWa2VEtLf_8RNKNFP9P",
-      "cardinality": "one_to_one",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action",
-      "name": "fk_order_address_id_address",
-      "id": "1aqdC6feQCg1M4fuXmZpL"
-    },
-    {
-      "startTableId": "yd6ud4nxFT8_7G4mmJ61w",
       "startFieldId": "HFRuoU2AlZoFut_B3eDnC",
       "endTableId": "2Upj26OG3ZVCgCzXbkKwN",
       "endFieldId": "SQBMxjbNl9yaYdJibsbfE",
@@ -2369,6 +2445,39 @@
       "deleteConstraint": "No action",
       "name": "fk_order_payment_id_payment",
       "id": "yLrH3-6wEO64I2kbsQYmG"
+    },
+    {
+      "startTableId": "8vJrNgoG1rl_t7VN1lTIb",
+      "startFieldId": "w7ARv2tydXgYYmBhhPxB_",
+      "endTableId": "kw0DFZqDteaiTCLARUlQS",
+      "endFieldId": "4tp3C1ZLugkIrFdMcPxZX",
+      "cardinality": "one_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_product_id_product_detail",
+      "id": "kNO7BJ_GFH9lMRFJaT-4O"
+    },
+    {
+      "startTableId": "yd6ud4nxFT8_7G4mmJ61w",
+      "startFieldId": "S04Fn1pf63Zt2S5_JEoEm",
+      "endTableId": "TIoZx8eKJ-IuXQ03jPZ6m",
+      "endFieldId": "303mSFvcK4FxP0AnlO33Z",
+      "cardinality": "one_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_order_id_order_detail",
+      "id": "Xll190Xq2L6mN4GpqEtfl"
+    },
+    {
+      "startTableId": "TIoZx8eKJ-IuXQ03jPZ6m",
+      "startFieldId": "SJQGSfb7WO2evZXnLNMIw",
+      "endTableId": "wtX93-elVzKu3cZ4QZ5nV",
+      "endFieldId": "4lqWa2VEtLf_8RNKNFP9P",
+      "cardinality": "one_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_order_detail_address_id_address",
+      "id": "GcVUw6Tg1GDQipNw8H8Sd"
     }
   ],
   "notes": [],

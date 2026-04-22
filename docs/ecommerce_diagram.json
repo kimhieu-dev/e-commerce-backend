@@ -476,6 +476,19 @@
           "id": "w7ARv2tydXgYYmBhhPxB_"
         },
         {
+          "id": "XWftDPK7zIb3HkltSyQLO",
+          "name": "sku",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 255
+        },
+        {
           "id": "em_73ylcRKAONYLgtc2ik",
           "name": "name",
           "type": "VARCHAR",
@@ -605,8 +618,8 @@
     {
       "id": "axNslygLG9uFGoo3kQMHf",
       "name": "inventory",
-      "x": -220.5095076603593,
-      "y": 951.8922659917846,
+      "x": -153.97233527054914,
+      "y": 949.3331439767919,
       "locked": false,
       "fields": [
         {
@@ -902,8 +915,8 @@
     {
       "id": "NwRIkqCQhFIC0MXMzyzI4",
       "name": "order_item",
-      "x": 166.7452714845815,
-      "y": 400.5520945750189,
+      "x": 28.877802442913435,
+      "y": 433.2226714373354,
       "locked": false,
       "fields": [
         {
@@ -1406,8 +1419,8 @@
     {
       "id": "iEY_K31nNCC7aHWCx_im8",
       "name": "category",
-      "x": 1144.2698713714963,
-      "y": -280.7762603190357,
+      "x": 1232.5413347758372,
+      "y": -270.5910914646886,
       "locked": false,
       "fields": [
         {
@@ -1525,8 +1538,8 @@
     {
       "id": "4FuOK5wr8dqdgvCHzHkMX",
       "name": "category_product",
-      "x": 845.4711906645833,
-      "y": 130.4573567343461,
+      "x": 906.5822037906654,
+      "y": 116.8771315952169,
       "locked": false,
       "fields": [
         {
@@ -1781,8 +1794,8 @@
     {
       "id": "zcxFUCELyCx7znmXQ-wxW",
       "name": "tracking_log",
-      "x": 297.8429177556964,
-      "y": -366.4701885297107,
+      "x": 481.1759571339431,
+      "y": -271.4086125558053,
       "locked": false,
       "fields": [
         {
@@ -1900,8 +1913,8 @@
     {
       "id": "tIOIzWQS20iNb7o4NdCYX",
       "name": "notification_queue",
-      "x": 495.44743878102656,
-      "y": 78.09192385563506,
+      "x": 481.86721364189737,
+      "y": 200.31395010779943,
       "locked": false,
       "fields": [
         {
@@ -2216,7 +2229,7 @@
           "comment": ""
         },
         {
-          "id": "xJyQr_WidkwlrFSbwlz0T",
+          "id": "h92nPFjRy7Sn8JRC9bIFQ",
           "name": "discount_amount",
           "type": "DECIMAL",
           "default": "",
@@ -2228,9 +2241,220 @@
           "comment": ""
         },
         {
+          "id": "xJyQr_WidkwlrFSbwlz0T",
+          "name": "discount_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
           "id": "bGo0idCxQlHVSBhncEJ1D",
           "name": "estimated_delivery_date",
           "type": "DATE",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "3pdLYjJBJp-OmL-qAl3gd",
+          "name": "carrier_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a"
+    },
+    {
+      "id": "HgOLOSudgJcP13aabfPPU",
+      "name": "discount",
+      "x": -1278.1336775411967,
+      "y": 948.0952765003534,
+      "locked": false,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": false,
+          "unsigned": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": "4b9IIXlTNQ7VaU-OlmUQu"
+        },
+        {
+          "id": "J4Az25CDNHoc87TxsYu_C",
+          "name": "code",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 255
+        },
+        {
+          "id": "4pWc1S2NJA9AUgdPghtMB",
+          "name": "type",
+          "type": "ENUM",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "values": []
+        },
+        {
+          "id": "80ps5RACh2UHmmbeNmmyG",
+          "name": "value",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "EQWmkgxahkfUVf0cLjIpE",
+          "name": "start_date",
+          "type": "DATE",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "6UXNcXncM9I9aCyilahej",
+          "name": "end_date",
+          "type": "DATE",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "tPgakOofLbLPk0fbon5M6",
+          "name": "usage_limit",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "BKZBW-tYccKqPcAM86Pxi",
+          "name": "used_count",
+          "type": "INTEGER",
+          "default": "0",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        }
+      ],
+      "comment": "",
+      "indices": [],
+      "color": "#175e7a"
+    },
+    {
+      "id": "EUGUp0cB7ofj3Sl0-f3ZF",
+      "name": "carrier",
+      "x": -685.4000592070668,
+      "y": 962.2390561715243,
+      "locked": false,
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": false,
+          "unsigned": true,
+          "notNull": true,
+          "increment": true,
+          "comment": "",
+          "id": "VFFaGoh6fNQEa6O788ndX"
+        },
+        {
+          "id": "eqQU_vSZMyZK3zR7_y6qH",
+          "name": "name",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": 50
+        },
+        {
+          "id": "vhwhS8_cLkJ5QIQ8dLO6q",
+          "name": "base_price",
+          "type": "DECIMAL",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "m3Z-Y0BbTQ9C1ezmA6kIj",
+          "name": "estimated_days",
+          "type": "INTEGER",
           "default": "",
           "check": "",
           "primary": false,
@@ -2478,6 +2702,28 @@
       "deleteConstraint": "No action",
       "name": "fk_order_detail_address_id_address",
       "id": "GcVUw6Tg1GDQipNw8H8Sd"
+    },
+    {
+      "startTableId": "TIoZx8eKJ-IuXQ03jPZ6m",
+      "startFieldId": "xJyQr_WidkwlrFSbwlz0T",
+      "endTableId": "HgOLOSudgJcP13aabfPPU",
+      "endFieldId": "4b9IIXlTNQ7VaU-OlmUQu",
+      "cardinality": "many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_order_detail_discount_id_discount",
+      "id": "kVV4USP9fbMxdCWHyQCH6"
+    },
+    {
+      "startTableId": "TIoZx8eKJ-IuXQ03jPZ6m",
+      "startFieldId": "3pdLYjJBJp-OmL-qAl3gd",
+      "endTableId": "EUGUp0cB7ofj3Sl0-f3ZF",
+      "endFieldId": "VFFaGoh6fNQEa6O788ndX",
+      "cardinality": "many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "name": "fk_order_detail_carrier_id_carrier",
+      "id": "aSSTEJL0jE8G5iVv0SIVg"
     }
   ],
   "notes": [],

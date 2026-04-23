@@ -1,6 +1,5 @@
 package com.nkh.ecommercebackend.entity;
 
-import com.nkh.ecommercebackend.common.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,8 +29,6 @@ public class Product extends BaseEntity implements Serializable {
     private BigDecimal basePrice;
 
     private String thumbnailUrl;
-
-    private ProductStatus status;
 
     @OneToOne(mappedBy = "product")
     private ProductDetail productDetail;

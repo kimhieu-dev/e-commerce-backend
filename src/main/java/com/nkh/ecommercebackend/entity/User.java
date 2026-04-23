@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -27,28 +27,28 @@ public class User extends BaseEntity implements Serializable {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email",nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone_number",nullable = false)
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "full_name",nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender",nullable = false)
+    @Column(name = "gender", nullable = false)
     private Gender gender;
 
-    @Column(name = "date_birth",nullable = false)
-    private Date dateBirth;
+    @Column(name = "date_birth", nullable = false)
+    private LocalDate dateBirth;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status",nullable = false)
-    private UserStatus status;
+    @Column(name = "status", nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
 
-    @Column(name = "is_verified",nullable = false)
-    private Boolean isVerified;
+    @Column(name = "is_verified", nullable = false)
+    private Boolean isVerified = false;
 
     @OneToOne(mappedBy = "user")
     private Cart cart;

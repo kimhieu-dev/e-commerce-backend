@@ -13,10 +13,10 @@ public enum ErrorCode {
     UNAUTHORIZED(1004, "You do not have permission", HttpStatus.FORBIDDEN),
 
     //VALIDATION
-    INVALID_REQUEST    (2001, "Invalid request data",    HttpStatus.BAD_REQUEST),
+    INVALID_REQUEST(2001, "Invalid request data", HttpStatus.BAD_REQUEST),
 
     //SYSTEM
-    UNCATEGORIZED_ERROR(9999, "Uncategorized error",     HttpStatus.INTERNAL_SERVER_ERROR),
+    UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     private final Integer code;
     private final String message;

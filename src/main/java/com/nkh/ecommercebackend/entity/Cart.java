@@ -10,13 +10,13 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "cart")
+//@Table(name = "cart")
 public class Cart extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    //@Column(name = "id")
     private Integer id;
 
-    @Column(name = "user_id")
+    //@Column(name = "user_id")
     private Integer userId;
 }

@@ -15,15 +15,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "product_detail")
+//@Table(name = "product_detail")
 public class ProductDetail extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
+    //@Column(name = "id")
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "product_id")
+    //@JoinColumn(name = "product_id")
     private Product product;
 
     private String description;

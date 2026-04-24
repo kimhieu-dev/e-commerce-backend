@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.mapper;
 
+import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
 import com.nkh.ecommercebackend.dto.request.UserReq;
 import com.nkh.ecommercebackend.dto.response.UserRes;
 import com.nkh.ecommercebackend.entity.User;
@@ -11,4 +12,5 @@ public interface UserMapper {
     UserRes toUserRes(User user);
     void updateUser(@MappingTarget User user, UserReq request);
     User toUser(UserReq request);
+    User toUser(RegisterUserReq request);
 }

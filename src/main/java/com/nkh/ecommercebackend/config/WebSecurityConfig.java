@@ -20,6 +20,8 @@ public class WebSecurityConfig {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers(HttpMethod.POST, "/api/v1/users")
                                 .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/")
+                                .permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
         return http.build();

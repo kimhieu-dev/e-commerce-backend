@@ -29,6 +29,8 @@ public enum ErrorCode {
     FULL_NAME_TOO_LONG(2010, "Full name is too long (maximum: 100)", HttpStatus.BAD_REQUEST),
     GENDER_NULL(2011, "Gender is null", HttpStatus.BAD_REQUEST),
     DATE_BIRTH_INVALID(2012, "Date of birth is invalid", HttpStatus.BAD_REQUEST),
+    ROLE_NULL(2013, "Role is null", HttpStatus.BAD_REQUEST),
+    ROLE_INVALID(2014, "Role is invalid", HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

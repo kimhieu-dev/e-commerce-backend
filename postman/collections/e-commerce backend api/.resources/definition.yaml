@@ -1,0 +1,6 @@
+$kind: collection
+name: 'E-Commerce Backend API'
+description: 'Local Postman collection for the implemented user endpoint.'
+variables:
+  - key: base_url
+    value: 'http://localhost:8022'

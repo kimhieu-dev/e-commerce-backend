@@ -1,0 +1,19 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/api/v1/user'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "johndoe1",
+      "password": "Password@1",
+      "email": "john@example.com",
+      "phoneNumber": "0123456789",
+      "fullName": "John Doe",
+      "gender": "MALE",
+      "dateBirth": "2000-01-01"
+    }

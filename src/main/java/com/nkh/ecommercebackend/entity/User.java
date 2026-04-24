@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -49,7 +50,7 @@ public class User extends BaseEntity implements Serializable {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;
 
-//    @OneToOne(mappedBy = "user")
-//    private Cart cart;
+    @OneToMany(mappedBy = "user")
+    private List<UserRole> userRoles;
 
 }

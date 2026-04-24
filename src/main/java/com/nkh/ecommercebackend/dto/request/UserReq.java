@@ -13,30 +13,30 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UserReq implements Serializable {
 
-    @NotBlank(message = "Username is blank")
-    @Size(min = 8, max = 12, message = "Username must be at minimum 8 and maximum 12")
+    @NotBlank(message = "USERNAME_BLANK")
+    @Size(min = 8, max = 12, message = "USERNAME_INVALID")
     private String username;
 
-    @NotBlank(message = "Your password is blank ")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
+    @NotBlank(message = "PASSWORD_BLANK")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",message = "PASSWORD_INVALID")
     //min 8 , contain uppercase, lowercase, number and special character
     private String password;
 
-    @Email(message = "Email is not valid")
-    @NotBlank(message = "Email is blank")
+    @Email(message = "EMAIL_INVALID")
+    @NotBlank(message = "EMAIL_BLANK")
     private String email;
 
-    @Pattern(regexp = "^[0-9]{10}$")
+    @Pattern(regexp = "^[0-9]{10}$",message = "PHONE_NUMBER_INVALID")
     private String phoneNumber;
 
-    @NotBlank(message = "Your full name is blank")
-    @Size(max = 100,message = "Maximum size: 100")
+    @NotBlank(message = "FULL_NAME_BLANK")
+    @Size(max = 100,message = "FULL_NAME_TOO_LONG")
     private String fullName;
 
-    @NotNull(message = "Gender is not valid")
+    @NotNull(message = "GENDER_NULL")
     private Gender gender;
 
-    @Past(message = "Please enter an valid Date of birth")
+    @Past(message = "DATE_BIRTH_INVALID")
     private LocalDate dateBirth;
 
 }

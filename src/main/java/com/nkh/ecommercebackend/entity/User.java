@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ public class User extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false, unique = true)
-    private UUID id;
+    private String id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -50,7 +49,7 @@ public class User extends BaseEntity implements Serializable {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;
 
-    @OneToOne(mappedBy = "user")
-    private Cart cart;
+//    @OneToOne(mappedBy = "user")
+//    private Cart cart;
 
 }

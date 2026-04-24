@@ -1,6 +1,5 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.config.PasswordEncoderConfig;
 import com.nkh.ecommercebackend.dto.request.UserReq;
 import com.nkh.ecommercebackend.entity.User;
 import com.nkh.ecommercebackend.exception.BusinessException;
@@ -12,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -23,9 +20,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(UserReq request) {
-        Optional<User> userOptional = userRepo.findByUsername(request.getUsername());
-        if(userOptional.isPresent()){
+        Boolean checkUsername = userRepo.existsByUsername(request.getUsername());
+        if(checkUsername){
             throw new BusinessException(ErrorCode.USER_EXISTED);
+        }
+        Boolean checkEmail = userRepo.existsByEmail(request.getEmail());
+        if(checkEmail){
+            throw new BusinessException(ErrorCode.EMAIL_EXISTED);
+        }
+        Boolean checkPhoneNumber = userRepo.existsByPhoneNumber(request.getPhoneNumber());
+        if(checkPhoneNumber){
+            throw new BusinessException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));

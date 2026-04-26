@@ -31,6 +31,11 @@ public enum ErrorCode {
     DATE_BIRTH_INVALID(2012, "Date of birth is invalid", HttpStatus.BAD_REQUEST),
     ROLE_NULL(2013, "Role is null", HttpStatus.BAD_REQUEST),
     ROLE_INVALID(2014, "Role is invalid", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_FOUND(2015, "Role not found", HttpStatus.NOT_FOUND),
+    ROLE_EXISTED(2016, "Role already existed", HttpStatus.CONFLICT),
+    ROLE_NAME_BLANK(2017, "Role name is blank", HttpStatus.BAD_REQUEST),
+    //CART
+    USER_ID_NULL(2018, "User id is null", HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

@@ -10,20 +10,20 @@ import lombok.Setter;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T> {
+public class BaseResponse<T> {
     private int code;
     private String message;
     private T data;
 
-    public static <T> ApiResponse<T> error(ErrorCode errorCode) {
-        return ApiResponse.<T>builder()
+    public static <T> BaseResponse<T> error(ErrorCode errorCode) {
+        return BaseResponse.<T>builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
+    public static <T> BaseResponse<T> success(T data) {
+        return BaseResponse.<T>builder()
                 .code(200)
                 .message("Success")
                 .data(data)

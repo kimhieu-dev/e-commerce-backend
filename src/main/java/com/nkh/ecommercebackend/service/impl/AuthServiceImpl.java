@@ -1,7 +1,6 @@
 package com.nkh.ecommercebackend.service.impl;
 
 import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
-import com.nkh.ecommercebackend.entity.User;
 import com.nkh.ecommercebackend.service.AuthService;
 import com.nkh.ecommercebackend.service.UserRoleService;
 import com.nkh.ecommercebackend.service.UserService;
@@ -16,6 +15,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void registerUser(RegisterUserReq userReq) {
-        userRoleService.assignRoleToUser(userReq);
+        userRoleService.createUser(userReq);
     }
 }

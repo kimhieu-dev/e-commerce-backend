@@ -36,7 +36,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public void assignRoleToUser(RegisterUserReq request) {
+    public void createUser(RegisterUserReq request) {
 
         Boolean checkUsername = userRepo.existsByUsername(request.getUsername());
         if (checkUsername) {
@@ -58,21 +58,14 @@ public class UserRoleServiceImpl implements UserRoleService {
         cart.setUser(user);
         cartRepo.save(cart);
 
-        List<Role> roles = roleRepo.findAllById(request.getRoleIds());
-        if (roles.isEmpty()) {
-            throw new BusinessException(ErrorCode.ROLE_INVALID);
+        Optional<Role> roleOptional = roleRepo.findByName("USER");
+        if(roleOptional.isEmpty()){
+            throw new BusinessException(ErrorCode.ROLE_NOT_FOUND);
         }
-        List<UserRole> currentUserRoles = userRoleRepo.findAllByUser(user);
-        Set<String> existingRoleIds = currentUserRoles.stream().map(ug -> ug.getRole().getId()).collect(Collectors.toSet());
-        Set<String> requestRoleIds = new HashSet<>(request.getRoleIds());
-        List<UserRole> toDelete = currentUserRoles.stream().filter(ug -> !requestRoleIds.contains(ug.getRole().getId())).collect(Collectors.toList());
-        userRoleRepo.deleteAll(toDelete);
-        List<UserRole> toAdd = roles.stream().filter(role -> !existingRoleIds.contains(role.getId())).map(role -> {
-            UserRole ug = new UserRole();
-            ug.setUser(user);
-            ug.setRole(role);
-            return ug;
-        }).collect(Collectors.toList());
-        userRoleRepo.saveAll(toAdd);
+
+        UserRole userRole = new UserRole();
+        userRole.setUser(user);
+        userRole.setRole(roleOptional.get());
+        userRoleRepo.save(userRole);
     }
 }

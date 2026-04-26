@@ -42,6 +42,6 @@ public class RegisterUserReq implements Serializable {
     @Past(message = "DATE_BIRTH_INVALID")
     private LocalDate dateBirth;
 
-    @NotNull(message = "ROLE_NULL")
-    private List<String> roleIds;
+//    @NotNull(message = "ROLE_NULL")
+//    private String roleId;
 }

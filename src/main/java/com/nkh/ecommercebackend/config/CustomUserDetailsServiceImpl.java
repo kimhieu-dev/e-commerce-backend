@@ -1,6 +1,7 @@
 package com.nkh.ecommercebackend.config;
 
 import com.nkh.ecommercebackend.repository.UserRepo;
+import com.nkh.ecommercebackend.repository.UserRoleRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomUserDetailsServiceImpl implements UserDetailsService {
     private final UserRepo userRepo;
+    private final UserRoleRepo userRoleRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

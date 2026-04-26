@@ -18,9 +18,9 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(HttpMethod.POST, "/api/v1/users")
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/**")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/")
+                                .requestMatchers(HttpMethod.POST, "/api/v1/roles")
                                 .permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());

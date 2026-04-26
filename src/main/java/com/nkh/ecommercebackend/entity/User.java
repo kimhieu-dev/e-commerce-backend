@@ -53,6 +53,6 @@ public class User extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "user")
     private List<UserRole> userRoles;
 
-    @OneToOne(mappedBy = "cart")
+    @OneToOne(mappedBy = "user")
     private Cart cart;
 }

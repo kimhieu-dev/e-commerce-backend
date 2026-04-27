@@ -2,6 +2,8 @@ create database ecommerce;
 
 use ecommerce;
 
+drop database ecommerce;
+
 create table user
 (
     id              varchar(36) primary key,
@@ -51,6 +53,8 @@ create table cart
 (
     id         varchar(36) primary key,
     user_id    varchar(36) not null unique,
+    total_price decimal(19,2) not null ,
+    status enum('ACTIVE','CONVERTED') default 'ACTIVE',
     created_at datetime default current_timestamp,
     updated_at datetime default current_timestamp on update current_timestamp,
     created_by varchar(32),
@@ -65,6 +69,7 @@ create table cart_item
     cart_id    varchar(36) not null,
     product_id varchar(36) not null,
     quantity   integer     not null,
+    unit_price decimal(19,2) not null ,
     created_at datetime default current_timestamp,
     updated_at datetime default current_timestamp on update current_timestamp,
     created_by varchar(32),

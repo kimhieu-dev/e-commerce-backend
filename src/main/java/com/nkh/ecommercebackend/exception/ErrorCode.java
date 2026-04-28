@@ -1,7 +1,6 @@
 package com.nkh.ecommercebackend.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -36,6 +35,10 @@ public enum ErrorCode {
     ROLE_NAME_BLANK(2017, "Role name is blank", HttpStatus.BAD_REQUEST),
     //CART
     USER_ID_NULL(2018, "User id is null", HttpStatus.BAD_REQUEST),
+    USER_ID_NOT_FOUND(2019, "User id not found", HttpStatus.NOT_FOUND),
+    CART_NOT_FOUND(2020, "Cart not found", HttpStatus.NOT_FOUND),
+    USER_DOES_NOT_HAVE_CART(2021, "User does not have a cart", HttpStatus.BAD_REQUEST),
+    PRODUCT_NOT_FOUND(2022, "Product not found", HttpStatus.NOT_FOUND),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

@@ -7,23 +7,31 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Table(name = "cart_item")
+@Table(name = "cart_item")
 public class CartItem extends BaseEntity implements Serializable {
     @Id
-    @GeneratedValue
-    //@Column(name = "id")
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    private String id;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
 
-    private Integer cartId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-    private Integer productId;
-
+    @Column(name = "quantity",nullable = false)
     private Integer quantity;
+
+    @Column(name = "unit_price",nullable = false)
+    private BigDecimal unitPrice;
 }

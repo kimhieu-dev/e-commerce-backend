@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,15 +25,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserReq request) {
         Boolean checkUsername = userRepo.existsByUsername(request.getUsername());
-        if(checkUsername){
+        if (checkUsername) {
             throw new BusinessException(ErrorCode.USER_EXISTED);
         }
         Boolean checkEmail = userRepo.existsByEmail(request.getEmail());
-        if(checkEmail){
+        if (checkEmail) {
             throw new BusinessException(ErrorCode.EMAIL_EXISTED);
         }
         Boolean checkPhoneNumber = userRepo.existsByPhoneNumber(request.getPhoneNumber());
-        if(checkPhoneNumber){
+        if (checkPhoneNumber) {
             throw new BusinessException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
         User user = userMapper.toUser(request);
@@ -39,5 +41,14 @@ public class UserServiceImpl implements UserService {
         userRepo.save(user);
         log.info("User created successfully");
         return user;
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        Optional<User> userOptional = userRepo.findByUsername(username);
+        if (userOptional.isEmpty()){
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+        return userOptional.get();
     }
 }

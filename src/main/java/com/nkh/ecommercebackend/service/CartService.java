@@ -1,8 +1,10 @@
 package com.nkh.ecommercebackend.service;
 
-import com.nkh.ecommercebackend.entity.Cart;
-import com.nkh.ecommercebackend.entity.User;
+import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
+import com.nkh.ecommercebackend.dto.response.CartSummaryRes;
 
 public interface CartService {
-    Cart getCart(String userId);
+    CartSummaryRes getCartSummary(String userId);
+
+    void addItem(String userId, AddItemToCartReq request);
 }

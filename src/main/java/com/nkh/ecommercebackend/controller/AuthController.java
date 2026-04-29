@@ -1,12 +1,10 @@
 package com.nkh.ecommercebackend.controller;
 
+import com.nkh.ecommercebackend.dto.request.LoginReq;
 import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
-import com.nkh.ecommercebackend.dto.request.UserReq;
-import com.nkh.ecommercebackend.dto.response.UserRes;
-import com.nkh.ecommercebackend.entity.User;
-import com.nkh.ecommercebackend.mapper.UserMapper;
+import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.service.AuthService;
-import com.nkh.ecommercebackend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,4 +27,11 @@ public class AuthController {
         return ResponseEntity.ok("Register Successfully");
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<BaseResponse<LoginRes>> login(@RequestBody @Valid LoginReq request){
+        Boolean authenticated = authService.login(request);
+        LoginRes loginRes = new LoginRes();
+        loginRes.setAuthenticated(authenticated);
+        return ResponseEntity.ok(BaseResponse.success(loginRes));
+    }
 }

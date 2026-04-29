@@ -1,6 +1,5 @@
 package com.nkh.ecommercebackend.dto.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartReq implements Serializable {
-    @NotNull(message = "USER_ID_NULL")
-    private String userId;
-
+public class LoginReq implements Serializable {
+    private String username;
+    private String password;
 }

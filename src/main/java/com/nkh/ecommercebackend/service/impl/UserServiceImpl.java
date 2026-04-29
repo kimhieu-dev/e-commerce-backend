@@ -51,4 +51,9 @@ public class UserServiceImpl implements UserService {
         }
         return userOptional.get();
     }
+
+    @Override
+    public Boolean checkIfUsernameExists(String username) {
+        return userRepo.existsByUsername(username);
+    }
 }

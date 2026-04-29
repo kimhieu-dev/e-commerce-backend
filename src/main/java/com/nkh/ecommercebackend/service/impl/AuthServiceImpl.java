@@ -21,6 +21,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Boolean login(LoginReq request) {
-        return false;
+        Boolean result = userService.checkIfUsernameExists(request.getUsername());
+        return result;
     }
 }

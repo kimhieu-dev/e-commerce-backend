@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
     protected String SIGNER_KEY;
 
     @Override
-    public void registerUser(RegisterUserReq userReq) {
+    public void register(RegisterUserReq userReq) {
         userRoleService.createUser(userReq);
     }
 

@@ -4,7 +4,6 @@ import com.nkh.ecommercebackend.dto.request.LoginReq;
 import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
-import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +21,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public BaseResponse<?> registerUser(@RequestBody @Valid RegisterUserReq request){
-        authService.registerUser(request);
+    public BaseResponse<?> register(@RequestBody @Valid RegisterUserReq request){
+        authService.register(request);
         return BaseResponse.success("Register Successfully");
     }
 

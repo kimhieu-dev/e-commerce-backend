@@ -2,9 +2,13 @@ package com.nkh.ecommercebackend.service.impl;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.nkh.ecommercebackend.dto.request.IntrospectReq;
 import com.nkh.ecommercebackend.dto.request.LoginReq;
 import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
+import com.nkh.ecommercebackend.dto.response.IntrospectRes;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.entity.User;
 import com.nkh.ecommercebackend.exception.BusinessException;
@@ -18,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -29,7 +34,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserRoleService userRoleService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-
     @Value("${jwt.secret}")
     protected String SIGNER_KEY;
 
@@ -57,6 +61,25 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    @Override
+    public IntrospectRes introspect(IntrospectReq request) {
+        String token = request.getToken();
+        Boolean verified = Boolean.TRUE;
+        Date expiredDay = Date.from(Instant.EPOCH);
+        try {
+            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            verified = signedJWT.verify(verifier);
+            expiredDay = signedJWT.getJWTClaimsSet().getExpirationTime();
+        } catch (JOSEException | ParseException e) {
+            log.error(e.getMessage());
+            verified = Boolean.FALSE;
+        }
+        return IntrospectRes.builder()
+                .valid(verified && expiredDay.after(new Date()))
+                .build();
+    }
+
     private String generateToken(String username) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
@@ -64,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
                 .issuer("kimhieu-dev.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000))
-                .claim("customClaim", "Claim")
+                .claim("custom", "Custom")
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 

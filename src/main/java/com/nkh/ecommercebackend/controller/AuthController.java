@@ -1,8 +1,10 @@
 package com.nkh.ecommercebackend.controller;
 
+import com.nkh.ecommercebackend.dto.request.IntrospectReq;
 import com.nkh.ecommercebackend.dto.request.LoginReq;
 import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.response.IntrospectRes;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.service.AuthService;
 import jakarta.validation.Valid;
@@ -28,16 +30,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public BaseResponse<LoginRes> login(@RequestBody @Valid LoginReq request){
-        LoginRes response = authService.login(request);
-        return BaseResponse.success(response);
+        return BaseResponse.success(authService.login(request));
     }
 
-//    @PostMapping("/introspect")
-//    ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest introspectRequest) {
-//        return ApiResponse.<IntrospectResponse>builder()
-//                .result(authenticationService.introspect(introspectRequest))
-//                .build();
-//    }
+    @PostMapping("/introspect")
+    BaseResponse<IntrospectRes> introspect(@RequestBody @Valid IntrospectReq request) {
+        return BaseResponse.success(authService.introspect(request));
+    }
 //
 //    @PostMapping("/logout")
 //    ApiResponse<Void> logout(@RequestBody @Valid LogoutRequest logoutRequest) {

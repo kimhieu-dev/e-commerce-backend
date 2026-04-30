@@ -8,13 +8,11 @@ import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tools.jackson.databind.json.JsonMapper;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -22,23 +20,32 @@ import tools.jackson.databind.json.JsonMapper;
 @Validated
 public class AuthController {
     private final AuthService authService;
-    private final JsonMapper.Builder builder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterUserReq request){
+    public BaseResponse<?> registerUser(@RequestBody @Valid RegisterUserReq request){
         authService.registerUser(request);
-        return ResponseEntity.ok("Register Successfully");
+        return BaseResponse.success("Register Successfully");
     }
 
     @PostMapping("/login")
     public BaseResponse<LoginRes> login(@RequestBody @Valid LoginReq request){
-        Boolean authenticated = authService.login(request);
-        LoginRes loginRes = new LoginRes();
-        loginRes.setAuthenticated(authenticated);
-        if(authenticated){
-            return BaseResponse.success(loginRes);
-        }else {
-            return BaseResponse.error(ErrorCode.UNAUTHENTICATED);
-        }
+        LoginRes response = authService.login(request);
+        return BaseResponse.success(response);
     }
+
+//    @PostMapping("/introspect")
+//    ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest introspectRequest) {
+//        return ApiResponse.<IntrospectResponse>builder()
+//                .result(authenticationService.introspect(introspectRequest))
+//                .build();
+//    }
+//
+//    @PostMapping("/logout")
+//    ApiResponse<Void> logout(@RequestBody @Valid LogoutRequest logoutRequest) {
+//        authenticationService.logout(logoutRequest);
+//        return ApiResponse.<Void>builder()
+//                .message("Logout successful")
+//                .build();
+//    }
+
 }

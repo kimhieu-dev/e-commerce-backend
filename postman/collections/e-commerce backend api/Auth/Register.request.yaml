@@ -1,0 +1,26 @@
+$kind: http-request
+name: Register
+url: "{{base_url}}/api/v1/auth/register"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"username\": \"toitenlatao\",\r
+
+    \  \"password\": \"Toitenlatao123@\",\r
+
+    \  \"email\": \"Toi123@example.com\",\r
+
+    \  \"phoneNumber\": \"0859302231\",\r
+
+    \  \"fullName\": \"Hi tao\",\r
+
+    \  \"gender\": \"MALE\",\r
+
+    \  \"dateBirth\": \"2003-08-01\"\r
+
+    }"
+auth:
+  type: noauth
+order: 1777059172038

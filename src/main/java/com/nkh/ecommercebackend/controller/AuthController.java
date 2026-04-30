@@ -1,15 +1,14 @@
 package com.nkh.ecommercebackend.controller;
 
+import com.nkh.ecommercebackend.dto.request.IntrospectReq;
+import com.nkh.ecommercebackend.dto.request.LoginReq;
 import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
-import com.nkh.ecommercebackend.dto.request.UserReq;
-import com.nkh.ecommercebackend.dto.response.UserRes;
-import com.nkh.ecommercebackend.entity.User;
-import com.nkh.ecommercebackend.mapper.UserMapper;
+import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.response.IntrospectRes;
+import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.service.AuthService;
-import com.nkh.ecommercebackend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,9 +23,27 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterUserReq request){
-        authService.registerUser(request);
-        return ResponseEntity.ok("Register Successfully");
+    public BaseResponse<?> register(@RequestBody @Valid RegisterUserReq request){
+        authService.register(request);
+        return BaseResponse.success("Register Successfully");
     }
+
+    @PostMapping("/login")
+    public BaseResponse<LoginRes> login(@RequestBody @Valid LoginReq request){
+        return BaseResponse.success(authService.login(request));
+    }
+
+    @PostMapping("/introspect")
+    BaseResponse<IntrospectRes> introspect(@RequestBody @Valid IntrospectReq request) {
+        return BaseResponse.success(authService.introspect(request));
+    }
+//
+//    @PostMapping("/logout")
+//    ApiResponse<Void> logout(@RequestBody @Valid LogoutRequest logoutRequest) {
+//        authenticationService.logout(logoutRequest);
+//        return ApiResponse.<Void>builder()
+//                .message("Logout successful")
+//                .build();
+//    }
 
 }

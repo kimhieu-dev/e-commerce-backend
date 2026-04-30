@@ -24,10 +24,6 @@ public class JpaConfig {
             }
             return Optional.of(authentication.getName());
         };
-
-        //Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-        //.map(Authentication::getName);
-        //get username login
     }
 
 }

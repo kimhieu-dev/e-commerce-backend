@@ -1,0 +1,10 @@
+$kind: http-request
+name: Introspect
+url: "{{base_url}}/api/v1/auth/introspect"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJ2dWF0cm9jaG9pIiwiZXhwIjoxNzc3NTYzNDE5LCJjdXN0b21DbGFpbSI6IkNsYWltIiwiaWF0IjoxNzc3NTU5ODE5fQ.7O6etpb7F3tKQwsZiF-RCAlpqGvct5stbYYT_QulFC0\""
+order: 2468875295306449

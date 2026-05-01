@@ -6,12 +6,11 @@ body:
   type: json
   content: "{\r
 
-    \    \"username\": \"vuatrochoi\",\r
+    \    \"username\": \"admin\",\r
 
-    \    \"password\": \"vuatrochoi\"\r
+    \    \"password\": \"admin123\"\r
 
     }"
 auth:
-  credentials: []
-  type: bearer
+  type: noauth
 order: 1009442108400231

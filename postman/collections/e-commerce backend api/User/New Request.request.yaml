@@ -1,0 +1,5 @@
+$kind: http-request
+name: New Request
+url: "{{base_url}}/api/v1/users"
+method: GET
+order: 289662887265191

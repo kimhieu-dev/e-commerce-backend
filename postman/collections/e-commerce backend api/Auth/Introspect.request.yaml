@@ -6,5 +6,7 @@ body:
   type: json
   content: "{\r
 
-    \    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJ2dWF0cm9jaG9pIiwiZXhwIjoxNzc3NTYzNDE5LCJjdXN0b21DbGFpbSI6IkNsYWltIiwiaWF0IjoxNzc3NTU5ODE5fQ.7O6etpb7F3tKQwsZiF-RCAlpqGvct5stbYYT_QulFC0\""
+    \    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJ0b2l0ZW5sYXRhbyIsImV4cCI6MTc3NzU3NDgxOCwiaWF0IjoxNzc3NTcxMjE4LCJjdXN0b20iOiJDdXN0b20ifQ.hZOi7M3T790pvjyhTvMmvh85KJR-BIDA3sWodwmmAI\"\r
+
+    }"
 order: 2468875295306449

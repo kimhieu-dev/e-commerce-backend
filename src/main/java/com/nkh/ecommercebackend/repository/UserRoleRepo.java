@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface UserRoleRepo extends JpaRepository<UserRole,String> {
     List<UserRole> findAllByUser(User user);
+
+    UserRole findByUser(User user);
 }

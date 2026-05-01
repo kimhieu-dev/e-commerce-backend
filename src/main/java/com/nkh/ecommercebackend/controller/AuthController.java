@@ -1,8 +1,6 @@
 package com.nkh.ecommercebackend.controller;
 
-import com.nkh.ecommercebackend.dto.request.IntrospectReq;
-import com.nkh.ecommercebackend.dto.request.LoginReq;
-import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
+import com.nkh.ecommercebackend.dto.request.*;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.IntrospectRes;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
@@ -23,7 +21,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public BaseResponse<?> register(@RequestBody @Valid RegisterUserReq request){
+    public BaseResponse<?> register(@RequestBody @Valid RegisterReq request){
         authService.register(request);
         return BaseResponse.success("Register Successfully");
     }
@@ -37,13 +35,17 @@ public class AuthController {
     BaseResponse<IntrospectRes> introspect(@RequestBody @Valid IntrospectReq request) {
         return BaseResponse.success(authService.introspect(request));
     }
-//
-//    @PostMapping("/logout")
-//    ApiResponse<Void> logout(@RequestBody @Valid LogoutRequest logoutRequest) {
-//        authenticationService.logout(logoutRequest);
-//        return ApiResponse.<Void>builder()
-//                .message("Logout successful")
-//                .build();
-//    }
+
+    @PostMapping("/logout")
+    BaseResponse<?> logout(@RequestBody @Valid LogoutReq request) {
+        //authService.logout(request);
+        return BaseResponse.success("Logout successfully");
+    }
+
+    @PostMapping("/refresh-token")
+    BaseResponse<?> logout(@RequestBody @Valid RefreshTokenReq request) {
+        //authService.logout(request);
+        return BaseResponse.success("Logout successfully");
+    }
 
 }

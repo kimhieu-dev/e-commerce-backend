@@ -1,17 +1,25 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.dto.request.UserReq;
+import com.nkh.ecommercebackend.dto.request.CreateUserReq;
+import com.nkh.ecommercebackend.dto.request.UserFilterReq;
 import com.nkh.ecommercebackend.entity.User;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.UserMapper;
 import com.nkh.ecommercebackend.repository.UserRepo;
 import com.nkh.ecommercebackend.service.UserService;
+import com.nkh.ecommercebackend.service.spec.UserSpec;
+import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User createUser(UserReq request) {
+    public User createUser(CreateUserReq request) {
         Boolean checkUsername = userRepo.existsByUsername(request.getUsername());
         if (checkUsername) {
             throw new BusinessException(ErrorCode.USER_EXISTED);
@@ -46,7 +54,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
         Optional<User> userOptional = userRepo.findByUsername(username);
-        if (userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
         return userOptional.get();
@@ -55,5 +63,42 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> checkIfUsernameExists(String username) {
         return userRepo.findByUsername(username);
+    }
+
+    @Override
+    public List<User> getUsers(UserFilterReq request, Pageable pageable) {
+        Specification<User> specification = (root, query, cb) -> cb.conjunction();
+        if (request.getUsername() != null && !request.getUsername().isEmpty()) {
+            specification = specification.and(UserSpec.likeUsername(request.getUsername()));
+        }
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            specification = specification.and(UserSpec.likeEmail(request.getEmail()));
+        }
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isEmpty()) {
+            specification = specification.and(UserSpec.equalPhoneNumber(request.getPhoneNumber()));
+        }
+        if (request.getFullName() != null && !request.getFullName().isEmpty()) {
+            specification = specification.and(UserSpec.likeFullName(request.getFullName()));
+        }
+        if (request.getGender() != null) {
+            specification = specification.and(UserSpec.equalGender(request.getGender()));
+        }
+        if (request.getDateBirthFrom() != null) {
+            specification = specification.and(UserSpec.equalDateBirthFrom(request.getDateBirthFrom()));
+        }
+        if (request.getDateBirthTo() != null) {
+            specification = specification.and(UserSpec.equalDateBirthTo(request.getDateBirthTo()));
+        }
+        if (request.getStatus() != null) {
+            specification = specification.and(UserSpec.equalStatus(request.getStatus()));
+        }
+        if (request.getRole() != null) {
+            specification = specification.and(UserSpec.equalRole(request.getRole()));
+        }
+        if (pageable == null) {
+            pageable = Pageable.unpaged();
+        }
+        Page<User> users = userRepo.findAll(specification, pageable);
+        return users.getContent();
     }
 }

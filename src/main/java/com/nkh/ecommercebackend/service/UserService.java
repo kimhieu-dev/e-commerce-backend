@@ -2,6 +2,7 @@ package com.nkh.ecommercebackend.service;
 
 import com.nkh.ecommercebackend.dto.request.CreateUserReq;
 import com.nkh.ecommercebackend.dto.request.UserFilterReq;
+import com.nkh.ecommercebackend.dto.response.UserRes;
 import com.nkh.ecommercebackend.entity.User;
 import org.springframework.data.domain.Pageable;
 
@@ -12,5 +13,5 @@ public interface UserService {
     User createUser(CreateUserReq request);
     User getUserByUsername(String username);
     Optional<User> checkIfUsernameExists(String username);
-    List<User> getUsers(UserFilterReq request, Pageable pageable);
+    List<UserRes> getUsers(UserFilterReq request, Pageable pageable);
 }

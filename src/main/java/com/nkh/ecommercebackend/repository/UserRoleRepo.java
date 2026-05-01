@@ -5,9 +5,9 @@ import com.nkh.ecommercebackend.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserRoleRepo extends JpaRepository<UserRole,String> {
     List<UserRole> findAllByUser(User user);
 
-    UserRole findByUser(User user);
 }

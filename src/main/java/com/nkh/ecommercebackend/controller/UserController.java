@@ -39,8 +39,7 @@ public class UserController {
 
     @GetMapping
     public BaseResponse<List<UserRes>> getUsers(UserFilterReq request, Pageable pageable){
-        List<User> users = userService.getUsers(request,pageable);
-        List<UserRes> response = userMapper.toListUserRes(users);
+        List<UserRes> response = userService.getUsers(request,pageable);
         return BaseResponse.success(response);
     }
 }

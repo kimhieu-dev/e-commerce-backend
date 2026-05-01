@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -32,11 +33,11 @@ public class UserRes implements Serializable {
 
     private Gender gender;
 
-    private Date dateBirth;
+    private LocalDate dateBirth;
 
     private UserStatus status;
 
     private Boolean isVerified;
 
-//    private Set<Role> roles;
+    //private List<Role> roles;
 }

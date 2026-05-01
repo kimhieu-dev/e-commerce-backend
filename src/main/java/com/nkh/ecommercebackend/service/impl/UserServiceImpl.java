@@ -2,11 +2,16 @@ package com.nkh.ecommercebackend.service.impl;
 
 import com.nkh.ecommercebackend.dto.request.CreateUserReq;
 import com.nkh.ecommercebackend.dto.request.UserFilterReq;
+import com.nkh.ecommercebackend.dto.response.UserRes;
+import com.nkh.ecommercebackend.entity.Role;
 import com.nkh.ecommercebackend.entity.User;
+import com.nkh.ecommercebackend.entity.UserRole;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.UserMapper;
 import com.nkh.ecommercebackend.repository.UserRepo;
+import com.nkh.ecommercebackend.repository.UserRoleRepo;
+import com.nkh.ecommercebackend.service.RoleService;
 import com.nkh.ecommercebackend.service.UserService;
 import com.nkh.ecommercebackend.service.spec.UserSpec;
 import jakarta.persistence.criteria.JoinType;
@@ -19,13 +24,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
+    private final RoleService roleService;
     private final UserRepo userRepo;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -66,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsers(UserFilterReq request, Pageable pageable) {
+    public List<UserRes> getUsers(UserFilterReq request, Pageable pageable) {
         Specification<User> specification = (root, query, cb) -> cb.conjunction();
         if (request.getUsername() != null && !request.getUsername().isEmpty()) {
             specification = specification.and(UserSpec.likeUsername(request.getUsername()));
@@ -99,6 +104,21 @@ public class UserServiceImpl implements UserService {
             pageable = Pageable.unpaged();
         }
         Page<User> users = userRepo.findAll(specification, pageable);
-        return users.getContent();
+        List<User> userList = users.getContent();
+        List<UserRes> userResList = new ArrayList<>();
+        for (User user : userList) {
+            UserRes userRes = new UserRes();
+            userRes.setUsername(user.getUsername());
+            userRes.setPassword(user.getPassword());
+            userRes.setEmail(user.getEmail());
+            userRes.setPhoneNumber(user.getPhoneNumber());
+            userRes.setFullName(user.getFullName());
+            userRes.setGender(user.getGender());
+            userRes.setStatus(user.getStatus());
+            userRes.setDateBirth(user.getDateBirth());
+            userRes.setIsVerified(user.getIsVerified());
+            userResList.add(userRes);
+        }
+        return userResList;
     }
 }

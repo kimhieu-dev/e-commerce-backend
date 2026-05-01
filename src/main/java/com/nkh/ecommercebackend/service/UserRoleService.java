@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface UserRoleService {
     void createUser(RegisterReq request);
-    List<UserRole> getRoles(List<User> users);
+    List<UserRole> getRoles(User users);
 }

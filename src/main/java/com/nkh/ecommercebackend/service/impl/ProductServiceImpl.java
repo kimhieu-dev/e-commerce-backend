@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.service.impl;
 
+import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
@@ -89,6 +90,13 @@ public class ProductServiceImpl implements ProductService {
         inventory.setProduct(product);
         inventory.setQuantityInStock(request.getQuantityInStock());
         inventory.setReservedQuantity(request.getReservedQuantity());
+        if (request.getQuantityInStock() == 0) {
+            inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
+        } else if (request.getQuantityInStock() <= 10) {
+            inventory.setStatus(InventoryStatus.LIMITED_STOCK);
+        } else {
+            inventory.setStatus(InventoryStatus.IN_STOCK);
+        }
         inventoryRepo.save(inventory);
 
         InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);

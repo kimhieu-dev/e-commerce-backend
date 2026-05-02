@@ -56,6 +56,9 @@ public enum ErrorCode {
     QUANTITY_IN_STOCK_NULL(2036, "Quantity in stock is null", HttpStatus.BAD_REQUEST),
     RESERVED_QUANTITY_NULL(2037, "Reserved quantity is null", HttpStatus.BAD_REQUEST),
     SKU_EXISTED(2038, "SKU is already existed", HttpStatus.CONFLICT),
+    PRODUCT_DO_NOT_HAVE_INVENTORY(2039, "Product does not have a inventory", HttpStatus.BAD_REQUEST),
+    PRODUCT_OUT_OF_STOCK(2040, "Product out of stock", HttpStatus.BAD_REQUEST),
+    PRODUCT_OUT_OF_RANGE(2041, "Product out of range", HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

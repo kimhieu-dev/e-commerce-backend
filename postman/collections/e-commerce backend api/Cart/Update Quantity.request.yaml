@@ -1,0 +1,13 @@
+$kind: http-request
+name: Update Quantity
+url: "{{base_url}}/api/v1/cart/items/1eb1bd9f-285f-4344-87e7-814fab31bbd6"
+method: PATCH
+body:
+  type: json
+  content: "{\r\n    \"quantity\": 2\r\n}"
+auth:
+  type: basic
+  credentials:
+    username: sieunhan11
+    password: sieunhan11
+order: 3709109728863196

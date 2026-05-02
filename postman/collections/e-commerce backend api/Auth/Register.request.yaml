@@ -6,19 +6,19 @@ body:
   type: json
   content: "{\r
 
-    \  \"username\": \"toitenlatao\",\r
+    \    \"username\": \"sieunhan11\",\r
 
-    \  \"password\": \"Toitenlatao123@\",\r
+    \    \"password\": \"sieunhan11\",\r
 
-    \  \"email\": \"Toi123@example.com\",\r
+    \    \"email\": \"sieunhan11@example.com\",\r
 
-    \  \"phoneNumber\": \"0859302231\",\r
+    \    \"phoneNumber\": \"0867845343\",\r
 
-    \  \"fullName\": \"Hi tao\",\r
+    \    \"fullName\": \"Sieu nhan\",\r
 
-    \  \"gender\": \"MALE\",\r
+    \    \"gender\": \"MALE\",\r
 
-    \  \"dateBirth\": \"2003-08-01\"\r
+    \    \"dateBirth\": \"2003-10-01\"\r
 
     }"
 auth:

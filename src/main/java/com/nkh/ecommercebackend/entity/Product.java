@@ -35,6 +35,7 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ProductStatus status;
 

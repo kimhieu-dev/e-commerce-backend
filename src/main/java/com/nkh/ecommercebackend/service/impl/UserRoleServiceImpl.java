@@ -1,6 +1,6 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
+import com.nkh.ecommercebackend.dto.request.RegisterReq;
 import com.nkh.ecommercebackend.entity.Cart;
 import com.nkh.ecommercebackend.entity.Role;
 import com.nkh.ecommercebackend.entity.User;
@@ -18,11 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public void createUser(RegisterUserReq request) {
+    public void createUser(RegisterReq request) {
 
         Boolean checkUsername = userRepo.existsByUsername(request.getUsername());
         if (checkUsername) {
@@ -58,14 +57,18 @@ public class UserRoleServiceImpl implements UserRoleService {
         cart.setUser(user);
         cartRepo.save(cart);
 
-        Optional<Role> roleOptional = roleRepo.findByName("USER");
-        if(roleOptional.isEmpty()){
+        Optional<Role> roleOptional = roleRepo.findByName(com.nkh.ecommercebackend.common.Role.USER.name());
+        if (roleOptional.isEmpty()) {
             throw new BusinessException(ErrorCode.ROLE_NOT_FOUND);
         }
-
         UserRole userRole = new UserRole();
         userRole.setUser(user);
         userRole.setRole(roleOptional.get());
         userRoleRepo.save(userRole);
+    }
+
+    @Override
+    public List<UserRole> getRoles(User user) {
+        return userRoleRepo.findAllByUser(user);
     }
 }

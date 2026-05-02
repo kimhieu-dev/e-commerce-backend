@@ -50,9 +50,9 @@ public class User extends BaseEntity implements Serializable {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private List<UserRole> userRoles;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",fetch = FetchType.EAGER)
     private Cart cart;
 }

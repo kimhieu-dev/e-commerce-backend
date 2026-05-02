@@ -1,6 +1,9 @@
 package com.nkh.ecommercebackend.repository;
 
 import com.nkh.ecommercebackend.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,4 +26,8 @@ public interface UserRepo extends JpaRepository<User,Integer> {
                 WHERE u.username = :username
             """)
     Optional<User> findByUsernameWithRoles(String username);
+
+    Page<User> findAll(Specification<User> specification, Pageable pageable);
+
+    User findByUsernameAndDeletedFalse(String username, Boolean deleted);
 }

@@ -3,6 +3,7 @@ package com.nkh.ecommercebackend.security;
 import com.nkh.ecommercebackend.repository.UserRepo;
 import com.nkh.ecommercebackend.repository.UserRoleRepo;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,7 +21,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
     private final UserRoleRepo userRoleRepo;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public @NullMarked UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<com.nkh.ecommercebackend.entity.User> userOptional = userRepo.findByUsernameWithRoles(username);
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("Username not found");

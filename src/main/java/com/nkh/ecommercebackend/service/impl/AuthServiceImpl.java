@@ -7,7 +7,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nkh.ecommercebackend.dto.request.IntrospectReq;
 import com.nkh.ecommercebackend.dto.request.LoginReq;
-import com.nkh.ecommercebackend.dto.request.RegisterUserReq;
+import com.nkh.ecommercebackend.dto.request.RegisterReq;
 import com.nkh.ecommercebackend.dto.response.IntrospectRes;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.entity.User;
@@ -35,10 +35,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     @Value("${jwt.secret}")
-    protected String SIGNER_KEY;
+    protected String SECRET;
 
     @Override
-    public void register(RegisterUserReq userReq) {
+    public void register(RegisterReq userReq) {
         userRoleService.createUser(userReq);
     }
 
@@ -52,9 +52,7 @@ public class AuthServiceImpl implements AuthService {
         if (!authenticated) {
             throw new BusinessException(ErrorCode.UNAUTHENTICATED);
         }
-
         String token = generateToken(request.getUsername());
-
         return LoginRes.builder()
                 .token(token)
                 .authenticated(authenticated)
@@ -67,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         Boolean verified = Boolean.TRUE;
         Date expiredDay = Date.from(Instant.EPOCH);
         try {
-            JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+            JWSVerifier verifier = new MACVerifier(SECRET.getBytes());
             SignedJWT signedJWT = SignedJWT.parse(token);
             verified = signedJWT.verify(verifier);
             expiredDay = signedJWT.getJWTClaimsSet().getExpirationTime();
@@ -86,21 +84,16 @@ public class AuthServiceImpl implements AuthService {
                 .subject(username)
                 .issuer("kimhieu-dev.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000))
-                .claim("custom", "Custom")
+                .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000 * 24))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
-
-
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY));
+            jwsObject.sign(new MACSigner(SECRET));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Error creating token: " + e.getMessage());
             throw new RuntimeException(e);
         }
-
     }
 }

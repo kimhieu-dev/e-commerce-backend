@@ -1,0 +1,13 @@
+$kind: http-request
+name: Get Users
+url: "{{base_url}}/api/v1/users"
+method: GET
+body:
+  type: json
+  content: ""
+auth:
+  credentials:
+    username: sieunhan11
+    password: sieunhan11
+  type: basic
+order: 289662887265191

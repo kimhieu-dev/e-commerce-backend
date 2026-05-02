@@ -1,6 +1,7 @@
 package com.nkh.ecommercebackend.controller;
 
 import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
+import com.nkh.ecommercebackend.dto.response.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.CartSummaryRes;
 import com.nkh.ecommercebackend.entity.User;
 import com.nkh.ecommercebackend.mapper.CartMapper;
@@ -21,17 +22,15 @@ public class CartController {
     private final CartMapper cartMapper;
 
     @GetMapping
-    public ResponseEntity<CartSummaryRes> getCart(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.getUserByUsername(userDetails.getUsername());
-        CartSummaryRes response = cartService.getCartSummary(user.getId());
-        return ResponseEntity.ok(response);
+    public BaseResponse<CartSummaryRes> getCart() {
+        CartSummaryRes response = cartService.getCurrentCart();
+        return BaseResponse.success(response);
     }
 
     @PostMapping("/items")
-    public ResponseEntity<Void> addItem(@AuthenticationPrincipal UserDetails userDetails, @RequestBody AddItemToCartReq request) {
-        User user = userService.getUserByUsername(userDetails.getUsername());
-        cartService.addItem(user.getId(), request);
-        return ResponseEntity.ok().build();
+    public BaseResponse<?> addItem(@RequestBody AddItemToCartReq request) {
+        cartService.addItem(request);
+        return BaseResponse.success("Add item successfully");
     }
 
 

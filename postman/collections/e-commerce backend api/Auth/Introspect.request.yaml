@@ -6,5 +6,11 @@ body:
   type: json
   content: "{\r
 
-    \    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJ2dWF0cm9jaG9pIiwiZXhwIjoxNzc3NTYzNDE5LCJjdXN0b21DbGFpbSI6IkNsYWltIiwiaWF0IjoxNzc3NTU5ODE5fQ.7O6etpb7F3tKQwsZiF-RCAlpqGvct5stbYYT_QulFC0\""
+    \    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJhZG1pbjEyMzQiLCJleHAiOjE3Nzc3NzY2ODYsImlhdCI6MTc3NzY5MDI4Nn0._3j4vylx6iF4-pHoJESOR2LO3MRQFR8oTZBCbIk5EfU\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJhZG1pbjEyMzQiLCJleHAiOjE3Nzc3MjkwNTQsImlhdCI6MTc3NzY0MjY1NH0._oSSYXjvNNoWl_dwzPr8q0Wh01_VRCDVZqM8avNGeHU
 order: 2468875295306449

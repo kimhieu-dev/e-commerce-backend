@@ -26,10 +26,10 @@ public class Inventory implements Serializable {
     private Product product;
 
     @Column(name = "quantity_in_stock",nullable = false)
-    private int quantityInStock;
+    private Integer quantityInStock;
 
     @Column(name = "reserved_quantity",nullable = false)
-    private int reservedQuantity;
+    private Integer reservedQuantity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)

@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.service;
 
+import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Product;
@@ -11,4 +12,6 @@ public interface ProductService {
     Product getProductById(String id);
 
     List<ProductRes> getProducts(ProductFilterReq request, Pageable pageable);
+
+    ProductRes createProduct(CreateProductReq request);
 }

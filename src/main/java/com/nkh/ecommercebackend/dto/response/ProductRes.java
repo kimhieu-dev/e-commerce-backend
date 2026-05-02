@@ -3,10 +3,7 @@ package com.nkh.ecommercebackend.dto.response;
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.common.ProductStatus;
 import com.nkh.ecommercebackend.entity.InventoryRes;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,6 +13,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProductRes implements Serializable {
 //    private String id;
 

@@ -39,6 +39,7 @@ public enum ErrorCode {
     CART_NOT_FOUND(2020, "Cart not found", HttpStatus.NOT_FOUND),
     USER_DOES_NOT_HAVE_CART(2021, "User does not have a cart", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(2022, "Product not found", HttpStatus.NOT_FOUND),
+    CART_ITEM_NOT_FOUND(2023, "Cart item not found", HttpStatus.NOT_FOUND),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

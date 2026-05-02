@@ -1,9 +1,10 @@
 package com.nkh.ecommercebackend.service.impl;
 
+import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
 import com.nkh.ecommercebackend.dto.response.CartItemRes;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
-import com.nkh.ecommercebackend.dto.response.CartSummaryRes;
+import com.nkh.ecommercebackend.dto.response.CartRes;
 import com.nkh.ecommercebackend.dto.response.CheckoutRes;
 import com.nkh.ecommercebackend.entity.Cart;
 import com.nkh.ecommercebackend.entity.CartItem;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ public class CartServiceImpl implements CartService {
     private final CurrentUserService currentUserService;
 
     @Override
-    public CartSummaryRes getCurrentCart() {
+    public CartRes getCurrentCart() {
 
         User user = currentUserService.getUser();
 
@@ -61,11 +64,11 @@ public class CartServiceImpl implements CartService {
         checkoutRes.setTotalAmount(subtotal.add(checkoutRes.getShippingFee()).subtract(checkoutRes.getDiscountAmount()));
 
 
-        CartSummaryRes cartSummaryRes = new CartSummaryRes();
-        cartSummaryRes.setItems(cartItemResList);
-        cartSummaryRes.setSummary(checkoutRes);
+        CartRes cartRes = new CartRes();
+        cartRes.setCartItemResList(cartItemResList);
+        cartRes.setCheckoutRes(checkoutRes);
 
-        return cartSummaryRes;
+        return cartRes;
     }
 
     @Override
@@ -95,6 +98,17 @@ public class CartServiceImpl implements CartService {
             cartItemRepo.save(newItem);
         }
 
+    }
+
+    @Override
+    public CartItemRes updateQuantityItem(String id, UpdateCartItemReq request) {
+        User user = currentUserService.getUser();
+        //co the lay cart item dua tren user hien tai ( chua biet cach )
+        CartItem cartItem = cartItemRepo.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        cartItem.setQuantity(request.getQuantity());
+        cartItemRepo.save(cartItem);
+        CartItemRes cartItemRes = cartItemMapper.toCartItemRes(cartItem);
+        return cartItemRes;
     }
 
 

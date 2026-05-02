@@ -1,0 +1,13 @@
+$kind: http-request
+name: Get Users
+url: "{{base_url}}/api/v1/users"
+method: GET
+body:
+  type: json
+  content: ""
+auth:
+  credentials:
+    - key: token
+      value: eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJraW1oaWV1LWRldi5jb20iLCJzdWIiOiJhZG1pbjEyMzQiLCJleHAiOjE3Nzc3MzU4MjIsImlhdCI6MTc3NzY0OTQyMn0.GLcRbnpbjS74TJ7hiOwOLJTPUgfDVgg6aPDv3LBtK8Y
+  type: bearer
+order: 289662887265191

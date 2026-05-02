@@ -4,7 +4,7 @@ import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
 import com.nkh.ecommercebackend.dto.response.CartSummaryRes;
 
 public interface CartService {
-    CartSummaryRes getCartSummary(String userId);
+    CartSummaryRes getCurrentCart();
 
-    void addItem(String userId, AddItemToCartReq request);
+    void addItem( AddItemToCartReq request);
 }

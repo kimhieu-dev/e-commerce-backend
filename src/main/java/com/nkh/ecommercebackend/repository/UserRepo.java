@@ -28,4 +28,6 @@ public interface UserRepo extends JpaRepository<User,Integer> {
     Optional<User> findByUsernameWithRoles(String username);
 
     Page<User> findAll(Specification<User> specification, Pageable pageable);
+
+    User findByUsernameAndDeletedFalse(String username, Boolean deleted);
 }

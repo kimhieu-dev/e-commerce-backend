@@ -101,6 +101,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public void deleteItem(String id) {
+        CartItem  cartItem = cartItemRepo.findByIdAndDeletedFalse(id).orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        cartItem.setDeleted(true);
+        cartItemRepo.save(cartItem);
+    }
+
+    @Override
     public CartItemRes updateQuantityItem(String id, UpdateCartItemReq request) {
         User user = currentUserService.getUser();
         //co the lay cart item dua tren user hien tai ( chua biet cach )

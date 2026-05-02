@@ -40,4 +40,9 @@ public class CartController {
         return BaseResponse.success(response);
     }
 
+    @DeleteMapping("/items/{id}")
+    public BaseResponse<?> deleteItem(@PathVariable String id) {
+        cartService.deleteItem(id);
+        return BaseResponse.success("Delete item successfully");
+    }
 }

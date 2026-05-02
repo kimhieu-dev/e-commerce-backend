@@ -8,7 +8,9 @@ import com.nkh.ecommercebackend.dto.response.CartRes;
 public interface CartService {
     CartRes getCurrentCart();
 
-    void addItem( AddItemToCartReq request);
+    void addItem(AddItemToCartReq request);
+
+    void deleteItem(String id);
 
     CartItemRes updateQuantityItem(String id, UpdateCartItemReq request);
 }

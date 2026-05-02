@@ -57,15 +57,13 @@ public class UserRoleServiceImpl implements UserRoleService {
         cart.setUser(user);
         cartRepo.save(cart);
 
-        Boolean checkRole = roleRepo.existsByName(com.nkh.ecommercebackend.common.Role.USER.name());
-        if (!checkRole) {
+        Optional<Role> roleOptional = roleRepo.findByName(com.nkh.ecommercebackend.common.Role.USER.name());
+        if (roleOptional.isEmpty()) {
             throw new BusinessException(ErrorCode.ROLE_NOT_FOUND);
         }
-        Role role = new Role();
-        role.setName(com.nkh.ecommercebackend.common.Role.USER.name());
         UserRole userRole = new UserRole();
         userRole.setUser(user);
-        userRole.setRole(role);
+        userRole.setRole(roleOptional.get());
         userRoleRepo.save(userRole);
     }
 

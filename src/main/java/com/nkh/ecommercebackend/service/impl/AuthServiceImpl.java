@@ -84,8 +84,7 @@ public class AuthServiceImpl implements AuthService {
                 .subject(username)
                 .issuer("kimhieu-dev.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000))
-                .claim("custom", "Custom")
+                .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000 * 24))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
@@ -96,6 +95,5 @@ public class AuthServiceImpl implements AuthService {
             log.error("Error creating token: " + e.getMessage());
             throw new RuntimeException(e);
         }
-
     }
 }

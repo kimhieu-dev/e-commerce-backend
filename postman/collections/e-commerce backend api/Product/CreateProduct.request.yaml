@@ -1,0 +1,37 @@
+$kind: http-request
+name: CreateProduct
+url: "{{base_url}}/api/v1/products"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"sku\": \"SKU-001\",\r
+
+    \  \"name\": \"Test Product\",\r
+
+    \  \"basePrice\": 99.99,\r
+
+    \  \"thumbnailUrl\": \"\",\r
+
+    \  \"description\": \"\",\r
+
+    \  \"weight\": 1.5,\r
+
+    \  \"length\": 10.0,\r
+
+    \  \"width\": 5.0,\r
+
+    \  \"height\": 3.0,\r
+
+    \  \"quantityInStock\": 10,\r
+
+    \  \"reservedQuantity\": 1\r
+
+    }"
+auth:
+  type: basic
+  credentials:
+    username: sieunhan11
+    password: sieunhan11
+order: 1777741227486

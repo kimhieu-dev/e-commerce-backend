@@ -12,4 +12,6 @@ public interface CartItemMapper {
     CartItem toCartItem(AddItemToCartReq addItemToCartReq);
 
     List<CartItemRes> toCartItemResList(List<CartItem> cartItemList);
+
+    CartItemRes toCartItemRes(CartItem cartItem);
 }

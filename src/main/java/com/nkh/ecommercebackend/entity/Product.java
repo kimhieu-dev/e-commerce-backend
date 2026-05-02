@@ -37,11 +37,14 @@ public class Product extends BaseEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private ProductStatus status;
+    private ProductStatus status = ProductStatus.ACTIVE;
 
     @OneToOne(mappedBy = "product",cascade = CascadeType.ALL)
     private ProductDetail productDetail;
 
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
+
+    @OneToOne(mappedBy = "product",cascade = CascadeType.ALL)
+    private Inventory inventory;
 }

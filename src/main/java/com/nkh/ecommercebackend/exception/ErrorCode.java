@@ -39,6 +39,23 @@ public enum ErrorCode {
     CART_NOT_FOUND(2020, "Cart not found", HttpStatus.NOT_FOUND),
     USER_DOES_NOT_HAVE_CART(2021, "User does not have a cart", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(2022, "Product not found", HttpStatus.NOT_FOUND),
+    CART_ITEM_NOT_FOUND(2023, "Cart item not found", HttpStatus.NOT_FOUND),
+    //PRODUCT
+    SKU_BLANK(2024, "SKU is blank", HttpStatus.BAD_REQUEST),
+    PRODUCT_NAME_BLANK(2025, "Product name is blank", HttpStatus.BAD_REQUEST),
+    BASE_PRICE_NULL(2026, "Base price is null", HttpStatus.BAD_REQUEST),
+    BASE_PRICE_INVALID(2027, "Base price is invalid", HttpStatus.BAD_REQUEST),
+    WEIGHT_NULL(2028, "Weight is null", HttpStatus.BAD_REQUEST),
+    WEIGHT_INVALID(2029, "Weight is invalid", HttpStatus.BAD_REQUEST),
+    LENGTH_NULL(2030, "Length is null", HttpStatus.BAD_REQUEST),
+    LENGTH_INVALID(2031, "Length is invalid", HttpStatus.BAD_REQUEST),
+    WIDTH_NULL(2032, "Width is null", HttpStatus.BAD_REQUEST),
+    WIDTH_INVALID(2033, "Width is invalid", HttpStatus.BAD_REQUEST),
+    HEIGHT_NULL(2034, "Height is null", HttpStatus.BAD_REQUEST),
+    HEIGHT_INVALID(2035, "Height is invalid", HttpStatus.BAD_REQUEST),
+    QUANTITY_IN_STOCK_NULL(2036, "Quantity in stock is null", HttpStatus.BAD_REQUEST),
+    RESERVED_QUANTITY_NULL(2037, "Reserved quantity is null", HttpStatus.BAD_REQUEST),
+    SKU_EXISTED(2038, "SKU is already existed", HttpStatus.CONFLICT),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     ;

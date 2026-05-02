@@ -4,9 +4,12 @@ import com.nkh.ecommercebackend.entity.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CartItemRepo extends JpaRepository<CartItem, String> {
     CartItem findByCartIdAndProductId(String cartId, String productId);
 
     List<CartItem> findAllByCartId(String cartId);
+
+    Optional<CartItem> findByIdAndDeletedFalse(String id);
 }

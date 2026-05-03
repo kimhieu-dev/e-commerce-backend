@@ -55,4 +55,10 @@ public class User extends BaseEntity implements Serializable {
 
     @OneToOne(mappedBy = "user",fetch = FetchType.EAGER)
     private Cart cart;
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private List<Address> addressList;
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private List<Order> orderList;
 }

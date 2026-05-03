@@ -59,8 +59,21 @@ public enum ErrorCode {
     PRODUCT_DO_NOT_HAVE_INVENTORY(2039, "Product does not have a inventory", HttpStatus.BAD_REQUEST),
     PRODUCT_OUT_OF_STOCK(2040, "Product out of stock", HttpStatus.BAD_REQUEST),
     PRODUCT_OUT_OF_RANGE(2041, "Product out of range", HttpStatus.BAD_REQUEST),
+    CART_ID_BLANK(2042, "Cart id is blank", HttpStatus.BAD_REQUEST),
+    PRODUCT_ID_BLANK(2043, "Product id is blank", HttpStatus.BAD_REQUEST),
+    QUANTITY_INVALID(2044, "Quantity is invalid", HttpStatus.BAD_REQUEST),
+    DISCOUNT_NOT_FOUND(2045, "Discount not found", HttpStatus.NOT_FOUND),
+    DISCOUNT_EXPIRED(2046, "Discount expired", HttpStatus.BAD_REQUEST),
+    PAYMENT_METHOD_NULL(2047, "Payment method is null", HttpStatus.BAD_REQUEST),
+    DISCOUNT_CODE_BLANK(2048, "Discount code is blank", HttpStatus.BAD_REQUEST),
+    CARRIER_BLANK(2049, "Carrier is blank", HttpStatus.BAD_REQUEST),
+    ADDRESS_BLANK(2050, "Address is blank", HttpStatus.BAD_REQUEST),
+    CARRIER_NOT_FOUND(2051, "Carrier not found", HttpStatus.NOT_FOUND),
+    ADDRESS_NOT_FOUND(2052, "Address not found", HttpStatus.NOT_FOUND),
+
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
+
     ;
     private final Integer code;
     private final String message;

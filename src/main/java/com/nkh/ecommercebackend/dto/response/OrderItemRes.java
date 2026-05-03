@@ -5,14 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartRes {
-    private List<CartItemRes> cartItemResList;
-    private CheckoutRes checkoutRes;
-    private List<DiscountRes> discountsList;
+public class OrderItemRes implements Serializable {
+    private ProductRes productRes;
+
+    private int quantity;
+
+    private BigDecimal price;
 }

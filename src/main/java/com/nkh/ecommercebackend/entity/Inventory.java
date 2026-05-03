@@ -15,7 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "inventory")
-public class Inventory implements Serializable {
+public class Inventory extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",unique = true, nullable = false)
@@ -34,5 +34,4 @@ public class Inventory implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)
     private InventoryStatus status;
-
 }

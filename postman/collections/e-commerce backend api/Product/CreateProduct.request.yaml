@@ -6,7 +6,7 @@ body:
   type: json
   content: "{\r
 
-    \  \"sku\": \"SKU-001\",\r
+    \  \"sku\": \"Prod123\",\r
 
     \  \"name\": \"Test Product\",\r
 
@@ -24,7 +24,7 @@ body:
 
     \  \"height\": 3.0,\r
 
-    \  \"quantityInStock\": 10,\r
+    \  \"quantityInStock\": 20,\r
 
     \  \"reservedQuantity\": 1\r
 

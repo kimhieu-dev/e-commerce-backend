@@ -1,6 +1,7 @@
 package com.nkh.ecommercebackend.service;
 
 import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
+import com.nkh.ecommercebackend.dto.request.DiscountReq;
 import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
 import com.nkh.ecommercebackend.dto.response.CartItemRes;
 import com.nkh.ecommercebackend.dto.response.CartRes;
@@ -13,4 +14,6 @@ public interface CartService {
     void deleteItem(String id);
 
     CartItemRes updateQuantityItem(String id, UpdateCartItemReq request);
+
+    CartRes appyDiscount(String id , DiscountReq request);
 }

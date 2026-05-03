@@ -47,4 +47,7 @@ public class Product extends BaseEntity implements Serializable {
 
     @OneToOne(mappedBy = "product",cascade = CascadeType.ALL)
     private Inventory inventory;
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
 }

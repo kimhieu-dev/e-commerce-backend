@@ -1,6 +1,6 @@
 package com.nkh.ecommercebackend.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +10,9 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class CartReq implements Serializable {
-    @NotNull(message = "USER_ID_NULL")
-    private String userId;
+@NoArgsConstructor
+public class DiscountReq implements Serializable {
+    @NotBlank
+    private String code;
 }

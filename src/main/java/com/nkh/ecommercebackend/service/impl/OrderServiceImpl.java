@@ -47,7 +47,6 @@ public class OrderServiceImpl implements OrderService {
         if (addressOptional.isEmpty()) {
             throw new BusinessException(ErrorCode.ADDRESS_NOT_FOUND);
         }
-
         List<CartItem> cartItemList = user.getCart().getCartItems();
         BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItem cartItem : cartItemList) {
@@ -55,9 +54,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         PaymentStatus paymentStatus;
-        if (request.getPaymentMethod() == PaymentMethod.COD){
+        if (request.getPaymentMethod() == PaymentMethod.COD) {
             paymentStatus = PaymentStatus.UNPAID;
-        }else {
+        } else {
             paymentStatus = PaymentStatus.AWAITING_PAYMENT;
         }
 
@@ -83,27 +82,27 @@ public class OrderServiceImpl implements OrderService {
                 .discountAmount(discountAmount)
                 .grandTotal(grandTotal)
                 .discount(discountOptional.get())
-                .estimatedDelivery()
-                .carrier()
-                .address()
-                .orderItems()
+                //.estimatedDelivery()
+//                .carrier()
+//                .address()
+//                .orderItems()
                 .build();
         orderRepo.save(order);
 
         OrderRes orderRes = OrderRes.builder()
                 .trackingNumber(order.getTrackingNumber())
                 .paymentMethod(order.getPaymentMethod())
-                .status()
-                .paymentStatus()
-                .totalPrice()
-                .shippingFee()
-                .discountAmount()
-                .grandTotal()
-                .discount()
-                .estimatedDelivery()
-                .carrier()
-                .address()
-                .orderItems()
+                //.status()
+//                .paymentStatus()
+//                .totalPrice()
+//                .shippingFee()
+//                .discountAmount()
+//                .grandTotal()
+//                .discount()
+//                .estimatedDelivery()
+//                .carrier()
+//                .address()
+//                .orderItems()
                 .build();
         return orderRes;
     }

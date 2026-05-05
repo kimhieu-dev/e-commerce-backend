@@ -2,21 +2,16 @@ package com.nkh.ecommercebackend.service.impl;
 
 import com.nkh.ecommercebackend.common.DiscountType;
 import com.nkh.ecommercebackend.common.InventoryStatus;
-import com.nkh.ecommercebackend.dto.request.DiscountReq;
+import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
-import com.nkh.ecommercebackend.dto.response.CartItemRes;
-import com.nkh.ecommercebackend.dto.response.DiscountRes;
+import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.mapper.DiscountMapper;
 import com.nkh.ecommercebackend.repository.*;
 import com.nkh.ecommercebackend.util.CurrentUserService;
-import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
-import com.nkh.ecommercebackend.dto.response.CartRes;
-import com.nkh.ecommercebackend.dto.response.CheckoutRes;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.CartItemMapper;
-import com.nkh.ecommercebackend.mapper.CartMapper;
 import com.nkh.ecommercebackend.service.CartService;
 import com.nkh.ecommercebackend.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -25,9 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,40 +33,35 @@ public class CartServiceImpl implements CartService {
     private final ProductRepo productRepo;
     private final DiscountMapper discountMapper;
     private final DiscountRepo discountRepo;
+    private final CarrierRepo carrierRepo;
 
     @Override
     public CartRes getCurrentCart() {
-
         User user = currentUserService.getUser();
+        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() ->
+                new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        Cart cart = cartRepo.findByUsername(user.getUsername())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+        List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cart.getCartItems());
 
-        List<CartItem> cartItemList = cart.getCartItems();
-
-        List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cartItemList);
-        CartRes cartRes = new CartRes();
-        cartRes.setItems(cartItemResList);
-
+        CartRes cartRes = CartRes.builder()
+                .items(cartItemResList)
+                .build();
         return cartRes;
     }
 
     @Override
     @Transactional
-    public void addItem(AddItemToCartReq request) {
-
+    public CartItemRes addItem(AddItemReq request) {
         User user = currentUserService.getUser();
-
-        Optional<Cart> cartOptional = cartRepo.findByUsername(user.getUsername());
-        if (cartOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART);
-        }
+        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() ->
+                new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
         Product product = productService.getProductById(request.getProductId());
         checkInventory(product);
         productRepo.save(product);
 
-        CartItem existingItem = cartItemRepo.findByCartIdAndProductId(cartOptional.get().getId(), product.getId());
+        //dung list, set, map lay ra item tuong ung
+        CartItem existingItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
 
         if (existingItem != null) {
             existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
@@ -86,7 +74,7 @@ public class CartServiceImpl implements CartService {
             cartItemRepo.save(existingItem);
         } else {
             CartItem newItem = new CartItem();
-            newItem.setCart(cartOptional.get());
+            newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(request.getQuantity());
             if (newItem.getProduct().getInventory().getQuantityInStock() == 0) {
@@ -95,9 +83,14 @@ public class CartServiceImpl implements CartService {
             if (newItem.getQuantity() > newItem.getProduct().getInventory().getQuantityInStock()) {
                 throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
             }
-            newItem.setUnitPrice(product.getBasePrice());
             cartItemRepo.save(newItem);
         }
+
+        return CartItemRes.builder()
+                .id(null)
+                .product(null)
+                .quantity(5)
+                .build();
     }
 
     @Override
@@ -114,6 +107,8 @@ public class CartServiceImpl implements CartService {
         User user = currentUserService.getUser();
         CartItem cartItem = cartItemRepo.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
+
+        //trang thai inventory
         checkInventory(cartItem.getProduct());
         Product product = cartItem.getProduct();
         productRepo.save(product);
@@ -125,53 +120,37 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartRes appyDiscount(String id, DiscountReq request) {
+    public SummaryRes getSummary(String discountCode) {
         User user = currentUserService.getUser();
-        Optional<Cart> cartOptional = cartRepo.findByUsername(user.getUsername());
-        if (cartOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART);
-        }
+        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        Optional<Discount> discount = discountRepo.findByCode(request.getCode());
-        if (discount.isEmpty()) {
-            throw new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND);
-        }
+        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrue(cart.getId());
 
-        if (discount.get().getEndDate().isBefore(LocalDate.now())) {
-            throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
-        }
+        BigDecimal subtotal = cartItemList.stream()
+                .map(item -> item
+                        .getProduct()
+                        .getBasePrice()
+                        .multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartId(cartOptional.get().getId());
-        BigDecimal subtotal = BigDecimal.ZERO;
-        for (CartItem cartItem : cartItemList) {
-            subtotal = subtotal.add(cartItem.getProduct().getBasePrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-        }
+        BigDecimal shippingFee = BigDecimal.valueOf(30.00);
 
-        List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cartItemList);
-
-        CheckoutRes checkoutRes = new CheckoutRes();
-        checkoutRes.setSubtotal(subtotal);
-        checkoutRes.setShippingFee(BigDecimal.valueOf(30.00));
-
-        if (discount.get().getType() == DiscountType.FIXED_AMOUNT) {
-            checkoutRes.setDiscountAmount(discount.get().getValue());
-        } else if (discount.get().getType() == DiscountType.PERCENTAGE) {
-            checkoutRes.setDiscountAmount(discount.get().getValue().multiply(subtotal).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+        BigDecimal discountAmount;
+        Discount discount = discountRepo.findByCode(discountCode).orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+        if (discount.getType() == DiscountType.PERCENTAGE) {
+            discountAmount = discount.getValue().multiply(subtotal).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         } else {
-            checkoutRes.setDiscountAmount(BigDecimal.ZERO);
+            discountAmount = discount.getValue();
         }
 
-        checkoutRes.setTotalAmount(subtotal.add(checkoutRes.getShippingFee()).subtract(checkoutRes.getDiscountAmount()));
+        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
 
-        List<Discount> discountList = discountRepo.findAll();
-        List<DiscountRes> discountResList = discountMapper.toDiscountResList(discountList);
-
-        CartRes cartRes = new CartRes();
-        cartRes.setItems(cartItemResList);
-//        cartRes.setCheckoutRes(checkoutRes);
-//        cartRes.setDiscountsList(discountResList);
-
-        return cartRes;
+        return SummaryRes.builder()
+                .subtotal(subtotal)
+                .shippingFee(shippingFee)
+                .discountAmount(discountAmount)
+                .totalAmount(totalAmount)
+                .build();
     }
 
     private void checkInventory(Product product) {

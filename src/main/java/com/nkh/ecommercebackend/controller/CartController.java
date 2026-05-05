@@ -1,23 +1,13 @@
 package com.nkh.ecommercebackend.controller;
 
-import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
-import com.nkh.ecommercebackend.dto.request.DiscountReq;
+import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
-import com.nkh.ecommercebackend.dto.response.CartItemRes;
-import com.nkh.ecommercebackend.dto.response.CartRes;
-import com.nkh.ecommercebackend.dto.response.DiscountRes;
-import com.nkh.ecommercebackend.mapper.CartMapper;
+import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.service.CartService;
-import com.nkh.ecommercebackend.service.DiscountService;
-import com.nkh.ecommercebackend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.stylesheets.LinkStyle;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/cart")
@@ -25,7 +15,6 @@ import java.util.List;
 @Validated
 public class CartController {
     private final CartService cartService;
-    private final DiscountService discountService;
 
     @GetMapping()
     public BaseResponse<CartRes> getCart() {
@@ -33,10 +22,16 @@ public class CartController {
         return BaseResponse.success(response);
     }
 
+    @GetMapping("/summary")
+    public BaseResponse<SummaryRes> getSummary(@RequestBody  String discountCode) {
+        SummaryRes response = cartService.getSummary(discountCode);
+        return BaseResponse.success(response);
+    }
+
     @PostMapping()
-    public BaseResponse<?> addItem(@RequestBody @Valid AddItemToCartReq request) {
-        cartService.addItem(request);
-        return BaseResponse.success("Add item successfully");
+    public BaseResponse<CartItemRes> addItem(@RequestBody @Valid AddItemReq request) {
+        CartItemRes response = cartService.addItem(request);
+        return BaseResponse.success(response);
     }
 
     ///
@@ -54,9 +49,4 @@ public class CartController {
         return BaseResponse.success("Delete item successfully");
     }
 
-    @PatchMapping("/cart/{id}")
-    public BaseResponse<CartRes> applyDiscount(@PathVariable String id, @RequestBody @Valid DiscountReq request) {
-        CartRes response = cartService.appyDiscount(id, request);
-        return BaseResponse.success(response);
-    }
 }

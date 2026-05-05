@@ -1,6 +1,6 @@
 $kind: http-request
 name: Get Cart
-url: "{{base_url}}/api/v1/checkout/cart"
+url: "{{base_url}}/api/v1/cart"
 method: GET
 body:
   type: json

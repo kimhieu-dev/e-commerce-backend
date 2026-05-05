@@ -18,6 +18,4 @@ public class CartItemRes implements Serializable {
     private ProductRes product;
 
     private Integer quantity;
-
-    private BigDecimal unitPrice;
 }

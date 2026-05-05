@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class ProductRes implements Serializable {
-//    private String id;
+    private String id;
 
     private String sku;
 

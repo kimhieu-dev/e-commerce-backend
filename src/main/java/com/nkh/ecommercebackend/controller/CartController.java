@@ -20,38 +20,38 @@ import org.w3c.dom.stylesheets.LinkStyle;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/cart")
+@RequestMapping("/api/v1/checkout")
 @RequiredArgsConstructor
 @Validated
 public class CartController {
     private final CartService cartService;
     private final DiscountService discountService;
 
-    @GetMapping
+    @GetMapping("/cart")
     public BaseResponse<CartRes> getCart() {
         CartRes response = cartService.getCurrentCart();
         return BaseResponse.success(response);
     }
 
-    @PostMapping("/items")
+    @PostMapping("/cart/items")
     public BaseResponse<?> addItem(@RequestBody @Valid AddItemToCartReq request) {
         cartService.addItem(request);
         return BaseResponse.success("Add item successfully");
     }
 
-    @PatchMapping("/items/{id}")
+    @PatchMapping("/cart/items/{id}")
     public BaseResponse<CartItemRes> updateQuantityItem(@PathVariable String id, @Valid @RequestBody UpdateCartItemReq request) {
         CartItemRes response = cartService.updateQuantityItem(id, request);
         return BaseResponse.success(response);
     }
 
-    @DeleteMapping("/items/{id}")
+    @DeleteMapping("/cart/items/{id}")
     public BaseResponse<?> deleteItem(@PathVariable String id) {
         cartService.deleteItem(id);
         return BaseResponse.success("Delete item successfully");
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/cart/{id}")
     public BaseResponse<CartRes> applyDiscount(@PathVariable String id, @RequestBody @Valid DiscountReq request) {
         CartRes response = cartService.appyDiscount(id, request);
         return BaseResponse.success(response);

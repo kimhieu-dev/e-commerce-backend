@@ -20,25 +20,28 @@ import org.w3c.dom.stylesheets.LinkStyle;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/checkout")
+@RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor
 @Validated
 public class CartController {
     private final CartService cartService;
     private final DiscountService discountService;
 
-    @GetMapping("/cart")
+    @GetMapping()
     public BaseResponse<CartRes> getCart() {
         CartRes response = cartService.getCurrentCart();
         return BaseResponse.success(response);
     }
 
-    @PostMapping("/cart/items")
+    @PostMapping()
     public BaseResponse<?> addItem(@RequestBody @Valid AddItemToCartReq request) {
         cartService.addItem(request);
         return BaseResponse.success("Add item successfully");
     }
 
+    ///
+    /// sửa đoạn này để trả về cart, sau khi tăng giảm số lượng thì load lại card
+    ///
     @PatchMapping("/cart/items/{id}")
     public BaseResponse<CartItemRes> updateQuantityItem(@PathVariable String id, @Valid @RequestBody UpdateCartItemReq request) {
         CartItemRes response = cartService.updateQuantityItem(id, request);

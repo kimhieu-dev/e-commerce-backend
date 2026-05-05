@@ -1,10 +1,24 @@
 package com.nkh.ecommercebackend.dto.request;
 
-import com.nkh.ecommercebackend.entity.Discount;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
+import java.io.Serializable;
 
-//public class AddItemReq {
-//    List<Summary>  summaryList;
-//    Discount discount;
-//}
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class AddItemReq implements Serializable {
+
+    @NotBlank(message = "PRODUCT_ID_BLANK")
+    private String productId;
+
+    @Min(value = 1,message = "QUANTITY_INVALID")
+    private Integer quantity;
+
+}

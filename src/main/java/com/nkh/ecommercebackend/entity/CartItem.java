@@ -32,6 +32,6 @@ public class CartItem extends BaseEntity implements Serializable {
     @Column(name = "quantity",nullable = false)
     private Integer quantity;
 
-    @Column(name = "unit_price",nullable = false)
-    private BigDecimal unitPrice;
+    @Column(name = "checked",nullable = false)
+    private Boolean checked;
 }

@@ -1,19 +1,22 @@
 package com.nkh.ecommercebackend.service;
 
-import com.nkh.ecommercebackend.dto.request.AddItemToCartReq;
-import com.nkh.ecommercebackend.dto.request.DiscountReq;
+import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
 import com.nkh.ecommercebackend.dto.response.CartItemRes;
 import com.nkh.ecommercebackend.dto.response.CartRes;
+import com.nkh.ecommercebackend.dto.response.SummaryRes;
+import com.nkh.ecommercebackend.entity.CartItem;
 
 public interface CartService {
     CartRes getCurrentCart();
 
-    void addItem(AddItemToCartReq request);
+    SummaryRes getSummary(String discountCode);
+
+    CartItemRes addItem(AddItemReq request);
 
     void deleteItem(String id);
 
     CartItemRes updateQuantityItem(String id, UpdateCartItemReq request);
 
-    CartRes appyDiscount(String id , DiscountReq request);
+//    CartRes appyDiscount(String id , DiscountReq request);
 }

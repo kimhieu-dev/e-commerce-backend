@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -117,56 +118,6 @@ public class CartServiceImpl implements CartService {
         CartItemRes cartItemRes = cartItemMapper.toCartItemRes(cartItem);
         return cartItemRes;
     }
-//
-//    @Override
-//    public CartRes appyDiscount(String id, DiscountReq request) {
-//        User user = currentUserService.getUser();
-//        Optional<Cart> cartOptional = cartRepo.findByUsername(user.getUsername());
-//        if (cartOptional.isEmpty()) {
-//            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART);
-//        }
-//
-//        Optional<Discount> discount = discountRepo.findByCode(request.getCode());
-//        if (discount.isEmpty()) {
-//            throw new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND);
-//        }
-//
-//        if (discount.get().getEndDate().isBefore(LocalDate.now())) {
-//            throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
-//        }
-//
-//        List<CartItem> cartItemList = cartItemRepo.findAllByCartId(cartOptional.get().getId());
-//        BigDecimal subtotal = BigDecimal.ZERO;
-//        for (CartItem cartItem : cartItemList) {
-//            subtotal = subtotal.add(cartItem.getProduct().getBasePrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-//        }
-//
-//        List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cartItemList);
-//
-//        CheckoutRes checkoutRes = new CheckoutRes();
-//        checkoutRes.setSubtotal(subtotal);
-//        checkoutRes.setShippingFee(BigDecimal.valueOf(30.00));
-//
-//        if (discount.get().getType() == DiscountType.FIXED_AMOUNT) {
-//            checkoutRes.setDiscountAmount(discount.get().getValue());
-//        } else if (discount.get().getType() == DiscountType.PERCENTAGE) {
-//            checkoutRes.setDiscountAmount(discount.get().getValue().multiply(subtotal).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
-//        } else {
-//            checkoutRes.setDiscountAmount(BigDecimal.ZERO);
-//        }
-//
-//        checkoutRes.setTotalAmount(subtotal.add(checkoutRes.getShippingFee()).subtract(checkoutRes.getDiscountAmount()));
-//
-//        List<Discount> discountList = discountRepo.findAll();
-//        List<DiscountRes> discountResList = discountMapper.toDiscountResList(discountList);
-//
-//        CartRes cartRes = new CartRes();
-//        cartRes.setItems(cartItemResList);
-//        cartRes.setCheckoutRes(checkoutRes);
-//        cartRes.setDiscountsList(discountResList);
-
-//        return cartRes;
-//    }
 
     @Override
     public SummaryRes getSummary(String discountCode) {

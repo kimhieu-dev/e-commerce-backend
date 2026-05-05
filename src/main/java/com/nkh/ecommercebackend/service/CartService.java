@@ -18,5 +18,4 @@ public interface CartService {
 
     CartItemRes updateQuantityItem(String id, UpdateCartItemReq request);
 
-//    CartRes appyDiscount(String id , DiscountReq request);
 }

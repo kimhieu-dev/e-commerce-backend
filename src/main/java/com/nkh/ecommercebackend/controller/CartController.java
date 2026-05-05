@@ -49,9 +49,4 @@ public class CartController {
         return BaseResponse.success("Delete item successfully");
     }
 
-//    @PatchMapping("/cart/{id}")
-//    public BaseResponse<CartRes> applyDiscount(@PathVariable String id, @RequestBody @Valid DiscountReq request) {
-//        CartRes response = cartService.appyDiscount(id, request);
-//        return BaseResponse.success(response);
-//    }
 }

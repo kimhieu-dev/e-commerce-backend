@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartRes {
-    private List<CartItemRes> cartItemResList;
-    private CheckoutRes checkoutRes;
-    private List<DiscountRes> discountsList;
+    private List<CartItemRes> items;
+//    private CheckoutRes checkoutRes;
+//    private List<DiscountRes> discountsList;
 }

@@ -21,7 +21,7 @@ public class Inventory extends BaseEntity implements Serializable {
     @Column(name = "id",unique = true, nullable = false)
     private String id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id",nullable = false)
     private Product product;
 

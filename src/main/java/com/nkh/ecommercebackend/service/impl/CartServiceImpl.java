@@ -46,31 +46,14 @@ public class CartServiceImpl implements CartService {
 
         User user = currentUserService.getUser();
 
-        Optional<Cart> cartOptional = cartRepo.findByUserId(user.getId());
-        if (cartOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART);
-        }
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartId(cartOptional.get().getId());
-        BigDecimal subtotal = BigDecimal.ZERO;
-        for (CartItem cartItem : cartItemList) {
-            subtotal = subtotal.add(cartItem.getProduct().getBasePrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-        }
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+
+        List<CartItem> cartItemList = cart.getCartItems();
 
         List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cartItemList);
-
-        CheckoutRes checkoutRes = new CheckoutRes();
-        checkoutRes.setSubtotal(subtotal);
-        checkoutRes.setShippingFee(BigDecimal.valueOf(30.00));
-        checkoutRes.setDiscountAmount(BigDecimal.ZERO);
-        checkoutRes.setTotalAmount(subtotal.add(checkoutRes.getShippingFee()).subtract(checkoutRes.getDiscountAmount()));
-
-        List<Discount> discountList = discountRepo.findAll();
-        List<DiscountRes> discountResList = discountMapper.toDiscountResList(discountList);
-
         CartRes cartRes = new CartRes();
-        cartRes.setCartItemResList(cartItemResList);
-        cartRes.setCheckoutRes(checkoutRes);
-        cartRes.setDiscountsList(discountResList);
+        cartRes.setItems(cartItemResList);
 
         return cartRes;
     }
@@ -81,7 +64,7 @@ public class CartServiceImpl implements CartService {
 
         User user = currentUserService.getUser();
 
-        Optional<Cart> cartOptional = cartRepo.findByUserId(user.getId());
+        Optional<Cart> cartOptional = cartRepo.findByUsername(user.getUsername());
         if (cartOptional.isEmpty()) {
             throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART);
         }
@@ -144,7 +127,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartRes appyDiscount(String id, DiscountReq request) {
         User user = currentUserService.getUser();
-        Optional<Cart> cartOptional = cartRepo.findByUserId(user.getId());
+        Optional<Cart> cartOptional = cartRepo.findByUsername(user.getUsername());
         if (cartOptional.isEmpty()) {
             throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART);
         }
@@ -184,9 +167,9 @@ public class CartServiceImpl implements CartService {
         List<DiscountRes> discountResList = discountMapper.toDiscountResList(discountList);
 
         CartRes cartRes = new CartRes();
-        cartRes.setCartItemResList(cartItemResList);
-        cartRes.setCheckoutRes(checkoutRes);
-        cartRes.setDiscountsList(discountResList);
+        cartRes.setItems(cartItemResList);
+//        cartRes.setCheckoutRes(checkoutRes);
+//        cartRes.setDiscountsList(discountResList);
 
         return cartRes;
     }

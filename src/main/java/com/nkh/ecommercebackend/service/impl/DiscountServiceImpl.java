@@ -19,7 +19,6 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public List<DiscountRes> getDiscounts() {
         List<Discount> discountList = discountRepo.findAll();
-        List<DiscountRes> discountResList = discountMapper.toDiscountResList(discountList);
-        return discountResList;
+        return discountMapper.toDiscountResList(discountList);
     }
 }

@@ -43,10 +43,9 @@ public class CartServiceImpl implements CartService {
 
         List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cart.getCartItems());
 
-        CartRes cartRes = CartRes.builder()
+        return CartRes.builder()
                 .items(cartItemResList)
                 .build();
-        return cartRes;
     }
 
     @Override

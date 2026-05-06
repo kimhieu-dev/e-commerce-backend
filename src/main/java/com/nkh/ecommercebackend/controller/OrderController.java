@@ -3,7 +3,9 @@ package com.nkh.ecommercebackend.controller;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
+import com.nkh.ecommercebackend.dto.response.SummaryRes;
 import com.nkh.ecommercebackend.service.OrderService;
+import com.nkh.ecommercebackend.service.SummaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +17,19 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class OrderController {
     private final OrderService orderService;
+    private final SummaryService summaryService;
 
     @PostMapping
     public BaseResponse<OrderRes> createOrder(@RequestBody @Valid CreateOrderReq request) {
         OrderRes response = orderService.createOrder(request);
         return BaseResponse.success(response);
     }
+
+    @GetMapping("/summary")
+    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode) {
+        SummaryRes response = summaryService.getSummary(discountCode);
+        return BaseResponse.success(response);
+    }
+
+
 }

@@ -25,6 +25,5 @@ public class ProductRes implements Serializable {
 
     private String thumbnailUrl;
 
-//    private ProductStatus status;
     private InventoryRes inventory;
 }

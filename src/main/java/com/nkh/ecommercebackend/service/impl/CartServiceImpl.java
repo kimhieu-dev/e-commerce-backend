@@ -27,10 +27,10 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     private final CartRepo cartRepo;
     private final CartItemRepo cartItemRepo;
-    private final ProductService productService;
     private final CartItemMapper cartItemMapper;
     private final CurrentUserService currentUserService;
     private final ProductRepo productRepo;
+    private final InventoryRepo inventoryRepo;
     private final DiscountMapper discountMapper;
     private final DiscountRepo discountRepo;
     private final CarrierRepo carrierRepo;
@@ -52,14 +52,14 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartItemRes addItem(AddItemReq request) {
         User user = currentUserService.getUser();
-        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() ->
-                new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        Product product = productService.getProductById(request.getProductId());
+        Product product = productRepo.findById(request.getProductId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+
         checkInventory(product);
-        productRepo.save(product);
 
-        //dung list, set, map lay ra item tuong ung
         CartItem existingItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
 
         if (existingItem != null) {
@@ -71,25 +71,27 @@ public class CartServiceImpl implements CartService {
                 throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
             }
             cartItemRepo.save(existingItem);
-        } else {
-            CartItem newItem = new CartItem();
-            newItem.setCart(cart);
-            newItem.setProduct(product);
-            newItem.setQuantity(request.getQuantity());
-            if (newItem.getProduct().getInventory().getQuantityInStock() == 0) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-            if (newItem.getQuantity() > newItem.getProduct().getInventory().getQuantityInStock()) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
-            }
-            cartItemRepo.save(newItem);
+
+            return cartItemMapper.toCartItemRes(existingItem);
         }
 
-        return CartItemRes.builder()
-                .id(null)
-                .product(null)
-                .quantity(5)
+        CartItem newItem = CartItem.builder()
+                .cart(cart)
+                .product(product)
+                .quantity(request.getQuantity())
+                .checked(false)
                 .build();
+
+        if (newItem.getProduct().getInventory().getQuantityInStock() == 0) {
+            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        }
+        if (newItem.getQuantity() > newItem.getProduct().getInventory().getQuantityInStock()) {
+            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
+        }
+        cartItemRepo.save(newItem);
+
+
+        return cartItemMapper.toCartItemRes(newItem);
     }
 
     @Override
@@ -130,5 +132,6 @@ public class CartServiceImpl implements CartService {
         } else {
             inventory.setStatus(InventoryStatus.IN_STOCK);
         }
+        inventoryRepo.save(inventory);
     }
 }

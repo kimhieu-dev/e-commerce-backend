@@ -6,11 +6,14 @@ import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
+import com.nkh.ecommercebackend.dto.response.SummaryRes;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
+import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
 import com.nkh.ecommercebackend.service.OrderService;
+import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,27 +35,28 @@ public class OrderServiceImpl implements OrderService {
     private final DiscountRepo discountRepo;
     private final CarrierRepo carrierRepo;
     private final AddressRepo addressRepo;
+    private final CartItemRepo cartItemRepo;
+    private final SummaryService summaryService;
+    private final CartRepo cartRepo;
+    private final OrderItemRepo orderItemRepo;
+    private final OrderMapper orderMapper;
 
     @Override
     public OrderRes createOrder(CreateOrderReq request) {
+
         User user = currentUserService.getUser();
-        Optional<Discount> discountOptional = discountRepo.findByCode(request.getDiscountCode());
-        if (discountOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND);
-        }
-        Optional<Carrier> carrierOptional = carrierRepo.findById(request.getCarrierId());
-        if (carrierOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.CARRIER_NOT_FOUND);
-        }
-        Optional<Address> addressOptional = addressRepo.findById(request.getAddressId());
-        if (addressOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.ADDRESS_NOT_FOUND);
-        }
-        List<CartItem> cartItemList = user.getCart().getCartItems();
-        BigDecimal subtotal = BigDecimal.ZERO;
-        for (CartItem cartItem : cartItemList) {
-            subtotal = subtotal.add(cartItem.getProduct().getBasePrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-        }
+
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+
+        Discount discount = discountRepo.findByCode(request.getDiscountCode())
+                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+        Carrier carrier = carrierRepo.findById(request.getCarrierId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.CARRIER_NOT_FOUND));
+
+        Address address = addressRepo.findById(request.getAddressId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
         PaymentStatus paymentStatus;
         if (request.getPaymentMethod() == PaymentMethod.COD) {
@@ -60,51 +65,41 @@ public class OrderServiceImpl implements OrderService {
             paymentStatus = PaymentStatus.AWAITING_PAYMENT;
         }
 
-        BigDecimal discountAmount = BigDecimal.ZERO;
-        if (discountOptional.get().getType() == DiscountType.FIXED_AMOUNT) {
-            discountAmount = discountOptional.get().getValue();
-        } else if (discountOptional.get().getType() == DiscountType.PERCENTAGE) {
-            discountAmount = discountOptional.get().getValue().multiply(subtotal).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        } else {
-            discountAmount = BigDecimal.ZERO;
-        }
-
-        BigDecimal grandTotal = subtotal.add(BigDecimal.valueOf(30.00).subtract(discountAmount));
+        SummaryRes summary = summaryService.getSummary(discount.getCode());
 
         Order order = Order.builder()
-                .trackingNumber(generateTrackingNumber("TEST"))
+                .trackingNumber(generateTrackingNumber(carrier.getName()))
                 .user(user)
                 .paymentMethod(request.getPaymentMethod())
                 .status(OrderStatus.PENDING)
                 .paymentStatus(paymentStatus)
-                .totalPrice(subtotal)
-                .shippingFee(BigDecimal.valueOf(30.00))
-                .discountAmount(discountAmount)
-                .grandTotal(grandTotal)
-                .discount(discountOptional.get())
-                //.estimatedDelivery()
-//                .carrier()
-//                .address()
-//                .orderItems()
+                .totalPrice(summary.getSubtotal())
+                .shippingFee(summary.getShippingFee())
+                .discountAmount(summary.getDiscountAmount())
+                .grandTotal(summary.getTotalAmount())
+                .discount(discount)
+                .estimatedDelivery(LocalDate.now().plusDays(carrier.getEstimatedDays()))
+                .carrier(carrier)
+                .address(address)
                 .build();
         orderRepo.save(order);
 
-        OrderRes orderRes = OrderRes.builder()
-                .trackingNumber(order.getTrackingNumber())
-                .paymentMethod(order.getPaymentMethod())
-                //.status()
-//                .paymentStatus()
-//                .totalPrice()
-//                .shippingFee()
-//                .discountAmount()
-//                .grandTotal()
-//                .discount()
-//                .estimatedDelivery()
-//                .carrier()
-//                .address()
-//                .orderItems()
-                .build();
-        return orderRes;
+        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrue(cart.getId());
+
+        List<OrderItem> orderItemList = new ArrayList<>();
+
+        for (CartItem cartItem : cartItemList) {
+            OrderItem orderItem = OrderItem.builder()
+                    .order(order)
+                    .product(cartItem.getProduct())
+                    .quantity(cartItem.getQuantity())
+                    .price(cartItem.getProduct().getBasePrice())
+                    .build();
+            orderItemList.add(orderItem);
+        }
+        orderItemRepo.saveAll(orderItemList);
+
+        return orderMapper.toOrderRes(order);
     }
 
     public String generateTrackingNumber(String prefix) {

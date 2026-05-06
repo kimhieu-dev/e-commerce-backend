@@ -10,8 +10,6 @@ import com.nkh.ecommercebackend.entity.CartItem;
 public interface CartService {
     CartRes getCurrentCart();
 
-    SummaryRes getSummary(String discountCode);
-
     CartItemRes addItem(AddItemReq request);
 
     void deleteItem(String id);

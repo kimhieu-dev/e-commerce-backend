@@ -4,6 +4,7 @@ import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.service.CartService;
+import com.nkh.ecommercebackend.service.SummaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class CartController {
     private final CartService cartService;
+    private final SummaryService summaryService;
 
     @GetMapping()
     public BaseResponse<CartRes> getCart() {
@@ -23,8 +25,8 @@ public class CartController {
     }
 
     @GetMapping("/summary")
-    public BaseResponse<SummaryRes> getSummary(@RequestBody  String discountCode) {
-        SummaryRes response = cartService.getSummary(discountCode);
+    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode) {
+        SummaryRes response = summaryService.getSummary(discountCode);
         return BaseResponse.success(response);
     }
 

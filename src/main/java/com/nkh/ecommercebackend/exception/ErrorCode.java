@@ -70,6 +70,7 @@ public enum ErrorCode {
     ADDRESS_BLANK(2050, "Address is blank", HttpStatus.BAD_REQUEST),
     CARRIER_NOT_FOUND(2051, "Carrier not found", HttpStatus.NOT_FOUND),
     ADDRESS_NOT_FOUND(2052, "Address not found", HttpStatus.NOT_FOUND),
+    PAYMENT_METHOD_INVALID(2053, "Payment method is invalid", HttpStatus.BAD_REQUEST),
 
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),

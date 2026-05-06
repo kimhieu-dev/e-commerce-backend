@@ -1,10 +1,7 @@
 package com.nkh.ecommercebackend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -15,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "order_item")
+@Builder
 public class OrderItem extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

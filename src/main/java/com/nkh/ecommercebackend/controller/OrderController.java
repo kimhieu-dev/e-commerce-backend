@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 public class OrderController {
-    private OrderService orderService;
+    private final OrderService orderService;
 
     @PostMapping
     public BaseResponse<OrderRes> createOrder(@RequestBody @Valid CreateOrderReq request) {

@@ -15,7 +15,7 @@ import lombok.Setter;
 public class CreateOrderReq {
 
     @NotNull(message = "PAYMENT_METHOD_NULL")
-    private PaymentMethod paymentMethod = PaymentMethod.COD;
+    private PaymentMethod paymentMethod;
 
     @NotBlank(message = "DISCOUNT_CODE_BLANK")
     private String discountCode;

@@ -42,7 +42,7 @@ public class Order extends BaseEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status",nullable = false)
-    private PaymentStatus paymentStatus = PaymentStatus.AWAITING_PAYMENT;
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
 
     @Column(name = "total_price",nullable = false)
     private BigDecimal totalPrice;

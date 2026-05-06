@@ -119,40 +119,6 @@ public class CartServiceImpl implements CartService {
         return cartItemRes;
     }
 
-    @Override
-    public SummaryRes getSummary(String discountCode) {
-        User user = currentUserService.getUser();
-        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
-
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrue(cart.getId());
-
-        BigDecimal subtotal = cartItemList.stream()
-                .map(item -> item
-                        .getProduct()
-                        .getBasePrice()
-                        .multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal shippingFee = BigDecimal.valueOf(30.00);
-
-        BigDecimal discountAmount;
-        Discount discount = discountRepo.findByCode(discountCode).orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-        if (discount.getType() == DiscountType.PERCENTAGE) {
-            discountAmount = discount.getValue().multiply(subtotal).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        } else {
-            discountAmount = discount.getValue();
-        }
-
-        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
-
-        return SummaryRes.builder()
-                .subtotal(subtotal)
-                .shippingFee(shippingFee)
-                .discountAmount(discountAmount)
-                .totalAmount(totalAmount)
-                .build();
-    }
-
     private void checkInventory(Product product) {
         Inventory inventory = product.getInventory();
         if (inventory == null) {

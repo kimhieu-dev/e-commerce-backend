@@ -95,9 +95,13 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(cartItem.getQuantity())
                     .price(cartItem.getProduct().getBasePrice())
                     .build();
+            cartItem.setChecked(false);
+            cartItem.setDeleted(true);
             orderItemList.add(orderItem);
         }
         orderItemRepo.saveAll(orderItemList);
+        cartItemRepo.saveAll(cartItemList);
+
 
         return orderMapper.toOrderRes(order);
     }

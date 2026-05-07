@@ -13,11 +13,11 @@ public interface CartRepo extends JpaRepository<Cart, String> {
 
     @Query(value = """
                 select c from Cart c
-                join fetch c.cartItems ci
+                left join fetch c.cartItems ci
                 join fetch ci.product p
                 join fetch p.inventory
                 join fetch p.productDetail
-                where c.user.username = :username
+                where c.user.username = :username and ci.deleted = false
             """)
     Optional<Cart> findByUsername(String username);
 

@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/v1/carriers")
 @RequiredArgsConstructor
 public class CarrierController {
-    private CarrierService carrierService;
+    private final CarrierService carrierService;
 
     @GetMapping
     public BaseResponse<List<CarrierRes>>  getCarriers() {

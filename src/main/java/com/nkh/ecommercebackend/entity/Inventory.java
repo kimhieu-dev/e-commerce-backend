@@ -14,24 +14,28 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "inventory")
+@Table(name = "inventories")
 public class Inventory extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id",unique = true, nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     private String id;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id",nullable = false)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "quantity_in_stock",nullable = false)
+    @Column(name = "quantity_in_stock", nullable = false)
     private Integer quantityInStock;
 
-    @Column(name = "reserved_quantity",nullable = false)
+    @Column(name = "reserved_quantity", nullable = false)
     private Integer reservedQuantity;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status",nullable = false)
+    @Column(name = "status", nullable = false)
     private InventoryStatus status;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 }

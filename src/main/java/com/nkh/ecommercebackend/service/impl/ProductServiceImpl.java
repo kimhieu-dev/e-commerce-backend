@@ -5,7 +5,7 @@ import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
-import com.nkh.ecommercebackend.entity.InventoryRes;
+import com.nkh.ecommercebackend.dto.response.InventoryRes;
 import com.nkh.ecommercebackend.entity.Product;
 import com.nkh.ecommercebackend.entity.ProductDetail;
 import com.nkh.ecommercebackend.exception.BusinessException;
@@ -22,8 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +64,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductRes createProduct(CreateProductReq request) {
         Boolean checkSku = productRepo.existsBySku(request.getSku());
         if (checkSku) {

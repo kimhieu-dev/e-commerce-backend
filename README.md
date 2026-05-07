@@ -32,30 +32,28 @@
 
 ## Tech Stack
 
-| Layer         | Technology                       |
-|---------------|----------------------------------|
-| Language      | Java 21                          |
-| Framework     | Spring Boot 3.2, Spring MVC      |
-| Security      | Spring Security, JWT (jjwt 0.11) |
-| Database      | MySQL 8.0                        |
-| ORM           | Spring Data JPA / Hibernate      |
-| Build Tool    | Maven                            |
-| Documentation | Swagger / OpenAPI 3 (springdoc)  |
-| Testing       | JUnit 5, Mockito                 |
-| Others        | Lombok, MapStruct                |
+| Layer         | Technology                  |
+|---------------|-----------------------------|
+| Language      | Java 21                     |
+| Framework     | Spring Boot 4.0.5           |
+| Security      | Spring Security             |
+| Database      | MySQL 9.6.0                 |
+| ORM           | Spring Data JPA / Hibernate |
+| Build Tool    | Maven                       |
+| Documentation | Swagger                     |
+| Testing       | JUnit 5, Mockito            |
+| Others        | Lombok, MapStruct           |
 
 ---
 
 ## Features
 
 **Authentication & Authorization**
-- [x] Register / Login with JWT
+- [x] Register / Login 
 - [x] Role-based access (ADMIN, USER)
-- [x] Token refresh
 
 **Product Management**
 - [x] CRUD for products and categories
-- [x] Image upload (local storage)
 - [x] Search, filter by category/price
 - [x] Pagination & sorting
 
@@ -63,10 +61,6 @@
 - [x] Add to cart, update quantity, remove item
 - [x] Place order, view order history
 - [x] Order status flow: `PENDING → CONFIRMED → SHIPPED → DELIVERED`
-
-**User**
-- [x] View and update profile
-- [x] Change password
 
 ---
 
@@ -185,7 +179,7 @@ This project helped me practice:
 
 **[Nguyen Kim Hieu]**  
 📧 nguyenkimhieu.dev@gmail.com 
-🔗 [LinkedIn](https://www.linkedin.com/in/hi%E1%BA%BFu-nguy%E1%BB%85n-kim-7a87913b8/)  
+🔗 [LinkedIn](https://www.linkedin.com/in/nguyenkimhieu/)  
 🐙 [GitHub](https://github.com/kimhieu-dev)
 
 ---

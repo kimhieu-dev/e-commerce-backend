@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "cart")
+@Table(name = "carts")
 public class Cart extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,4 +29,8 @@ public class Cart extends BaseEntity implements Serializable {
 
     @OneToMany(mappedBy = "cart",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 }

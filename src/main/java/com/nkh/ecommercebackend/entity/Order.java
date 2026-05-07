@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "order")
+@Table(name = "orders")
 public class Order extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -73,4 +73,8 @@ public class Order extends BaseEntity implements Serializable {
 
     @OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 }

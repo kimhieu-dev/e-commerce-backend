@@ -1,6 +1,5 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.common.DiscountType;
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
@@ -17,14 +16,11 @@ import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,8 +36,10 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepo cartRepo;
     private final OrderItemRepo orderItemRepo;
     private final OrderMapper orderMapper;
+    private final InventoryRepo inventoryRepo;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes createOrder(CreateOrderReq request) {
 
         User user = currentUserService.getUser();
@@ -57,6 +55,14 @@ public class OrderServiceImpl implements OrderService {
 
         Address address = addressRepo.findById(request.getAddressId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
+
+//        if (discount.getUsedCount() >= discount.getUsageLimit()) {
+//            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+//        }
+        int updated = discountRepo.increaseUserDiscount(discount.getId());
+        if (updated == 0) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+        }
 
         PaymentStatus paymentStatus;
         if (request.getPaymentMethod() == PaymentMethod.COD) {
@@ -82,22 +88,45 @@ public class OrderServiceImpl implements OrderService {
                 .carrier(carrier)
                 .address(address)
                 .build();
+
         orderRepo.save(order);
 
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrue(cart.getId());
+        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
+        if (cartItemList.isEmpty()) {
+            throw new BusinessException(ErrorCode.CART_IS_EMPTY);
+        }
 
         List<OrderItem> orderItemList = new ArrayList<>();
+        List<Inventory> inventories = new ArrayList<>();
 
         for (CartItem cartItem : cartItemList) {
+            Product product = cartItem.getProduct();
+
+            Inventory inventory = product.getInventory();
+            if (inventory.getQuantityInStock() < cartItem.getQuantity()) {
+                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+            }
+            inventory.setQuantityInStock(inventory.getQuantityInStock() - cartItem.getQuantity());
+            inventories.add(inventory);
+
             OrderItem orderItem = OrderItem.builder()
                     .order(order)
-                    .product(cartItem.getProduct())
+                    .product(product)
                     .quantity(cartItem.getQuantity())
-                    .price(cartItem.getProduct().getBasePrice())
+                    .price(product.getBasePrice())
                     .build();
+            cartItem.setChecked(false);
+            cartItem.setDeleted(true);
             orderItemList.add(orderItem);
         }
+
+        inventoryRepo.saveAll(inventories);
         orderItemRepo.saveAll(orderItemList);
+        cartItemRepo.saveAll(cartItemList);
+
+//        discount.setUsedCount(discount.getUsedCount() + 1);
+//        discountRepo.save(discount);
+
 
         return orderMapper.toOrderRes(order);
     }

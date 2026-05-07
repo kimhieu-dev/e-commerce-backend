@@ -1,7 +1,7 @@
 package com.nkh.ecommercebackend.controller;
 
 import com.nkh.ecommercebackend.dto.request.AddItemReq;
-import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
+import com.nkh.ecommercebackend.dto.request.UpdateItemQuantityReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.service.CartService;
 import com.nkh.ecommercebackend.service.SummaryService;
@@ -39,9 +39,9 @@ public class CartController {
     ///
     /// sửa đoạn này để trả về cart, sau khi tăng giảm số lượng thì load lại card
     ///
-    @PatchMapping("/cart/items/{id}")
-    public BaseResponse<CartItemRes> updateQuantityItem(@PathVariable String id, @Valid @RequestBody UpdateCartItemReq request) {
-        CartItemRes response = cartService.updateQuantityItem(id, request);
+    @PatchMapping("/items/{id}")
+    public BaseResponse<CartItemRes> updateItemQuantity(@PathVariable String id, @Valid @RequestBody UpdateItemQuantityReq request) {
+        CartItemRes response = cartService.updateItemQuantity(id, request);
         return BaseResponse.success(response);
     }
 

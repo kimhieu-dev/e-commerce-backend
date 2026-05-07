@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateCartItemReq implements Serializable {
+public class UpdateItemQuantityReq implements Serializable {
     @Min(value = 1,message = "quantity must greater than or equals to 1")
     private int quantity;
 }

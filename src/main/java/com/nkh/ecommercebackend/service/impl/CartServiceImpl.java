@@ -2,7 +2,7 @@ package com.nkh.ecommercebackend.service.impl;
 
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.AddItemReq;
-import com.nkh.ecommercebackend.dto.request.UpdateCartItemReq;
+import com.nkh.ecommercebackend.dto.request.UpdateItemQuantityReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.mapper.DiscountMapper;
@@ -100,9 +100,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CartItemRes updateQuantityItem(String id, UpdateCartItemReq request) {
+    public CartItemRes updateItemQuantity(String id, UpdateItemQuantityReq request) {
         User user = currentUserService.getUser();
-        CartItem cartItem = cartItemRepo.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        CartItem cartItem = cartItemRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        if (!user.getId().equals(id)) {
+            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
+        }
 
         //trang thai inventory
         checkInventory(cartItem.getProduct());
@@ -111,8 +116,7 @@ public class CartServiceImpl implements CartService {
 
         cartItem.setQuantity(request.getQuantity());
         cartItemRepo.save(cartItem);
-        CartItemRes cartItemRes = cartItemMapper.toCartItemRes(cartItem);
-        return cartItemRes;
+        return cartItemMapper.toCartItemRes(cartItem);
     }
 
     private void checkInventory(Product product) {

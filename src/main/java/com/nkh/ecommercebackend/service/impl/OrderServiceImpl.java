@@ -56,7 +56,11 @@ public class OrderServiceImpl implements OrderService {
         Address address = addressRepo.findById(request.getAddressId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
-        if (discount.getUsedCount() >= discount.getUsageLimit()) {
+//        if (discount.getUsedCount() >= discount.getUsageLimit()) {
+//            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+//        }
+        int updated = discountRepo.increaseUserDiscount(discount.getId());
+        if (updated == 0) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
 
@@ -120,8 +124,9 @@ public class OrderServiceImpl implements OrderService {
         orderItemRepo.saveAll(orderItemList);
         cartItemRepo.saveAll(cartItemList);
 
-        discount.setUsedCount(discount.getUsedCount() + 1);
-        discountRepo.save(discount);
+//        discount.setUsedCount(discount.getUsedCount() + 1);
+//        discountRepo.save(discount);
+
 
         return orderMapper.toOrderRes(order);
     }

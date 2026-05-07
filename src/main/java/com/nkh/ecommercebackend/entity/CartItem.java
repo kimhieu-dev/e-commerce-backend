@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "cart_item")
+@Table(name = "cart_items")
 @Builder
 public class CartItem extends BaseEntity implements Serializable {
     @Id

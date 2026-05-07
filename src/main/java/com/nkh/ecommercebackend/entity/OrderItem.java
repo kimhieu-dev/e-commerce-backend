@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "order_item")
+@Table(name = "order_items")
 @Builder
 public class OrderItem extends BaseEntity implements Serializable {
     @Id

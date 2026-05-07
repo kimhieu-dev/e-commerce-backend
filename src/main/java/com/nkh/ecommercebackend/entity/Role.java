@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "role")
+@Table(name = "roles")
 public class Role extends BaseEntity implements Serializable {
 
     @Id

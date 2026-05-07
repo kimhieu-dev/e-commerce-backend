@@ -5,7 +5,7 @@ import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
-import com.nkh.ecommercebackend.entity.InventoryRes;
+import com.nkh.ecommercebackend.dto.response.InventoryRes;
 import com.nkh.ecommercebackend.entity.Product;
 import com.nkh.ecommercebackend.entity.ProductDetail;
 import com.nkh.ecommercebackend.exception.BusinessException;

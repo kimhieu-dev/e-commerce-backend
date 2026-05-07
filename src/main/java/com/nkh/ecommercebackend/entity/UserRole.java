@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_role")
+@Table(name = "users_roles")
 public class UserRole extends BaseEntity implements Serializable {
 
     @Id

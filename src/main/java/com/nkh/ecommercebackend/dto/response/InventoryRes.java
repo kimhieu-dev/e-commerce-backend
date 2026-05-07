@@ -1,4 +1,4 @@
-package com.nkh.ecommercebackend.entity;
+package com.nkh.ecommercebackend.dto.response;
 
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import lombok.AllArgsConstructor;

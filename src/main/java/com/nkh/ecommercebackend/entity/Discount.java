@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "discount")
+@Table(name = "discounts")
 public class Discount implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,4 +44,7 @@ public class Discount implements Serializable {
 
     @Column(name = "used_count", nullable = false)
     private Integer usedCount;
+
+    @Column(name = "version",nullable = false)
+    private Long version;
 }

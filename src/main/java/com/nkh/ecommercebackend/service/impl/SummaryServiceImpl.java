@@ -11,7 +11,6 @@ import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.repository.CartItemRepo;
 import com.nkh.ecommercebackend.repository.CartRepo;
 import com.nkh.ecommercebackend.repository.DiscountRepo;
-import com.nkh.ecommercebackend.service.CartService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class SummaryServiceImpl implements SummaryService {
         Cart cart = cartRepo.findByUsername(user.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrue(cart.getId());
+        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
 
         BigDecimal subtotal = cartItemList.stream()
                 .map(item -> item

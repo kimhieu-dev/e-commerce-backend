@@ -71,6 +71,8 @@ public enum ErrorCode {
     CARRIER_NOT_FOUND(2051, "Carrier not found", HttpStatus.NOT_FOUND),
     ADDRESS_NOT_FOUND(2052, "Address not found", HttpStatus.NOT_FOUND),
     PAYMENT_METHOD_INVALID(2053, "Payment method is invalid", HttpStatus.BAD_REQUEST),
+    DISCOUNT_EXCEED(2054, "Discount exceeded", HttpStatus.BAD_REQUEST),
+    CART_IS_EMPTY(2055, "Cart is empty", HttpStatus.BAD_REQUEST),
 
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),

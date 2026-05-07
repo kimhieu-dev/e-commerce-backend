@@ -23,8 +23,6 @@ import java.util.Set;
 public class UserRes implements Serializable {
     private String username;
 
-    private String password;
-
     private String email;
 
     private String phoneNumber;

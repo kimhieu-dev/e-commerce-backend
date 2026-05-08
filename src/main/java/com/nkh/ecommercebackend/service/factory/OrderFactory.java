@@ -28,6 +28,8 @@ public class OrderFactory {
     private final OrderMapper orderMapper;
 
     public OrderRes generateOrder(String trackingNumber, User user, Cart cart, Discount discount, Carrier carrier, Address address, PaymentMethod paymentMethod, SummaryRes summary) {
+
+        //dung strategy pattern thay the if-else
         PaymentStatus paymentStatus;
         if (paymentMethod == PaymentMethod.COD) {
             paymentStatus = PaymentStatus.UNPAID;

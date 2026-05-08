@@ -42,6 +42,7 @@ public class SummaryServiceImpl implements SummaryService {
 
         BigDecimal shippingFee = BigDecimal.valueOf(30.00);
 
+        //dung strategy pattern thay the if-else
         BigDecimal discountAmount;
         if (discount.getType() == DiscountType.PERCENTAGE) {
             discountAmount = discount.getValue()

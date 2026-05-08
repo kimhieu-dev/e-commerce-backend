@@ -1,0 +1,23 @@
+$kind: http-request
+name: Create order
+url: "{{base_url}}/api/v1/orders"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"paymentMethod\": \"MOMO\",\r
+
+    \    \"discountCode\": \"HELLO123\",\r
+
+    \    \"carrierId\": \"760e4dae-c885-41ba-88b9-ef930dd941a4\",\r
+
+    \    \"addressId\": \"645b8534-640c-4d39-8abe-71f65c270bf4\"\r
+
+    }"
+auth:
+  credentials:
+    username: sieunhan11
+    password: sieunhan11
+  type: basic
+order: 1778214998788

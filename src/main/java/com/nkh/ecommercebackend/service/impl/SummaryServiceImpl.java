@@ -29,10 +29,7 @@ public class SummaryServiceImpl implements SummaryService {
     private final CartItemRepo cartItemRepo;
 
     @Override
-    public SummaryRes getSummary(String discountCode) {
-        User user = currentUserService.getUser();
-        Cart cart = cartRepo.findByUsername(user.getUsername())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+    public SummaryRes getSummary(Cart cart, Discount discount ) {
 
         List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
 
@@ -46,9 +43,6 @@ public class SummaryServiceImpl implements SummaryService {
         BigDecimal shippingFee = BigDecimal.valueOf(30.00);
 
         BigDecimal discountAmount;
-        Discount discount = discountRepo.findByCode(discountCode)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-
         if (discount.getType() == DiscountType.PERCENTAGE) {
             discountAmount = discount.getValue()
                     .multiply(subtotal)

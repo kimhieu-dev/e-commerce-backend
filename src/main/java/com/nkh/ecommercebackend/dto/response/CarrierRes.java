@@ -15,6 +15,5 @@ import java.math.BigDecimal;
 public class CarrierRes implements Serializable {
     private String name;
     private BigDecimal basePrice;
-    private BigDecimal tax;
     private Integer estimatedDays;
 }

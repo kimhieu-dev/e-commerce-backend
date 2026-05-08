@@ -13,6 +13,8 @@ import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
+import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
+import com.nkh.ecommercebackend.service.factory.OrderFactory;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,17 +28,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepo orderRepo;
     private final CurrentUserService currentUserService;
     private final DiscountRepo discountRepo;
     private final CarrierRepo carrierRepo;
     private final AddressRepo addressRepo;
-    private final CartItemRepo cartItemRepo;
     private final SummaryService summaryService;
     private final CartRepo cartRepo;
-    private final OrderItemRepo orderItemRepo;
-    private final OrderMapper orderMapper;
-    private final InventoryRepo inventoryRepo;
+    private final OrderFactory orderFactory;
+    private final TrackingNumberGenerator trackingNumberGenerator;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -56,83 +55,13 @@ public class OrderServiceImpl implements OrderService {
         Address address = addressRepo.findById(request.getAddressId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
-//        if (discount.getUsedCount() >= discount.getUsageLimit()) {
-//            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-//        }
-        int updated = discountRepo.increaseUserDiscount(discount.getId());
-        if (updated == 0) {
-            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-        }
+        SummaryRes summary = summaryService.getSummary(cart, discount);
 
-        PaymentStatus paymentStatus;
-        if (request.getPaymentMethod() == PaymentMethod.COD) {
-            paymentStatus = PaymentStatus.UNPAID;
-        } else {
-            paymentStatus = PaymentStatus.AWAITING_PAYMENT;
-        }
+        String trackingNumber = trackingNumberGenerator.generateTrackingNumber(carrier.getName());
 
-        SummaryRes summary = summaryService.getSummary(discount.getCode());
+        PaymentMethod paymentMethod = request.getPaymentMethod();
 
-        Order order = Order.builder()
-                .trackingNumber(generateTrackingNumber(carrier.getName()))
-                .user(user)
-                .paymentMethod(request.getPaymentMethod())
-                .status(OrderStatus.PENDING)
-                .paymentStatus(paymentStatus)
-                .totalPrice(summary.getSubtotal())
-                .shippingFee(summary.getShippingFee())
-                .discountAmount(summary.getDiscountAmount())
-                .grandTotal(summary.getTotalAmount())
-                .discount(discount)
-                .estimatedDelivery(LocalDate.now().plusDays(carrier.getEstimatedDays()))
-                .carrier(carrier)
-                .address(address)
-                .build();
-
-        orderRepo.save(order);
-
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
-        if (cartItemList.isEmpty()) {
-            throw new BusinessException(ErrorCode.CART_IS_EMPTY);
-        }
-
-        List<OrderItem> orderItemList = new ArrayList<>();
-        List<Inventory> inventories = new ArrayList<>();
-
-        for (CartItem cartItem : cartItemList) {
-            Product product = cartItem.getProduct();
-
-            Inventory inventory = product.getInventory();
-            if (inventory.getQuantityInStock() < cartItem.getQuantity()) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-            inventory.setQuantityInStock(inventory.getQuantityInStock() - cartItem.getQuantity());
-            inventories.add(inventory);
-
-            OrderItem orderItem = OrderItem.builder()
-                    .order(order)
-                    .product(product)
-                    .quantity(cartItem.getQuantity())
-                    .price(product.getBasePrice())
-                    .build();
-            cartItem.setChecked(false);
-            cartItem.setDeleted(true);
-            orderItemList.add(orderItem);
-        }
-
-        inventoryRepo.saveAll(inventories);
-        orderItemRepo.saveAll(orderItemList);
-        cartItemRepo.saveAll(cartItemList);
-
-//        discount.setUsedCount(discount.getUsedCount() + 1);
-//        discountRepo.save(discount);
-
-
-        return orderMapper.toOrderRes(order);
+        return orderFactory.generateOrder(trackingNumber, user, cart, discount, carrier, address, paymentMethod, summary);
     }
 
-    public String generateTrackingNumber(String prefix) {
-        String uuid = UUID.randomUUID().toString().replace("-", "").toUpperCase();
-        return prefix + uuid.substring(0, 8);
-    }
 }

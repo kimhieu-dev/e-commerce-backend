@@ -12,7 +12,7 @@ public interface CartItemRepo extends JpaRepository<CartItem, String> {
 
     @Query("""
             select ci from CartItem ci
-            join fetch ci.product p
+            join fetch ci.product p join fetch p.productDetail
             join fetch p.inventory where ci.cart.id = :cartId and ci.checked = true
             """)
     List<CartItem> findAllByCartIdAndCheckedTrueWithProduct(String cartId);

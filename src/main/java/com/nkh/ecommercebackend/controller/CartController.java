@@ -24,11 +24,11 @@ public class CartController {
         return BaseResponse.success(response);
     }
 
-    @GetMapping("/summary")
-    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode) {
-        SummaryRes response = summaryService.getSummary(discountCode);
-        return BaseResponse.success(response);
-    }
+//    @GetMapping("/summary")
+//    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode, @RequestParam String cartId) {
+//        SummaryRes response = cartService.getSummary(discountCode);
+//        return BaseResponse.success(response);
+//    }
 
     @PostMapping()
     public BaseResponse<CartItemRes> addItem(@RequestBody @Valid AddItemReq request) {

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemRes implements Serializable {
-    private ProductRes productRes;
+    private ProductRes product;
 
     private int quantity;
 

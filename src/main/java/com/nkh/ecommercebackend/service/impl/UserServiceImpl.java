@@ -109,7 +109,6 @@ public class UserServiceImpl implements UserService {
         for (User user : userList) {
             UserRes userRes = new UserRes();
             userRes.setUsername(user.getUsername());
-            userRes.setPassword(user.getPassword());
             userRes.setEmail(user.getEmail());
             userRes.setPhoneNumber(user.getPhoneNumber());
             userRes.setFullName(user.getFullName());

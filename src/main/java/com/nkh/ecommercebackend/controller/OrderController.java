@@ -25,11 +25,10 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
-    @GetMapping("/summary")
-    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode) {
-        SummaryRes response = summaryService.getSummary(discountCode);
-        return BaseResponse.success(response);
-    }
-
+//    @GetMapping("/summary")
+//    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode, @RequestBody String cartId) {
+//        SummaryRes response = orderService.getSummary(discountCode);
+//        return BaseResponse.success(response);
+//    }
 
 }

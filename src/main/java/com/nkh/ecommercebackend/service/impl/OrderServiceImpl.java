@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
         Address address = addressRepo.findById(request.getAddressId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
-        SummaryRes summary = summaryService.getSummary(discount.getCode());
+        SummaryRes summary = summaryService.getSummary(cart, discount);
 
         String trackingNumber = trackingNumberGenerator.generateTrackingNumber(carrier.getName());
 

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DiscountRes implements Serializable {
     private String code;
-    private DiscountType discountType;
+    private DiscountType type;
     private BigDecimal value;
     private LocalDate startDate;
     private LocalDate endDate;

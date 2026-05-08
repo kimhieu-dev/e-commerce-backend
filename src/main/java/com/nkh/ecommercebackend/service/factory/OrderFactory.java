@@ -83,6 +83,8 @@ public class OrderFactory {
 
         inventoryRepo.saveAll(inventories);
         orderItemRepo.saveAll(orderItemList);
+        order.setOrderItems(orderItemList);
+
         cartItemRepo.saveAll(cartItemList);
 
         int updated = discountRepo.increaseUserDiscount(discount.getId());

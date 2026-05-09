@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.service.impl;
 
+import com.nkh.ecommercebackend.common.DiscountType;
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
@@ -11,18 +12,22 @@ import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
+import com.nkh.ecommercebackend.service.DiscountStrategy;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
+import com.nkh.ecommercebackend.service.factory.DiscountStrategyFactory;
 import com.nkh.ecommercebackend.service.factory.OrderFactory;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service

@@ -11,7 +11,9 @@ import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.repository.CartItemRepo;
 import com.nkh.ecommercebackend.repository.CartRepo;
 import com.nkh.ecommercebackend.repository.DiscountRepo;
+import com.nkh.ecommercebackend.service.DiscountStrategy;
 import com.nkh.ecommercebackend.service.SummaryService;
+import com.nkh.ecommercebackend.service.factory.DiscountStrategyFactory;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SummaryServiceImpl implements SummaryService {
-    private final CartRepo cartRepo;
-    private final DiscountRepo discountRepo;
-    private final CurrentUserService currentUserService;
     private final CartItemRepo cartItemRepo;
+    private final DiscountStrategyFactory discountStrategyFactory;
 
     @Override
-    public SummaryRes getSummary(Cart cart, Discount discount ) {
+    public SummaryRes getSummary(Cart cart, Discount discount) {
 
         List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
 
@@ -42,22 +42,16 @@ public class SummaryServiceImpl implements SummaryService {
 
         BigDecimal shippingFee = BigDecimal.valueOf(30.00);
 
-        //dung strategy pattern thay the if-else
-        BigDecimal discountAmount;
-        if (discount.getType() == DiscountType.PERCENTAGE) {
-            discountAmount = discount.getValue()
-                    .multiply(subtotal)
-                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        } else {
-            discountAmount = discount.getValue();
-        }
+        DiscountStrategy strategy = discountStrategyFactory.create(discount.getType(), discount.getValue());
 
-        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
+        BigDecimal discountValue = strategy.calculate(subtotal);
+
+        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountValue);
 
         return SummaryRes.builder()
                 .subtotal(subtotal)
                 .shippingFee(shippingFee)
-                .discountAmount(discountAmount)
+                .discountAmount(discountValue)
                 .totalAmount(totalAmount)
                 .build();
     }

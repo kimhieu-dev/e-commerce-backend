@@ -10,6 +10,7 @@ import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
+import com.nkh.ecommercebackend.service.PaymentMethodStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,16 +27,12 @@ public class OrderFactory {
     private final OrderItemRepo orderItemRepo;
     private final DiscountRepo discountRepo;
     private final OrderMapper orderMapper;
+    private final PaymentMethodStrategyFactory paymentMethodStrategyFactory;
 
     public OrderRes generateOrder(String trackingNumber, User user, Cart cart, Discount discount, Carrier carrier, Address address, PaymentMethod paymentMethod, SummaryRes summary) {
 
-        //dung strategy pattern thay the if-else
-        PaymentStatus paymentStatus;
-        if (paymentMethod == PaymentMethod.COD) {
-            paymentStatus = PaymentStatus.UNPAID;
-        } else {
-            paymentStatus = PaymentStatus.AWAITING_PAYMENT;
-        }
+        PaymentMethodStrategy strategy = paymentMethodStrategyFactory.create(paymentMethod);
+        PaymentStatus paymentStatus = strategy.apply(paymentMethod);
 
         Order order = Order.builder()
                 .trackingNumber(trackingNumber)

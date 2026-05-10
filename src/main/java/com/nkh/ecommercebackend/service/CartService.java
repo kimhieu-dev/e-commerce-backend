@@ -4,6 +4,7 @@ import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateItemQuantityReq;
 import com.nkh.ecommercebackend.dto.response.CartItemRes;
 import com.nkh.ecommercebackend.dto.response.CartRes;
+import com.nkh.ecommercebackend.dto.response.SummaryRes;
 
 public interface CartService {
     CartRes getCurrentCart();
@@ -14,4 +15,5 @@ public interface CartService {
 
     CartItemRes updateItemQuantity(String id, UpdateItemQuantityReq request);
 
+    SummaryRes getSummary(String discountCode);
 }

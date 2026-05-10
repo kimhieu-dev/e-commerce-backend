@@ -15,4 +15,6 @@ public interface DiscountRepo extends JpaRepository<Discount, String> {
     int increaseUserDiscount(String id);
 
     Optional<Discount> findByCode(String code);
+
+
 }

@@ -6,17 +6,24 @@ import com.nkh.ecommercebackend.service.impl.CodMethodStrategy;
 import com.nkh.ecommercebackend.service.impl.MomoMethodStrategy;
 import com.nkh.ecommercebackend.service.impl.StripeMethodStrategy;
 import com.nkh.ecommercebackend.service.impl.VNPayMethodStrategy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PaymentMethodStrategyFactory {
+    private final CodMethodStrategy codMethodStrategy;
+    private final MomoMethodStrategy momoMethodStrategy;
+    private final VNPayMethodStrategy vnPayMethodStrategy;
+    private final StripeMethodStrategy stripeMethodStrategy;
+
     public PaymentMethodStrategy create(PaymentMethod paymentMethod) {
         return switch (paymentMethod){
-            case PaymentMethod.COD -> new CodMethodStrategy();
-            case PaymentMethod.MOMO -> new MomoMethodStrategy();
-            case PaymentMethod.VNPAY ->  new VNPayMethodStrategy();
-            case PaymentMethod.STRIPE ->  new StripeMethodStrategy();
+            case PaymentMethod.COD -> codMethodStrategy;
+            case PaymentMethod.MOMO -> momoMethodStrategy;
+            case PaymentMethod.VNPAY ->  vnPayMethodStrategy;
+            case PaymentMethod.STRIPE ->  stripeMethodStrategy;
         };
     }
 }

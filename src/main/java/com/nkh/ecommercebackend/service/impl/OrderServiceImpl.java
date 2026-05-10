@@ -5,6 +5,7 @@ import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
+import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
 import com.nkh.ecommercebackend.dto.response.SummaryRes;
 import com.nkh.ecommercebackend.entity.*;
@@ -18,8 +19,12 @@ import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
 import com.nkh.ecommercebackend.service.factory.DiscountStrategyFactory;
 import com.nkh.ecommercebackend.service.factory.OrderFactory;
+import com.nkh.ecommercebackend.service.spec.OrderSpec;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +46,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepo cartRepo;
     private final OrderFactory orderFactory;
     private final TrackingNumberGenerator trackingNumberGenerator;
+    private final OrderRepo orderRepo;
+    private final OrderMapper orderMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -67,6 +74,29 @@ public class OrderServiceImpl implements OrderService {
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
         return orderFactory.generateOrder(trackingNumber, user, cart, discount, carrier, address, paymentMethod, summary);
+    }
+
+    @Override
+    public List<OrderRes> getOrders(OrderFilterReq request, Pageable pageable) {
+        Specification<Order> specification = (root, query, criteriaBuilder)
+                -> criteriaBuilder.conjunction();
+        if (request.getTrackingNumber() != null && !request.getTrackingNumber().isEmpty()) {
+            specification = specification.and(OrderSpec.likeTrackingNumber(request.getTrackingNumber()));
+        }
+        if (request.getOrderStatus() != null) {
+            specification = specification.and(OrderSpec.equalOrderStatus(request.getOrderStatus()));
+        }
+        if (request.getMinPrice() != null) {
+            specification = specification.and(OrderSpec.equalMinPrice(request.getMinPrice()));
+        }
+        if (request.getMaxPrice() != null) {
+            specification = specification.and(OrderSpec.equalMaxPrice(request.getMaxPrice()));
+        }
+        if (request.getPaymentStatus() != null) {
+            specification = specification.and(OrderSpec.equalPaymentStatus(request.getPaymentStatus()));
+        }
+        List<Order> orders = orderRepo.findAll(specification, pageable).getContent();
+        return orderMapper.toOrderResList(orders);
     }
 
 }

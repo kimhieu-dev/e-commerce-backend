@@ -1,0 +1,12 @@
+$kind: http-request
+name: Get Orders
+url: "{{base_url}}/api/v1/orders"
+method: GET
+auth:
+  credentials:
+    - key: username
+      value: sieunhan11
+    - key: password
+      value: sieunhan11
+  type: basic
+order: 2460345809032268

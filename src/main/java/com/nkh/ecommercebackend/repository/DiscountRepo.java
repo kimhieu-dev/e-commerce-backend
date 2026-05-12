@@ -1,6 +1,5 @@
 package com.nkh.ecommercebackend.repository;
 
-import com.nkh.ecommercebackend.dto.response.DiscountRes;
 import com.nkh.ecommercebackend.entity.Discount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +11,11 @@ public interface DiscountRepo extends JpaRepository<Discount, String> {
 
     @Modifying
     @Query("update Discount d set d.usedCount = d.usedCount+1 where d.id = :id and d.usedCount<d.usageLimit")
-    int increaseUserDiscount(String id);
+    int increaseUsedCount(String id);
+
+    @Modifying
+    @Query("update Discount d set d = d.reservedCount+1 where d.id = :id and d.reservedCount<d.usageLimit")
+    int increaseReservedCount(String id);
 
     Optional<Discount> findByCode(String code);
 

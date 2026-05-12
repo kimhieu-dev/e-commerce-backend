@@ -86,10 +86,18 @@ public class OrderFactory {
 
         cartItemRepo.saveAll(cartItemList);
 
-        int updated = discountRepo.increaseUserDiscount(discount.getId());
-        if (updated == 0) {
+        int updated = discountRepo.increaseReservedCount(discount.getId());
+        if(updated == 0){
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
+
+        //TODO: đoạn này mình sẽ tăng reserved count còn used count chỉ tăng khi admin confirm order
+//        int updated = discountRepo.increaseUsedCount(discount.getId());
+//        if (updated == 0) {
+//            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+//        }
+
+
         return orderMapper.toOrderRes(order);
     }
 }

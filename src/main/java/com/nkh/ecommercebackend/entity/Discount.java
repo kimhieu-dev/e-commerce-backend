@@ -45,6 +45,9 @@ public class Discount implements Serializable {
     @Column(name = "used_count", nullable = false)
     private Integer usedCount;
 
+    @Column(name = "reserved_count",nullable = false)
+    private Integer reservedCount;
+
     @Column(name = "version",nullable = false)
     private Long version;
 }

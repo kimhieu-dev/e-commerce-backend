@@ -30,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +57,10 @@ public class OrderServiceImpl implements OrderService {
 
         Discount discount = discountRepo.findByCode(request.getDiscountCode())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+        //TODO: dùng schedule để quét xem bảng discount cái nào end rồi thì
+        if (discount.getEndDate().isBefore(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
+        }
 
         Carrier carrier = carrierRepo.findById(request.getCarrierId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CARRIER_NOT_FOUND));

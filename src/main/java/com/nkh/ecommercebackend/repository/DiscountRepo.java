@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DiscountRepo extends JpaRepository<Discount, String> {
@@ -19,5 +20,11 @@ public interface DiscountRepo extends JpaRepository<Discount, String> {
 
     Optional<Discount> findByCode(String code);
 
+    @Query("""
+            select d from Discount d
+            where d.deleted = false
+            and current_timestamp >= d.startDate
+            and current_timestamp <= d.endDate""")
+    List<Discount> findAllUsableDiscounts();
 
 }

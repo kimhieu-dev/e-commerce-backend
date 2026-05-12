@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DiscountService {
     List<DiscountRes> getDiscounts();
+
+    List<DiscountRes> getUsableDiscounts();
 }

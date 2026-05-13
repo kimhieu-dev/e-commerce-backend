@@ -1,10 +1,11 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.common.DiscountType;
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
+import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
+import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
 import com.nkh.ecommercebackend.dto.response.SummaryRes;
 import com.nkh.ecommercebackend.entity.*;
@@ -12,23 +13,20 @@ import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
-import com.nkh.ecommercebackend.service.DiscountStrategy;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
-import com.nkh.ecommercebackend.service.factory.DiscountStrategyFactory;
 import com.nkh.ecommercebackend.service.factory.OrderFactory;
+import com.nkh.ecommercebackend.service.spec.OrderSpec;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +39,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepo cartRepo;
     private final OrderFactory orderFactory;
     private final TrackingNumberGenerator trackingNumberGenerator;
+    private final OrderRepo orderRepo;
+    private final OrderMapper orderMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -53,6 +53,9 @@ public class OrderServiceImpl implements OrderService {
 
         Discount discount = discountRepo.findByCode(request.getDiscountCode())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+        if (discount.getEndDate().isBefore(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
+        }
 
         Carrier carrier = carrierRepo.findById(request.getCarrierId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CARRIER_NOT_FOUND));
@@ -67,6 +70,48 @@ public class OrderServiceImpl implements OrderService {
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
         return orderFactory.generateOrder(trackingNumber, user, cart, discount, carrier, address, paymentMethod, summary);
+    }
+
+    @Override
+    public List<OrderRes> getOrders(OrderFilterReq request, Pageable pageable) {
+        Specification<Order> specification = (root, query, criteriaBuilder)
+                -> criteriaBuilder.conjunction();
+        if (request.getTrackingNumber() != null && !request.getTrackingNumber().isEmpty()) {
+            specification = specification.and(OrderSpec.likeTrackingNumber(request.getTrackingNumber()));
+        }
+        if (request.getOrderStatus() != null) {
+            specification = specification.and(OrderSpec.equalOrderStatus(request.getOrderStatus()));
+        }
+        if (request.getMinPrice() != null) {
+            specification = specification.and(OrderSpec.equalMinPrice(request.getMinPrice()));
+        }
+        if (request.getMaxPrice() != null) {
+            specification = specification.and(OrderSpec.equalMaxPrice(request.getMaxPrice()));
+        }
+        if (request.getPaymentStatus() != null) {
+            specification = specification.and(OrderSpec.equalPaymentStatus(request.getPaymentStatus()));
+        }
+        List<Order> orders = orderRepo.findAll(specification, pageable).getContent();
+        return orderMapper.toOrderResList(orders);
+    }
+
+    @Override
+    public OrderRes approveOrder(String id, ApproveOrderReq request) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.CONFIRMED) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_CONFIRMED);
+        }
+        if(order.getPaymentStatus()== PaymentStatus.AWAITING_PAYMENT){
+            throw new BusinessException(ErrorCode.ORDER_AWAITING_PAYMENT);
+        }
+        order.setStatus(OrderStatus.CONFIRMED);
+        orderRepo.save(order);
+        int updated = discountRepo.increaseUsedCount(id);
+        if(updated == 0){
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+        }
+        return orderMapper.toOrderRes(order);
     }
 
 }

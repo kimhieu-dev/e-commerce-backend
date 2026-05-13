@@ -7,6 +7,7 @@ import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.mapper.DiscountMapper;
 import com.nkh.ecommercebackend.repository.*;
+import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
@@ -30,6 +31,7 @@ public class CartServiceImpl implements CartService {
     private final DiscountMapper discountMapper;
     private final DiscountRepo discountRepo;
     private final CarrierRepo carrierRepo;
+    private final SummaryService summaryService;
 
     @Override
     public CartRes getCurrentCart() {
@@ -117,6 +119,15 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(request.getQuantity());
         cartItemRepo.save(cartItem);
         return cartItemMapper.toCartItemRes(cartItem);
+    }
+
+    @Override
+    public SummaryRes getSummary(String discountCode) {
+        User user = currentUserService.getUser();
+        Cart cart = user.getCart();
+        Discount discount = discountRepo.findByCode(discountCode)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+        return summaryService.getSummary(cart, discount);
     }
 
     private void checkInventory(Product product) {

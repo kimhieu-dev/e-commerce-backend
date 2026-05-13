@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "discounts")
-public class Discount implements Serializable {
+public class Discount extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",unique = true, nullable = false)
@@ -44,6 +44,9 @@ public class Discount implements Serializable {
 
     @Column(name = "used_count", nullable = false)
     private Integer usedCount;
+
+    @Column(name = "reserved_count",nullable = false)
+    private Integer reservedCount;
 
     @Column(name = "version",nullable = false)
     private Long version;

@@ -23,4 +23,10 @@ public class DiscountServiceImpl implements DiscountService {
         List<Discount> discountList = discountRepo.findAll();
         return discountMapper.toDiscountResList(discountList);
     }
+
+    @Override
+    public List<DiscountRes> getUsableDiscounts() {
+        List<Discount> response = discountRepo.findAllUsableDiscounts();
+        return discountMapper.toDiscountResList(response);
+    }
 }

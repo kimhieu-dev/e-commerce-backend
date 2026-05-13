@@ -11,12 +11,16 @@ import java.util.Optional;
 public interface DiscountRepo extends JpaRepository<Discount, String> {
 
     @Modifying
-    @Query("update Discount d set d.usedCount = d.usedCount+1 where d.id = :id and d.usedCount<d.usageLimit")
+    @Query("update Discount d set d.usedCount = d.usedCount+1 where d.id = :id and d.usageLimit - d.usedCount - d.reservedCount > 0")
     int increaseUsedCount(String id);
 
     @Modifying
-    @Query("update Discount d set d = d.reservedCount+1 where d.id = :id and d.reservedCount<d.usageLimit")
+    @Query("update Discount d set d.reservedCount = d.reservedCount+1 where d.id = :id and d.usageLimit - d.usedCount - d.reservedCount > 0")
     int increaseReservedCount(String id);
+
+    @Modifying
+    @Query("update Discount d set d.reservedCount = d.reservedCount-1 where d.id = :id and d.reservedCount>0")
+    int decreaseReservedCount(String id);
 
     Optional<Discount> findByCode(String code);
 

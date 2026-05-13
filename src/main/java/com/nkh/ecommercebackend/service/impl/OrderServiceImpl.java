@@ -6,6 +6,7 @@ import com.nkh.ecommercebackend.common.PaymentStatus;
 import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
+import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
 import com.nkh.ecommercebackend.dto.response.SummaryRes;
 import com.nkh.ecommercebackend.entity.*;
@@ -96,21 +97,46 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes approveOrder(String id, ApproveOrderReq request) {
+        request.setStatus(OrderStatus.CONFIRMED);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         if (order.getStatus() == OrderStatus.CONFIRMED) {
             throw new BusinessException(ErrorCode.ORDER_ALREADY_CONFIRMED);
         }
-        if(order.getPaymentStatus()== PaymentStatus.AWAITING_PAYMENT){
+        if (order.getPaymentStatus() == PaymentStatus.AWAITING_PAYMENT) {
             throw new BusinessException(ErrorCode.ORDER_AWAITING_PAYMENT);
         }
-        order.setStatus(OrderStatus.CONFIRMED);
+        order.setStatus(request.getStatus());
         orderRepo.save(order);
-        int updated = discountRepo.increaseUsedCount(id);
-        if(updated == 0){
+        int updatedUsedCount = discountRepo.increaseUsedCount(order.getDiscount().getId());
+        if (updatedUsedCount == 0) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
+        int updatedReservedCount = discountRepo.decreaseReservedCount(order.getDiscount().getId());
+        if (updatedReservedCount == 0) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+        }
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrderRes rejectOrder(String id, RejectOrderReq request) {
+        request.setStatus(OrderStatus.REJECTED);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.REJECTED) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_REJECTED);
+        }
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+        int updated = discountRepo.decreaseReservedCount(order.getDiscount().getId());
+        if (updated == 0) {
+            throw new BusinessException(ErrorCode.RESERVED_COUNT_NEGATIVE);
+        }
+        //TODO: nếu user trả tiền rồi thì hoàn tiền ?
         return orderMapper.toOrderRes(order);
     }
 

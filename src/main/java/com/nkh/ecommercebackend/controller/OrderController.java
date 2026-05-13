@@ -3,9 +3,11 @@ package com.nkh.ecommercebackend.controller;
 import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
+import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
 import com.nkh.ecommercebackend.dto.response.SummaryRes;
+import com.nkh.ecommercebackend.entity.Order;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import jakarta.validation.Valid;
@@ -47,9 +49,16 @@ public class OrderController {
 
 
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/approve")
     public BaseResponse<OrderRes> approveOrder(@PathVariable String id, @RequestBody @Valid ApproveOrderReq request) {
         OrderRes response = orderService.approveOrder(id,request);
+        return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PatchMapping("/{id}/reject")
+    public BaseResponse<OrderRes> rejectOrder(@PathVariable String id, @RequestBody @Valid RejectOrderReq request) {
+        OrderRes response = orderService.rejectOrder(id,request);
         return BaseResponse.success(response);
     }
 }

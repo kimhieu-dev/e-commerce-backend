@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApproveOrderReq implements Serializable {
+public class RejectOrderReq implements Serializable {
     @NotNull
-    private OrderStatus status = OrderStatus.CONFIRMED;
+    private OrderStatus status = OrderStatus.REJECTED;
 }

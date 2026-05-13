@@ -74,6 +74,9 @@ public enum ErrorCode {
     DISCOUNT_EXCEED(2054, "Discount exceeded", HttpStatus.BAD_REQUEST),
     CART_IS_EMPTY(2055, "Cart is empty", HttpStatus.BAD_REQUEST),
     USER_DOES_NOT_HAVE_PRIVILEGE(2056, "User does not have privilege", HttpStatus.FORBIDDEN),
+    ORDER_NOT_FOUND(2057, "Order does not exist", HttpStatus.NOT_FOUND),
+    ORDER_ALREADY_CONFIRMED(2058, "Order already confirmed", HttpStatus.BAD_REQUEST),
+    ORDER_AWAITING_PAYMENT(2059, "Order awaiting payment", HttpStatus.BAD_REQUEST),
 
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),

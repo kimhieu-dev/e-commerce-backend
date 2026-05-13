@@ -1,9 +1,9 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.common.DiscountType;
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
+import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
@@ -13,22 +13,18 @@ import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
-import com.nkh.ecommercebackend.service.DiscountStrategy;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
-import com.nkh.ecommercebackend.service.factory.DiscountStrategyFactory;
 import com.nkh.ecommercebackend.service.factory.OrderFactory;
 import com.nkh.ecommercebackend.service.spec.OrderSpec;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -57,7 +53,6 @@ public class OrderServiceImpl implements OrderService {
 
         Discount discount = discountRepo.findByCode(request.getDiscountCode())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-        //TODO: dùng schedule để quét xem bảng discount cái nào end rồi thì
         if (discount.getEndDate().isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
         }
@@ -98,6 +93,25 @@ public class OrderServiceImpl implements OrderService {
         }
         List<Order> orders = orderRepo.findAll(specification, pageable).getContent();
         return orderMapper.toOrderResList(orders);
+    }
+
+    @Override
+    public OrderRes approveOrder(String id, ApproveOrderReq request) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.CONFIRMED) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_CONFIRMED);
+        }
+        if(order.getPaymentStatus()== PaymentStatus.AWAITING_PAYMENT){
+            throw new BusinessException(ErrorCode.ORDER_AWAITING_PAYMENT);
+        }
+        order.setStatus(OrderStatus.CONFIRMED);
+        orderRepo.save(order);
+        int updated = discountRepo.increaseUsedCount(id);
+        if(updated == 0){
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+        }
+        return orderMapper.toOrderRes(order);
     }
 
 }

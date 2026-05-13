@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.controller;
 
+import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,10 +38,18 @@ public class OrderController {
 //        return BaseResponse.success(response);
 //    }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
-    public BaseResponse<List<OrderRes>> getOrders(OrderFilterReq request,@PageableDefault(size = 5,page = 0) Pageable pageable) {
-        List<OrderRes> response = orderService.getOrders(request,pageable);
+    public BaseResponse<List<OrderRes>> getOrders(OrderFilterReq request, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+        List<OrderRes> response = orderService.getOrders(request, pageable);
         return BaseResponse.success(response);
     }
 
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PatchMapping("/{id}")
+    public BaseResponse<OrderRes> approveOrder(@PathVariable String id, @RequestBody @Valid ApproveOrderReq request) {
+        OrderRes response = orderService.approveOrder(id,request);
+        return BaseResponse.success(response);
+    }
 }

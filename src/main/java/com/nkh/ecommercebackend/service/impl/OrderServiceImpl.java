@@ -8,6 +8,7 @@ import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
+import com.nkh.ecommercebackend.dto.response.OverviewRes;
 import com.nkh.ecommercebackend.dto.response.SummaryRes;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.exception.BusinessException;
@@ -26,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -138,6 +140,26 @@ public class OrderServiceImpl implements OrderService {
         }
         //TODO: nếu user trả tiền rồi thì hoàn tiền ?
         return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OverviewRes getOverview(LocalDate from, LocalDate to) {
+        if (from == null) from = LocalDate.now().minusDays(30);
+        if (to == null) to = LocalDate.now();
+
+        //TODO dùng overview factory ?
+        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(from,to);
+        Integer totalOrders = orderRepo.countTotalOrders(from,to);
+        Integer totalPending = orderRepo.countTotalPendingOrders(from,to);
+        Integer totalShipping = orderRepo.countTotalShippingOrders(from,to);
+        Integer totalFailed = orderRepo.countTotalFailedOrders(from,to);
+        return OverviewRes.builder()
+                .totalRevenue(totalRevenue)
+                .totalOrders(totalOrders)
+                .totalPending(totalPending)
+                .totalShipping(totalShipping)
+                .totalFailed(totalFailed)
+                .build();
     }
 
 }

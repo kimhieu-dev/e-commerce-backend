@@ -4,16 +4,11 @@ import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
-import com.nkh.ecommercebackend.dto.response.OrderRes;
-import com.nkh.ecommercebackend.dto.response.OverviewRes;
-import com.nkh.ecommercebackend.dto.response.SummaryRes;
-import com.nkh.ecommercebackend.entity.Order;
+import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,9 +62,16 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/overview")
-    public BaseResponse<OverviewRes> getOverview(@RequestParam(value = "from", required = false) LocalDate from,
-                                                 @RequestParam(value = "to", required = false) LocalDate to) {
-        OverviewRes response = orderService.getOverview(from,to);
+    public BaseResponse<OverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,
+                                                 @RequestParam(value = "toDate", required = false) LocalDate toDate) {
+        OverviewRes response = orderService.getOverview(fromDate, toDate);
+        return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/today-statistics")
+    public BaseResponse<TodayStatisticsRes> getTodayStatistics() {
+        TodayStatisticsRes response = orderService.getTodayStatistics();
         return BaseResponse.success(response);
     }
 }

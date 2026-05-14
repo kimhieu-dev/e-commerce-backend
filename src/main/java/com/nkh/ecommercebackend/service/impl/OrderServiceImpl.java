@@ -10,6 +10,7 @@ import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
 import com.nkh.ecommercebackend.dto.response.OverviewRes;
 import com.nkh.ecommercebackend.dto.response.SummaryRes;
+import com.nkh.ecommercebackend.dto.response.TodayStatisticsRes;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -143,22 +145,43 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OverviewRes getOverview(LocalDate from, LocalDate to) {
-        if (from == null) from = LocalDate.now().minusDays(30);
-        if (to == null) to = LocalDate.now();
+    public OverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
+
+
+        if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
+        if (toDate == null) toDate = LocalDate.now();
+
+        LocalDateTime fromDateTime = fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atStartOfDay();
 
         //TODO dùng overview factory ?
-        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(from,to);
-        Integer totalOrders = orderRepo.countTotalOrders(from,to);
-        Integer totalPending = orderRepo.countTotalPendingOrders(from,to);
-        Integer totalShipping = orderRepo.countTotalShippingOrders(from,to);
-        Integer totalFailed = orderRepo.countTotalFailedOrders(from,to);
+        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(fromDateTime, toDateTime);
+        Integer totalOrders = orderRepo.countTotalOrders(fromDateTime, toDateTime);
+        Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
+        Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
+        Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
         return OverviewRes.builder()
                 .totalRevenue(totalRevenue)
                 .totalOrders(totalOrders)
                 .totalPending(totalPending)
                 .totalShipping(totalShipping)
                 .totalFailed(totalFailed)
+                .build();
+    }
+
+    @Override
+    public TodayStatisticsRes getTodayStatistics() {
+        LocalDateTime fromDateTime = LocalDate.now().atStartOfDay();
+        LocalDateTime toDateTime = LocalDate.now().plusDays(1).atStartOfDay();
+
+        Integer totalOrdersToday = orderRepo.countTotalOrders(fromDateTime, toDateTime);
+        Integer totalOrdersConfirmedToday = orderRepo.countTotalConfirmedOrders(fromDateTime, toDateTime);
+        Integer totalOrdersPendingToday = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
+
+        return TodayStatisticsRes.builder()
+                .totalOrdersToday(totalOrdersToday)
+                .totalOrdersConfirmedToday(totalOrdersConfirmedToday)
+                .totalOrdersPendingToday(totalOrdersPendingToday)
                 .build();
     }
 

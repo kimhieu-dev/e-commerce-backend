@@ -3,6 +3,7 @@ package com.nkh.ecommercebackend.service.impl;
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
+import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
 import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
@@ -120,22 +121,67 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate == null ) fromDate = LocalDate.now().minusDays(30);
-        if (toDate == null ) toDate = LocalDate.now();
+        if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
+        if (toDate == null) toDate = LocalDate.now();
 
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
         LocalDateTime toDateTime = toDate.atStartOfDay();
 
-        BigDecimal inventoryValue = productRepo.getInventoryValue(fromDateTime,toDateTime);
+        BigDecimal inventoryValue = productRepo.getInventoryValue(fromDateTime, toDateTime);
 
-        Integer totalProducts = productRepo.getTotalProducts(fromDateTime,toDateTime);
+        Integer totalProducts = productRepo.getTotalProducts(fromDateTime, toDateTime);
 
-        Integer totalLimitedStock = productRepo.getTotalLimitedStock(fromDateTime,toDateTime);
+        Integer totalLimitedStock = productRepo.getTotalLimitedStock(fromDateTime, toDateTime);
 
         return ProductOverviewRes.builder()
                 .inventoryValue(inventoryValue)
                 .totalProducts(totalProducts)
                 .totalLimitedStock(totalLimitedStock)
+                .build();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ProductRes updateProduct(String id, UpdateProductReq request) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        product.setName(request.getName());
+        product.setBasePrice(request.getBasePrice());
+        product.setThumbnailUrl(request.getThumbnailUrl());
+        productRepo.save(product);
+
+
+        ProductDetail productDetail = product.getProductDetail();
+        productDetail.setProduct(product);
+        productDetail.setDescription(request.getDescription());
+        productDetail.setWeight(request.getWeight());
+        productDetail.setLength(request.getLength());
+        productDetail.setWidth(request.getWidth());
+        productDetail.setHeight(request.getHeight());
+        productDetailRepo.save(productDetail);
+
+        Inventory inventory = product.getInventory();
+        inventory.setProduct(product);
+        inventory.setQuantityInStock(request.getQuantityInStock());
+        inventory.setReservedQuantity(request.getReservedQuantity());
+        if (request.getQuantityInStock() == 0) {
+            inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
+        } else if (request.getQuantityInStock() <= 10) {
+            inventory.setStatus(InventoryStatus.LIMITED_STOCK);
+        } else {
+            inventory.setStatus(InventoryStatus.IN_STOCK);
+        }
+        inventoryRepo.save(inventory);
+
+        InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);
+
+        return ProductRes.builder()
+                .sku(product.getSku())
+                .name(product.getName())
+                .basePrice(product.getBasePrice())
+                .thumbnailUrl(product.getThumbnailUrl())
+                .inventory(inventoryRes)
                 .build();
     }
 }

@@ -74,4 +74,16 @@ public class OrderController {
         TodayStatisticsRes response = orderService.getTodayStatistics();
         return BaseResponse.success(response);
     }
+
+    @GetMapping("/{id}/tracking-logs")
+    public BaseResponse<List<TrackingLogRes>> getTrackingLogs(@PathVariable String id){
+        List<TrackingLogRes> response = orderService.getTrackingLogs(id);
+        return BaseResponse.success(response);
+    }
+
+    @GetMapping("/{id}")
+    public BaseResponse<OrderDetailRes> getOrderDetail(@PathVariable String id){
+        OrderDetailRes response = orderService.getOrderDetail(id);
+        return BaseResponse.success(response);
+    }
 }

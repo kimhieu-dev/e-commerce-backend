@@ -1,12 +1,14 @@
 package com.nkh.ecommercebackend.repository;
 
 import com.nkh.ecommercebackend.entity.Order;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificationExecutor<Order> {
 
@@ -55,4 +57,13 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                                                 and o.createdAt between :from and :to
             """)
     Integer countTotalConfirmedOrders(LocalDateTime from, LocalDateTime to);
+
+    @Query("""
+                select o from Order o
+                left join fetch o.trackingLogs
+                join fetch o.address
+                join fetch o.orderItems
+                where o.id = :id
+            """)
+    Optional<Order> findByIdTrackingLog(String id);
 }

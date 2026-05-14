@@ -7,14 +7,14 @@ import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
-import com.nkh.ecommercebackend.dto.response.OrderRes;
-import com.nkh.ecommercebackend.dto.response.OverviewRes;
-import com.nkh.ecommercebackend.dto.response.SummaryRes;
-import com.nkh.ecommercebackend.dto.response.TodayStatisticsRes;
+import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
+import com.nkh.ecommercebackend.mapper.AddressMapper;
+import com.nkh.ecommercebackend.mapper.OrderItemMapper;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
+import com.nkh.ecommercebackend.mapper.TrackingLogMapper;
 import com.nkh.ecommercebackend.repository.*;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
@@ -46,6 +46,11 @@ public class OrderServiceImpl implements OrderService {
     private final TrackingNumberGenerator trackingNumberGenerator;
     private final OrderRepo orderRepo;
     private final OrderMapper orderMapper;
+    private final TrackingLogRepo trackingLogRepo;
+    private final TrackingLogMapper trackingLogMapper;
+    private final AddressMapper addressMapper;
+    private final OrderItemRepo orderItemRepo;
+    private final OrderItemMapper orderItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -122,6 +127,7 @@ public class OrderServiceImpl implements OrderService {
         if (updatedReservedCount == 0) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
+        //TODO: thêm tracking log
         return orderMapper.toOrderRes(order);
     }
 
@@ -141,6 +147,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.RESERVED_COUNT_NEGATIVE);
         }
         //TODO: nếu user trả tiền rồi thì hoàn tiền ?
+        //TODO: thêm tracking log
         return orderMapper.toOrderRes(order);
     }
 
@@ -182,6 +189,35 @@ public class OrderServiceImpl implements OrderService {
                 .totalOrdersToday(totalOrdersToday)
                 .totalOrdersConfirmedToday(totalOrdersConfirmedToday)
                 .totalOrdersPendingToday(totalOrdersPendingToday)
+                .build();
+    }
+
+    @Override
+    public List<TrackingLogRes> getTrackingLogs(String id) {
+        List<TrackingLog> trackingLogs = trackingLogRepo.findAllByOrderId(id);
+        if (trackingLogs == null || trackingLogs.isEmpty()) {
+            throw new BusinessException(ErrorCode.TRACKING_LOGS_NOT_FOUND);
+        }
+        return trackingLogMapper.toTrackingLogResList(trackingLogs);
+    }
+
+    @Override
+    public OrderDetailRes getOrderDetail(String id) {
+        Order order = orderRepo.findByIdTrackingLog(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        List<OrderItem> orderItemList = order.getOrderItems();
+        if (orderItemList == null || orderItemList.isEmpty()) {
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        List<OrderItemRes> orderItemResList = orderItemMapper.toOrderItemResList(orderItemList);
+        return OrderDetailRes.builder()
+                .trackingNumber(order.getTrackingNumber())
+                .paymentMethod(order.getPaymentMethod())
+                .status(order.getStatus())
+                .grandTotal(order.getGrandTotal())
+                .estimatedDelivery(order.getEstimatedDelivery())
+                .address(addressMapper.toAddressRes(order.getAddress()))
+                .orderItems(orderItemResList)
                 .build();
     }
 

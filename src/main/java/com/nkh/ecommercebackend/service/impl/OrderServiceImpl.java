@@ -152,8 +152,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
-
+    public OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
 
         if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
         if (toDate == null) toDate = LocalDate.now();
@@ -167,7 +166,7 @@ public class OrderServiceImpl implements OrderService {
         Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
         Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
         Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
-        return OverviewRes.builder()
+        return OrderOverviewRes.builder()
                 .totalRevenue(totalRevenue)
                 .totalOrders(totalOrders)
                 .totalPending(totalPending)
@@ -194,6 +193,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<TrackingLogRes> getTrackingLogs(String id) {
+        User user = currentUserService.getUser();
+
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new BusinessException(ErrorCode.YOU_DO_NOT_HAVE_PRIVILEGE);
+        }
+
         List<TrackingLog> trackingLogs = trackingLogRepo.findAllByOrderId(id);
         if (trackingLogs == null || trackingLogs.isEmpty()) {
             throw new BusinessException(ErrorCode.TRACKING_LOGS_NOT_FOUND);
@@ -203,8 +210,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailRes getOrderDetail(String id) {
+        User user = currentUserService.getUser();
         Order order = orderRepo.findByIdTrackingLog(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new BusinessException(ErrorCode.YOU_DO_NOT_HAVE_PRIVILEGE);
+        }
         List<OrderItem> orderItemList = order.getOrderItems();
         if (orderItemList == null || orderItemList.isEmpty()) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);

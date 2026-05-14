@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OverviewRes implements Serializable {
+public class OrderOverviewRes implements Serializable {
     private BigDecimal totalRevenue;
     private Integer totalOrders;
     private Integer totalPending;

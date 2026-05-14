@@ -60,6 +60,7 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
 
     @Query("""
                 select o from Order o
+                            join fetch o.user
                 left join fetch o.trackingLogs
                 join fetch o.address
                 join fetch o.orderItems

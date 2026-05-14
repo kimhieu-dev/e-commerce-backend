@@ -3,6 +3,8 @@ package com.nkh.ecommercebackend.service.impl;
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
+import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
+import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
 import com.nkh.ecommercebackend.dto.response.InventoryRes;
@@ -24,6 +26,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,9 +63,7 @@ public class ProductServiceImpl implements ProductService {
         }
         Page<Product> products = productRepo.findAll(specification, pageable);
         List<Product> productList = products.getContent();
-        List<ProductRes> productResList = productMapper.toProductResList(productList);
-
-        return productResList;
+        return productMapper.toProductResList(productList);
     }
 
     @Override
@@ -71,14 +74,85 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException(ErrorCode.SKU_EXISTED);
         }
 
-        Product product = new Product();
-        product.setSku(request.getSku());
+        Product product = Product.builder()
+                .sku(request.getSku())
+                .name(request.getName())
+                .basePrice(request.getBasePrice())
+                .thumbnailUrl(request.getThumbnailUrl())
+                .build();
+        productRepo.save(product);
+
+        ProductDetail productDetail = ProductDetail.builder()
+                .product(product)
+                .description(request.getDescription())
+                .weight(request.getWeight())
+                .length(request.getLength())
+                .width(request.getWidth())
+                .height(request.getHeight())
+                .build();
+        productDetailRepo.save(productDetail);
+
+        Inventory inventory = Inventory.builder()
+                .product(product)
+                .quantityInStock(request.getQuantityInStock())
+                .reservedQuantity(request.getReservedQuantity())
+                .build();
+
+        if (request.getQuantityInStock() == 0) {
+            inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
+        } else if (request.getQuantityInStock() <= 10) {
+            inventory.setStatus(InventoryStatus.LIMITED_STOCK);
+        } else {
+            inventory.setStatus(InventoryStatus.IN_STOCK);
+        }
+
+        inventoryRepo.save(inventory);
+
+        InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);
+
+        return ProductRes.builder()
+                .sku(product.getSku())
+                .name(product.getName())
+                .basePrice(product.getBasePrice())
+                .thumbnailUrl(product.getThumbnailUrl())
+                .inventory(inventoryRes)
+                .build();
+    }
+
+    @Override
+    public ProductOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
+        if (toDate == null) toDate = LocalDate.now();
+
+        LocalDateTime fromDateTime = fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atStartOfDay();
+
+        BigDecimal inventoryValue = productRepo.getInventoryValue(fromDateTime, toDateTime);
+
+        Integer totalProducts = productRepo.getTotalProducts(fromDateTime, toDateTime);
+
+        Integer totalLimitedStock = productRepo.getTotalLimitedStock(fromDateTime, toDateTime);
+
+        return ProductOverviewRes.builder()
+                .inventoryValue(inventoryValue)
+                .totalProducts(totalProducts)
+                .totalLimitedStock(totalLimitedStock)
+                .build();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ProductRes updateProduct(String id, UpdateProductReq request) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+
         product.setName(request.getName());
         product.setBasePrice(request.getBasePrice());
         product.setThumbnailUrl(request.getThumbnailUrl());
         productRepo.save(product);
 
-        ProductDetail productDetail = new ProductDetail();
+
+        ProductDetail productDetail = product.getProductDetail();
         productDetail.setProduct(product);
         productDetail.setDescription(request.getDescription());
         productDetail.setWeight(request.getWeight());
@@ -87,7 +161,7 @@ public class ProductServiceImpl implements ProductService {
         productDetail.setHeight(request.getHeight());
         productDetailRepo.save(productDetail);
 
-        Inventory inventory = new Inventory();
+        Inventory inventory = product.getInventory();
         inventory.setProduct(product);
         inventory.setQuantityInStock(request.getQuantityInStock());
         inventory.setReservedQuantity(request.getReservedQuantity());

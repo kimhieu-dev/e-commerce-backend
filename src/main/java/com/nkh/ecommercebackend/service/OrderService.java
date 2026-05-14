@@ -19,7 +19,7 @@ public interface OrderService {
 
     OrderRes rejectOrder(String id, RejectOrderReq request );
 
-    OverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
+    OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
 
     TodayStatisticsRes getTodayStatistics();
 

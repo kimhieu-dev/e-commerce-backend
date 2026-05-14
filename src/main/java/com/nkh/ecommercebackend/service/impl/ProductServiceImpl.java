@@ -58,9 +58,7 @@ public class ProductServiceImpl implements ProductService {
         }
         Page<Product> products = productRepo.findAll(specification, pageable);
         List<Product> productList = products.getContent();
-        List<ProductRes> productResList = productMapper.toProductResList(productList);
-
-        return productResList;
+        return productMapper.toProductResList(productList);
     }
 
     @Override
@@ -71,26 +69,30 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException(ErrorCode.SKU_EXISTED);
         }
 
-        Product product = new Product();
-        product.setSku(request.getSku());
-        product.setName(request.getName());
-        product.setBasePrice(request.getBasePrice());
-        product.setThumbnailUrl(request.getThumbnailUrl());
+        Product product = Product.builder()
+                .sku(request.getSku())
+                .name(request.getName())
+                .basePrice(request.getBasePrice())
+                .thumbnailUrl(request.getThumbnailUrl())
+                .build();
         productRepo.save(product);
 
-        ProductDetail productDetail = new ProductDetail();
-        productDetail.setProduct(product);
-        productDetail.setDescription(request.getDescription());
-        productDetail.setWeight(request.getWeight());
-        productDetail.setLength(request.getLength());
-        productDetail.setWidth(request.getWidth());
-        productDetail.setHeight(request.getHeight());
+        ProductDetail productDetail = ProductDetail.builder()
+                .product(product)
+                .description(request.getDescription())
+                .weight(request.getWeight())
+                .length(request.getLength())
+                .width(request.getWidth())
+                .height(request.getHeight())
+                .build();
         productDetailRepo.save(productDetail);
 
-        Inventory inventory = new Inventory();
-        inventory.setProduct(product);
-        inventory.setQuantityInStock(request.getQuantityInStock());
-        inventory.setReservedQuantity(request.getReservedQuantity());
+        Inventory inventory = Inventory.builder()
+                .product(product)
+                .quantityInStock(request.getQuantityInStock())
+                .reservedQuantity(request.getReservedQuantity())
+                .build();
+
         if (request.getQuantityInStock() == 0) {
             inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
         } else if (request.getQuantityInStock() <= 10) {
@@ -98,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
         } else {
             inventory.setStatus(InventoryStatus.IN_STOCK);
         }
+
         inventoryRepo.save(inventory);
 
         InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);

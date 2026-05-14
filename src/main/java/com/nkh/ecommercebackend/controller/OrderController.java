@@ -62,9 +62,9 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/overview")
-    public BaseResponse<OverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,
-                                                 @RequestParam(value = "toDate", required = false) LocalDate toDate) {
-        OverviewRes response = orderService.getOverview(fromDate, toDate);
+    public BaseResponse<OrderOverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,
+                                                      @RequestParam(value = "toDate", required = false) LocalDate toDate) {
+        OrderOverviewRes response = orderService.getOverview(fromDate, toDate);
         return BaseResponse.success(response);
     }
 

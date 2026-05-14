@@ -3,6 +3,7 @@ package com.nkh.ecommercebackend.service.impl;
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
+import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
 import com.nkh.ecommercebackend.dto.response.InventoryRes;
@@ -24,6 +25,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,6 +115,27 @@ public class ProductServiceImpl implements ProductService {
                 .basePrice(product.getBasePrice())
                 .thumbnailUrl(product.getThumbnailUrl())
                 .inventory(inventoryRes)
+                .build();
+    }
+
+    @Override
+    public ProductOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate == null ) fromDate = LocalDate.now().minusDays(30);
+        if (toDate == null ) toDate = LocalDate.now();
+
+        LocalDateTime fromDateTime = fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atStartOfDay();
+
+        BigDecimal inventoryValue = productRepo.getInventoryValue(fromDateTime,toDateTime);
+
+        Integer totalProducts = productRepo.getTotalProducts(fromDateTime,toDateTime);
+
+        Integer totalLimitedStock = productRepo.getTotalLimitedStock(fromDateTime,toDateTime);
+
+        return ProductOverviewRes.builder()
+                .inventoryValue(inventoryValue)
+                .totalProducts(totalProducts)
+                .totalLimitedStock(totalLimitedStock)
                 .build();
     }
 }

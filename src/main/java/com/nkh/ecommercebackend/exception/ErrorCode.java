@@ -79,7 +79,7 @@ public enum ErrorCode {
     ORDER_AWAITING_PAYMENT(2059, "Order awaiting payment", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_REJECTED(2060, "Order already rejected", HttpStatus.BAD_REQUEST),
     RESERVED_COUNT_NEGATIVE(2061, "Reserved count is negative", HttpStatus.BAD_REQUEST),
-
+    TRACKING_LOGS_NOT_FOUND(2062, "Tracking logs not found", HttpStatus.NOT_FOUND),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

@@ -77,4 +77,7 @@ public class Order extends BaseEntity implements Serializable {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
+
+    @OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
+    private List<TrackingLog> trackingLogs;
 }

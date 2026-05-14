@@ -4,14 +4,10 @@ import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
 import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
 import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
 import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
-import com.nkh.ecommercebackend.dto.response.OrderRes;
-import com.nkh.ecommercebackend.dto.response.OverviewRes;
-import com.nkh.ecommercebackend.dto.response.TodayStatisticsRes;
-import com.nkh.ecommercebackend.entity.Order;
+import com.nkh.ecommercebackend.dto.response.*;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderService {
@@ -26,4 +22,8 @@ public interface OrderService {
     OverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
 
     TodayStatisticsRes getTodayStatistics();
+
+    List<TrackingLogRes> getTrackingLogs(String id);
+
+    OrderDetailRes getOrderDetail(String id);
 }

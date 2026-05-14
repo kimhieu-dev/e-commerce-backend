@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificationExecutor<Order> {
 
@@ -15,14 +15,14 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                         where o.status = OrderStatus.DELIVERED
                                     and o.createdAt between :from and :to and o.deleted = false
             """)
-    BigDecimal calculateTotalRevenue(LocalDate from, LocalDate to);
+    BigDecimal calculateTotalRevenue(LocalDateTime from, LocalDateTime to);
 
     @Query("""
             select count (o.id) from Order o
                         where o.deleted = false
                                     and o.createdAt between :from and :to
             """)
-    Integer countTotalOrders(LocalDate from, LocalDate to);
+    Integer countTotalOrders(LocalDateTime from, LocalDateTime to);
 
     @Query("""
             select count (o.id) from Order o
@@ -30,7 +30,7 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                                     and o.status = OrderStatus.PENDING
                                                 and o.createdAt between :from and :to
             """)
-    Integer countTotalPendingOrders(LocalDate from, LocalDate to);
+    Integer countTotalPendingOrders(LocalDateTime from, LocalDateTime to);
 
     @Query("""
             select count (o.id) from Order o
@@ -38,7 +38,7 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                                     and o.status = OrderStatus.SHIPPING
                                                 and o.createdAt between :from and :to
             """)
-    Integer countTotalShippingOrders(LocalDate from, LocalDate to);
+    Integer countTotalShippingOrders(LocalDateTime from, LocalDateTime to);
 
     @Query("""
             select count (o.id) from Order o
@@ -46,5 +46,13 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                                     and o.status = OrderStatus.FAILED
                                                 and o.createdAt between :from and :to
             """)
-    Integer countTotalFailedOrders(LocalDate from, LocalDate to);
+    Integer countTotalFailedOrders(LocalDateTime from, LocalDateTime to);
+
+    @Query("""
+            select count (o.id) from Order o
+                        where o.deleted = false
+                                    and o.status = OrderStatus.CONFIRMED
+                                                and o.createdAt between :from and :to
+            """)
+    Integer countTotalConfirmedOrders(LocalDateTime from, LocalDateTime to);
 }

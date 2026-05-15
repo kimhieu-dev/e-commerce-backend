@@ -47,6 +47,7 @@ public class SecurityConfig {
 //                        ));
         http.httpBasic(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable);
+        http.formLogin(AbstractHttpConfigurer::disable);
         return http.build();
     }
 //

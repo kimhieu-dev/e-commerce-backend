@@ -1,10 +1,8 @@
 package com.nkh.ecommercebackend.service;
 
-import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
-import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
-import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
-import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
+import com.nkh.ecommercebackend.dto.request.*;
 import com.nkh.ecommercebackend.dto.response.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
@@ -26,4 +24,6 @@ public interface OrderService {
     List<TrackingLogRes> getTrackingLogs(String id);
 
     OrderDetailRes getOrderDetail(String id);
+
+    List<MyOrdersRes> getMyOrders(MyOrderFilterReq request, Pageable pageable);
 }

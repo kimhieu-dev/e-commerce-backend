@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.mapper;
 
+import com.nkh.ecommercebackend.dto.response.MyOrdersRes;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
 import com.nkh.ecommercebackend.entity.Order;
 import org.mapstruct.Mapper;
@@ -11,4 +12,6 @@ public interface OrderMapper {
     OrderRes toOrderRes(Order order);
 
     List<OrderRes> toOrderResList(List<Order> orders);
+
+    List<MyOrdersRes> toMyOrders(List<Order> orders);
 }

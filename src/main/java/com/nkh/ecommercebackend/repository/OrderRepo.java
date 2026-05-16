@@ -1,6 +1,9 @@
 package com.nkh.ecommercebackend.repository;
 
+import com.nkh.ecommercebackend.common.OrderStatus;
+import com.nkh.ecommercebackend.common.UserOrderStatus;
 import com.nkh.ecommercebackend.entity.Order;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -8,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificationExecutor<Order> {
@@ -67,4 +71,13 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                 where o.id = :id
             """)
     Optional<Order> findByIdTrackingLog(String id);
+
+    @Query("""
+    select o from Order o where o.user.id = :userId and o.deleted = false order by o.createdAt desc
+""")
+    List<Order> findMyOrders(String userId);
+
+    List<Order> findAllByUserIdAndStatusAndDeletedFalse(String userId, OrderStatus status, Pageable pageable);
+
+    List<Order> findAllByUserIdAndDeletedFalse(String userId);
 }

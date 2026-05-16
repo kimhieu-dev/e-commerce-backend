@@ -3,10 +3,8 @@ package com.nkh.ecommercebackend.service.impl;
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
-import com.nkh.ecommercebackend.dto.request.ApproveOrderReq;
-import com.nkh.ecommercebackend.dto.request.CreateOrderReq;
-import com.nkh.ecommercebackend.dto.request.OrderFilterReq;
-import com.nkh.ecommercebackend.dto.request.RejectOrderReq;
+import com.nkh.ecommercebackend.common.UserOrderStatus;
+import com.nkh.ecommercebackend.dto.request.*;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.exception.BusinessException;
@@ -230,6 +228,22 @@ public class OrderServiceImpl implements OrderService {
                 .address(addressMapper.toAddressRes(order.getAddress()))
                 .orderItems(orderItemResList)
                 .build();
+    }
+
+    @Override
+    public List<MyOrdersRes> getMyOrders(MyOrderFilterReq request, Pageable pageable) {
+        User user = currentUserService.getUser();
+        List<Order> orders;
+        switch (request.getStatus()) {
+            case PENDING -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.PENDING,pageable);
+            case PICKING -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.PICKING,pageable);
+            case SHIPPING ->  orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.SHIPPING,pageable);
+            case DELIVERED ->  orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.DELIVERED,pageable);
+            case FAILED -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.FAILED,pageable);
+            case RETURNED -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.RETURNING,pageable);
+            default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(user.getId());
+        }
+        return orderMapper.toMyOrders(orders);
     }
 
 }

@@ -184,4 +184,12 @@ public class ProductServiceImpl implements ProductService {
                 .inventory(inventoryRes)
                 .build();
     }
+
+    @Override
+    public void deleteProduct(String id) {
+        Product product =  productRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.setDeleted(true);
+        productRepo.save(product);
+    }
 }

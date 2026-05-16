@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,5 +50,12 @@ public class ProductController {
     public BaseResponse<ProductRes> updateProduct(@PathVariable String id, @RequestBody @Valid UpdateProductReq request) {
         ProductRes response = productService.updateProduct(id,request);
         return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public BaseResponse<?> deleteProduct(@PathVariable String id) {
+        productService.deleteProduct(id);
+        return BaseResponse.success("Deleted successfully");
     }
 }

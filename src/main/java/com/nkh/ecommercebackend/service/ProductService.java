@@ -21,4 +21,6 @@ public interface ProductService {
     ProductOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
 
     ProductRes updateProduct(String id, UpdateProductReq request);
+
+    void deleteProduct(String id);
 }

@@ -65,6 +65,13 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/ship")
+    public BaseResponse<OrderRes> shipOrder(@PathVariable String id, @RequestBody @Valid ShipOrderReq request){
+        OrderRes response = orderService.shipOrder(id, request);
+        return BaseResponse.success(response);
+    }
+
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/overview")

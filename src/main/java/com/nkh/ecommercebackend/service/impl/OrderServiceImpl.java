@@ -191,8 +191,33 @@ public class OrderServiceImpl implements OrderService {
                 .order(order)
                 .fromStatus(orderStatus)
                 .toStatus(order.getStatus())
-                .note("order confirmed")
+                .note("order picked up")
                 .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OrderRes shipOrder(String id, ShipOrderReq request) {
+        request.setStatus(OrderStatus.SHIPPING);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.SHIPPING) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_SHIPPING);
+        }
+        OrderStatus orderStatus = order.getStatus();
+
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order shipping")
+                .location("shipping location")
                 .build();
         trackingLogRepo.save(trackingLog);
 

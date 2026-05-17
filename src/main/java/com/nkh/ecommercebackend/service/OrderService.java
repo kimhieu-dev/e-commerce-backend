@@ -17,6 +17,8 @@ public interface OrderService {
 
     OrderRes rejectOrder(String id, RejectOrderReq request );
 
+    OrderRes pickupOrder(String id, PickupOrderReq request);
+
     OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
 
     TodayStatisticsRes getTodayStatistics();

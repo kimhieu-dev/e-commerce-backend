@@ -81,6 +81,7 @@ public enum ErrorCode {
     RESERVED_COUNT_NEGATIVE(2061, "Reserved count is negative", HttpStatus.BAD_REQUEST),
     TRACKING_LOGS_NOT_FOUND(2062, "Tracking logs not found", HttpStatus.NOT_FOUND),
     YOU_DO_NOT_HAVE_PRIVILEGE(2063, "You do not have privilege", HttpStatus.BAD_REQUEST),
+    ORDER_ALREADY_PICKING(2064, "Order already picking", HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

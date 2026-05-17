@@ -175,6 +175,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderRes pickupOrder(String id, PickupOrderReq request) {
+        request.setStatus(OrderStatus.PICKING);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.PICKING) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_PICKING);
+        }
+        OrderStatus orderStatus = order.getStatus();
+
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order confirmed")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
     public OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
 
         if (fromDate == null) fromDate = LocalDate.now().minusDays(30);

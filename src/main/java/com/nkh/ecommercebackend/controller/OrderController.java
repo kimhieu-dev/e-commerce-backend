@@ -58,6 +58,14 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/pickup")
+    public BaseResponse<OrderRes> pickupOrder(@PathVariable String id, @RequestBody @Valid PickupOrderReq request) {
+        OrderRes response = orderService.pickupOrder(id, request);
+        return BaseResponse.success(response);
+    }
+
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/overview")
     public BaseResponse<OrderOverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,

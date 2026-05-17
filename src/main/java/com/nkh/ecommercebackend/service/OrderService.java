@@ -33,4 +33,6 @@ public interface OrderService {
     OrderDetailRes getOrderDetail(String id);
 
     List<MyOrdersRes> getMyOrders(MyOrderFilterReq request, Pageable pageable);
+
+    void sendMail();
 }

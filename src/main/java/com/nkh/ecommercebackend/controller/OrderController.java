@@ -72,7 +72,7 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
-    @PreAuthorize(("hasAnyRole('SHIPPER')"))
+    @PreAuthorize("hasAnyRole('SHIPPER')")
     @PatchMapping("/{id}/ship")
     public BaseResponse<OrderRes> deliverOrder(@PathVariable String id, @RequestBody @Valid DeliverOrderReq request){
         OrderRes response = orderService.deliverOrder(id, request);

@@ -21,6 +21,8 @@ import com.nkh.ecommercebackend.service.factory.OrderFactory;
 import com.nkh.ecommercebackend.service.spec.OrderSpec;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -29,8 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -335,15 +339,41 @@ public class OrderServiceImpl implements OrderService {
         User user = currentUserService.getUser();
         List<Order> orders;
         switch (request.getStatus()) {
-            case PENDING -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.PENDING,pageable);
-            case PICKING -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.PICKING,pageable);
-            case SHIPPING ->  orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.SHIPPING,pageable);
-            case DELIVERED ->  orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.DELIVERED,pageable);
-            case FAILED -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.FAILED,pageable);
-            case RETURNED -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.RETURNING,pageable);
+            case PENDING ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.PENDING, pageable);
+            case PICKING ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.PICKING, pageable);
+            case SHIPPING ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.SHIPPING, pageable);
+            case DELIVERED ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.DELIVERED, pageable);
+            case FAILED ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.FAILED, pageable);
+            case RETURNED ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.RETURNING, pageable);
             default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(user.getId());
         }
         return orderMapper.toMyOrders(orders);
+    }
+
+    @Override
+    public void sendMail() {
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        Pageable pageable = PageRequest.of(0, 100);
+        List<Order> orders = orderRepo.findOrdersForSendMail(OrderStatus.DELIVERED, startOfDay, endOfDay, pageable);
+
+        for (Order order : orders) {
+            try {
+                  System.out.println("Sending mail...");
+//                NotificationService.sendMail(order);
+            } catch (Exception e) {
+                log.error("Error:{}", e.getMessage());
+            }
+        }
     }
 
 }

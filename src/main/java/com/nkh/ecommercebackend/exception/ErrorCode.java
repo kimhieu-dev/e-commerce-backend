@@ -83,6 +83,7 @@ public enum ErrorCode {
     YOU_DO_NOT_HAVE_PRIVILEGE(2063, "You do not have privilege", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_PICKING(2064, "Order already picking", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_SHIPPING(2065, "Order already shipping", HttpStatus.BAD_REQUEST),
+    ORDER_ALREADY_DELIVERED(2066, "Order already delivered", HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

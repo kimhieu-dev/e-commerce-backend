@@ -225,6 +225,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderRes deliverOrder(String id, DeliverOrderReq request) {
+        request.setStatus(OrderStatus.DELIVERED);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_DELIVERED);
+        }
+        OrderStatus orderStatus = order.getStatus();
+
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order delivered")
+                .location("user address location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
     public OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
 
         if (fromDate == null) fromDate = LocalDate.now().minusDays(30);

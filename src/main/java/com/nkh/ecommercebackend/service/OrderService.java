@@ -22,6 +22,8 @@ public interface OrderService {
 
     OrderRes shipOrder(String id, ShipOrderReq request);
 
+    OrderRes deliverOrder(String id, DeliverOrderReq request);
+
     OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
 
     TodayStatisticsRes getTodayStatistics();

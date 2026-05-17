@@ -2,7 +2,7 @@ package com.nkh.ecommercebackend.service.impl;
 
 import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.AddItemReq;
-import com.nkh.ecommercebackend.dto.request.UpdateItemQuantityReq;
+import com.nkh.ecommercebackend.dto.request.UpdateItemReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.mapper.DiscountMapper;
@@ -102,7 +102,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CartItemRes updateItemQuantity(String id, UpdateItemQuantityReq request) {
+    public CartItemRes updateItem(String id, UpdateItemReq request) {
         User user = currentUserService.getUser();
         CartItem cartItem = cartItemRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));

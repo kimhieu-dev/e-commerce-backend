@@ -115,8 +115,21 @@ public class OrderServiceImpl implements OrderService {
         if (order.getPaymentStatus() == PaymentStatus.AWAITING_PAYMENT) {
             throw new BusinessException(ErrorCode.ORDER_AWAITING_PAYMENT);
         }
+
+        OrderStatus orderStatus = order.getStatus();
+
         order.setStatus(request.getStatus());
         orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order confirmed")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
         int updatedUsedCount = discountRepo.increaseUsedCount(order.getDiscount().getId());
         if (updatedUsedCount == 0) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
@@ -138,8 +151,20 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() == OrderStatus.REJECTED) {
             throw new BusinessException(ErrorCode.ORDER_ALREADY_REJECTED);
         }
+        OrderStatus orderStatus = order.getStatus();
+
         order.setStatus(request.getStatus());
         orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order confirmed")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
         int updated = discountRepo.decreaseReservedCount(order.getDiscount().getId());
         if (updated == 0) {
             throw new BusinessException(ErrorCode.RESERVED_COUNT_NEGATIVE);

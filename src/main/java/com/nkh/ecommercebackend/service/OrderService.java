@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.service;
 
+import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.dto.request.*;
 import com.nkh.ecommercebackend.dto.response.*;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,12 @@ public interface OrderService {
 
     OrderRes rejectOrder(String id, RejectOrderReq request );
 
+    OrderRes pickupOrder(String id, PickupOrderReq request);
+
+    OrderRes shipOrder(String id, ShipOrderReq request);
+
+    OrderRes deliverOrder(String id, DeliverOrderReq request);
+
     OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
 
     TodayStatisticsRes getTodayStatistics();
@@ -26,4 +33,6 @@ public interface OrderService {
     OrderDetailRes getOrderDetail(String id);
 
     List<MyOrdersRes> getMyOrders(MyOrderFilterReq request, Pageable pageable);
+
+    void sendMail();
 }

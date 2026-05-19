@@ -58,6 +58,27 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/pickup")
+    public BaseResponse<OrderRes> pickupOrder(@PathVariable String id, @RequestBody @Valid PickupOrderReq request) {
+        OrderRes response = orderService.pickupOrder(id, request);
+        return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/ship")
+    public BaseResponse<OrderRes> shipOrder(@PathVariable String id, @RequestBody @Valid ShipOrderReq request){
+        OrderRes response = orderService.shipOrder(id, request);
+        return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/ship")
+    public BaseResponse<OrderRes> deliverOrder(@PathVariable String id, @RequestBody @Valid DeliverOrderReq request){
+        OrderRes response = orderService.deliverOrder(id, request);
+        return BaseResponse.success(response);
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/overview")
     public BaseResponse<OrderOverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,

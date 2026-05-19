@@ -22,4 +22,6 @@ public class CarrierController {
         List<CarrierRes> response = carrierService.getCarriers();
         return BaseResponse.success(response);
     }
+
+
 }

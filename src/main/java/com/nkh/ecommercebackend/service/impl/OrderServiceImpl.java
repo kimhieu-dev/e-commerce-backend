@@ -21,6 +21,8 @@ import com.nkh.ecommercebackend.service.factory.OrderFactory;
 import com.nkh.ecommercebackend.service.spec.OrderSpec;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -29,8 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -115,8 +119,21 @@ public class OrderServiceImpl implements OrderService {
         if (order.getPaymentStatus() == PaymentStatus.AWAITING_PAYMENT) {
             throw new BusinessException(ErrorCode.ORDER_AWAITING_PAYMENT);
         }
+
+        OrderStatus orderStatus = order.getStatus();
+
         order.setStatus(request.getStatus());
         orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order confirmed")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
         int updatedUsedCount = discountRepo.increaseUsedCount(order.getDiscount().getId());
         if (updatedUsedCount == 0) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
@@ -138,14 +155,101 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() == OrderStatus.REJECTED) {
             throw new BusinessException(ErrorCode.ORDER_ALREADY_REJECTED);
         }
+        OrderStatus orderStatus = order.getStatus();
+
         order.setStatus(request.getStatus());
         orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order confirmed")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
         int updated = discountRepo.decreaseReservedCount(order.getDiscount().getId());
         if (updated == 0) {
             throw new BusinessException(ErrorCode.RESERVED_COUNT_NEGATIVE);
         }
         //TODO: nếu user trả tiền rồi thì hoàn tiền ?
         //TODO: thêm tracking log
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OrderRes pickupOrder(String id, PickupOrderReq request) {
+        request.setStatus(OrderStatus.PICKING);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.PICKING) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_PICKING);
+        }
+        OrderStatus orderStatus = order.getStatus();
+
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order picked up")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OrderRes shipOrder(String id, ShipOrderReq request) {
+        request.setStatus(OrderStatus.SHIPPING);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.SHIPPING) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_SHIPPING);
+        }
+        OrderStatus orderStatus = order.getStatus();
+
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order shipping")
+                .location("shipping location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OrderRes deliverOrder(String id, DeliverOrderReq request) {
+        request.setStatus(OrderStatus.DELIVERED);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_DELIVERED);
+        }
+        OrderStatus orderStatus = order.getStatus();
+
+        order.setStatus(request.getStatus());
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(orderStatus)
+                .toStatus(order.getStatus())
+                .note("order delivered")
+                .location("user address location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
         return orderMapper.toOrderRes(order);
     }
 
@@ -235,15 +339,41 @@ public class OrderServiceImpl implements OrderService {
         User user = currentUserService.getUser();
         List<Order> orders;
         switch (request.getStatus()) {
-            case PENDING -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.PENDING,pageable);
-            case PICKING -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.PICKING,pageable);
-            case SHIPPING ->  orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.SHIPPING,pageable);
-            case DELIVERED ->  orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.DELIVERED,pageable);
-            case FAILED -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.FAILED,pageable);
-            case RETURNED -> orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(),OrderStatus.RETURNING,pageable);
+            case PENDING ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.PENDING, pageable);
+            case PICKING ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.PICKING, pageable);
+            case SHIPPING ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.SHIPPING, pageable);
+            case DELIVERED ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.DELIVERED, pageable);
+            case FAILED ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.FAILED, pageable);
+            case RETURNED ->
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.RETURNING, pageable);
             default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(user.getId());
         }
         return orderMapper.toMyOrders(orders);
+    }
+
+    @Override
+    public void sendMail() {
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        Pageable pageable = PageRequest.of(0, 100);
+        List<Order> orders = orderRepo.findOrdersForSendMail(OrderStatus.DELIVERED, startOfDay, endOfDay, pageable);
+
+        for (Order order : orders) {
+            try {
+                  System.out.println("Sending mail...");
+//                NotificationService.sendMail(order);
+            } catch (Exception e) {
+                log.error("Error:{}", e.getMessage());
+            }
+        }
     }
 
 }

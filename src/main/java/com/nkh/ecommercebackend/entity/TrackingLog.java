@@ -2,10 +2,7 @@ package com.nkh.ecommercebackend.entity;
 
 import com.nkh.ecommercebackend.common.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 
 import java.io.Serializable;
@@ -16,6 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tracking_logs")
+@Builder
 public class TrackingLog extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -1,6 +1,6 @@
 package com.nkh.ecommercebackend.dto.request;
 
-import jakarta.validation.constraints.Min;
+import com.nkh.ecommercebackend.common.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,6 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateItemQuantityReq implements Serializable {
-    @Min(value = 1,message = "quantity must greater than or equals to 1")
-    private int quantity;
+public class DeliverOrderReq implements Serializable {
+    private OrderStatus status = OrderStatus.DELIVERED;
 }

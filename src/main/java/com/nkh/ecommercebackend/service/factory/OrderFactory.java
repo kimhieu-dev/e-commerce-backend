@@ -28,6 +28,7 @@ public class OrderFactory {
     private final DiscountRepo discountRepo;
     private final OrderMapper orderMapper;
     private final PaymentMethodStrategyFactory paymentMethodStrategyFactory;
+    private final TrackingLogRepo trackingLogRepo;
 
     public OrderRes generateOrder(String trackingNumber, User user, Cart cart, Discount discount, Carrier carrier, Address address, PaymentMethod paymentMethod, SummaryRes summary) {
 
@@ -96,7 +97,14 @@ public class OrderFactory {
 //        if (updated == 0) {
 //            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
 //        }
-
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(order.getStatus())
+                .toStatus(order.getStatus())
+                .note("init note")
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
 
         return orderMapper.toOrderRes(order);
     }

@@ -1,13 +1,11 @@
 package com.nkh.ecommercebackend.controller;
 
+import com.nkh.ecommercebackend.dto.request.CreateCarrierReq;
 import com.nkh.ecommercebackend.dto.response.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.CarrierRes;
 import com.nkh.ecommercebackend.service.CarrierService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,5 +21,9 @@ public class CarrierController {
         return BaseResponse.success(response);
     }
 
-
+    @PostMapping
+    public BaseResponse<CarrierRes> createCarrier(@RequestBody CreateCarrierReq request) {
+        CarrierRes response = carrierService.createCarrier(request);
+        return BaseResponse.success(response);
+    }
 }

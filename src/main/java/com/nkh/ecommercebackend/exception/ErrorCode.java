@@ -84,6 +84,7 @@ public enum ErrorCode {
     ORDER_ALREADY_PICKING(2064, "Order already picking", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_SHIPPING(2065, "Order already shipping", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_DELIVERED(2066, "Order already delivered", HttpStatus.BAD_REQUEST),
+    CARRIER_EXISTS(2067, "Carrier already exists", HttpStatus.CONFLICT),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

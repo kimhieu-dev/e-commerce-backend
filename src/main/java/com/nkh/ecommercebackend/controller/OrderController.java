@@ -43,7 +43,6 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
-
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("/{id}/approve")
     public BaseResponse<OrderRes> approveOrder(@PathVariable String id, @RequestBody @Valid ApproveOrderReq request) {
@@ -79,6 +78,13 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('USER')")
+    @PostMapping("/{id}/refund")
+    public BaseResponse<OrderRes> refundOrder(@PathVariable String id, RefundOrderReq request) {
+        OrderRes response = orderService.refundOrder(id,request);
+        return BaseResponse.success(response);
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/overview")
     public BaseResponse<OrderOverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,
@@ -107,9 +113,9 @@ public class OrderController {
     }
 
     @GetMapping("/my")
-    public BaseResponse<List<MyOrdersRes>> getMyOrders(MyOrderFilterReq request,
-                                                       @PageableDefault(size = 5, page = 0) Pageable pageable) {
+    public BaseResponse<List<MyOrdersRes>> getMyOrders(MyOrderFilterReq request, @PageableDefault(size = 5, page = 0) Pageable pageable) {
         List<MyOrdersRes> response = orderService.getMyOrders(request, pageable);
         return BaseResponse.success(response);
     }
+
 }

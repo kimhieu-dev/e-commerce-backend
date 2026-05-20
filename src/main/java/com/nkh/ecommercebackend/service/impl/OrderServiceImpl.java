@@ -254,6 +254,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderRes refundOrder(String id, RefundOrderReq request) {
+        request.setStatus(UserOrderStatus.RETURNED);
+        User user = currentUserService.getUser();
+        Optional<Order> order = orderRepo.findById(id);
+        if (order.isEmpty()) {
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        if (!order.get().getUser().getId().equals(user.getId())) {
+            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
+        }
+        order.get().setStatus(OrderStatus.RETURNING);
+        orderRepo.save(order.get());
+        return orderMapper.toOrderRes(order.get());
+    }
+
+    @Override
     public OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
 
         if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
@@ -368,7 +384,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (Order order : orders) {
             try {
-                  System.out.println("Sending mail...");
+                System.out.println("Sending mail...");
 //                NotificationService.sendMail(order);
             } catch (Exception e) {
                 log.error("Error:{}", e.getMessage());

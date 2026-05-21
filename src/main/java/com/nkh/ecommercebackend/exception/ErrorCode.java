@@ -85,6 +85,8 @@ public enum ErrorCode {
     ORDER_ALREADY_SHIPPING(2065, "Order already shipping", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_DELIVERED(2066, "Order already delivered", HttpStatus.BAD_REQUEST),
     CARRIER_EXISTS(2067, "Carrier already exists", HttpStatus.CONFLICT),
+    CATEGORY_NOT_FOUND(2068, "Category not found", HttpStatus.NOT_FOUND),
+    SLUG_EXISTED(2069, "Slug is already existed", HttpStatus.CONFLICT),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

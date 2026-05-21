@@ -18,8 +18,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +39,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain configSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
@@ -46,7 +52,6 @@ public class SecurityConfig {
 //                                .jwtAuthenticationConverter(jwtAuthConverter()) // thêm dòng này
 //                        ));
         http.httpBasic(Customizer.withDefaults());
-        http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
         return http.build();
     }
@@ -70,5 +75,24 @@ public class SecurityConfig {
 //                .build();
 //    }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
+        // 1. Cho phép Frontend ở cổng 5173 truy cập
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+
+        // 2. Cho phép các HTTP Methods (Đặc biệt phải có OPTIONS cho Preflight request)
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // 3. Cho phép các Headers cần thiết (Đặc biệt là Authorization cho Basic Auth)
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+
+        // 4. Cho phép gửi thông tin xác thực (Credentials)
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Áp dụng cho toàn bộ API
+        return source;
+    }
 }

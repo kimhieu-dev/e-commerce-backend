@@ -84,7 +84,7 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
 
     @Query("""
                 select o from Order o
-                where o.status = :status
+                where o.status = :orderStatus
                     and o.updatedAt between :start and :end
             """)
     List<Order> findOrdersForSendMail(OrderStatus orderStatus, LocalDateTime start, LocalDateTime end, Pageable pageable);

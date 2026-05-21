@@ -81,6 +81,8 @@ public class OrderServiceImpl implements OrderService {
 
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
+        //TODO: quên chưa trừ discount , nhỡ đâu 2 user cùng đọc voucher cuối cùng, rồi cùng tạo đơn hàng, lúc
+        //TODO: lúc đó Admin sẽ thấy 2 đơn hàng và confirm cả 2 -> die
         return orderFactory.generateOrder(trackingNumber, user, cart, discount, carrier, address, paymentMethod, summary);
     }
 

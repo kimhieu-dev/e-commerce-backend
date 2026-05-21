@@ -32,6 +32,7 @@ public class ProductController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping
     public BaseResponse<ProductRes> createProduct(@RequestBody @Valid CreateProductReq request) {
         ProductRes response = productService.createProduct(request);

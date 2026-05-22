@@ -12,8 +12,12 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCategoryReq implements Serializable {
+public class UpdateCategoryReq implements Serializable {
+    @NotEmpty
+    private String id;
+
     private String parentId;
+
     @NotEmpty
     private String name;
     @NotEmpty

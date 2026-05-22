@@ -1,6 +1,8 @@
 package com.nkh.ecommercebackend.service.impl;
 
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import com.nkh.ecommercebackend.dto.request.CreateCategoryReq;
+import com.nkh.ecommercebackend.dto.request.UpdateCategoryReq;
 import com.nkh.ecommercebackend.dto.response.CategoryRes;
 import com.nkh.ecommercebackend.entity.Category;
 import com.nkh.ecommercebackend.exception.BusinessException;
@@ -43,6 +45,32 @@ public class CategoryServiceImpl implements CategoryService {
                 .name(request.getName())
                 .slug(slug)
                 .description(request.getDescription())
+                .build();
+    }
+
+    @Override
+    public CategoryRes update(UpdateCategoryReq request) {
+
+        Category category = categoryRepo.findById(request.getId())
+                .orElseThrow(() -> new  BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        if (request.getParentId() != null) {
+            Boolean isExisted = categoryRepo.existsByParentId(request.getParentId());
+            if (!isExisted) {
+                throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+            }
+        }
+        category.setParentId(request.getParentId());
+        category.setName(request.getName());
+        category.setDescription(request.getDescription());
+
+        categoryRepo.save(category);
+
+        return CategoryRes.builder()
+                .parentId(category.getParentId())
+                .name(category.getName())
+                .slug(category.getSlug())
+                .description(category.getDescription())
                 .build();
     }
 }

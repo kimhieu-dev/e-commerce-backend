@@ -18,7 +18,7 @@ public class CreateOrderReq {
     private PaymentMethod paymentMethod;
 
     @NotBlank(message = "DISCOUNT_CODE_BLANK")
-    private String discountCode;
+    private String discountId;
 
     @NotBlank(message = "CARRIER_BLANK")
     private String carrierId;

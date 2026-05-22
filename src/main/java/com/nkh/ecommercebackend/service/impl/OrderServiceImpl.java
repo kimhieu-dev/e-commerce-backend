@@ -63,8 +63,15 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartRepo.findByUsername(user.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        Discount discount = discountRepo.findByCode(request.getDiscountCode())
+        //atomic update
+        int updatedReservedCount = discountRepo.increaseReservedCount(request.getDiscountId());
+        if (updatedReservedCount == 0) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+        }
+
+        Discount discount = discountRepo.findById(request.getDiscountId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+
         if (discount.getEndDate().isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
         }
@@ -109,74 +116,65 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResList(orders);
     }
 
+    /// Đã sửa lại API approve order
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderRes approveOrder(String id, ApproveOrderReq request) {
-        request.setStatus(OrderStatus.CONFIRMED);
+
+        int approved = orderRepo.approveOrder(id);
+        if (approved == 0) {
+            throw new BusinessException(ErrorCode.ORDER_CAN_NOT_APPROVE);
+        }
+
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getStatus() == OrderStatus.CONFIRMED) {
-            throw new BusinessException(ErrorCode.ORDER_ALREADY_CONFIRMED);
-        }
-        if (order.getPaymentStatus() == PaymentStatus.AWAITING_PAYMENT) {
-            throw new BusinessException(ErrorCode.ORDER_AWAITING_PAYMENT);
+
+        int updatedUsedCountAndReservedCount = discountRepo.updateUsedCountAndReservedCount(order.getDiscount().getId());
+        if (updatedUsedCountAndReservedCount == 0) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
 
-        OrderStatus orderStatus = order.getStatus();
-
-        order.setStatus(request.getStatus());
-        orderRepo.save(order);
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
-                .fromStatus(orderStatus)
+                .fromStatus(OrderStatus.PENDING)
                 .toStatus(order.getStatus())
                 .note("order confirmed")
                 .location("init location")
                 .build();
         trackingLogRepo.save(trackingLog);
 
-        int updatedUsedCount = discountRepo.increaseUsedCount(order.getDiscount().getId());
-        if (updatedUsedCount == 0) {
-            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-        }
-        int updatedReservedCount = discountRepo.decreaseReservedCount(order.getDiscount().getId());
-        if (updatedReservedCount == 0) {
-            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-        }
-        //TODO: thêm tracking log
         return orderMapper.toOrderRes(order);
     }
 
+    /// đã sửa lại api reject
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderRes rejectOrder(String id, RejectOrderReq request) {
-        request.setStatus(OrderStatus.REJECTED);
+
+        //atomic update để nhỡ 2 admin cùng đọc và cùng reject 1 order pending thì reserved count bị trừ tận 2 lần
+        int rejected = orderRepo.rejectOrder(id);
+        if (rejected == 0) {
+            throw new BusinessException(ErrorCode.ORDER_CAN_NOT_REJECT);
+        }
+
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getStatus() == OrderStatus.REJECTED) {
-            throw new BusinessException(ErrorCode.ORDER_ALREADY_REJECTED);
-        }
-        OrderStatus orderStatus = order.getStatus();
-
-        order.setStatus(request.getStatus());
-        orderRepo.save(order);
-
-        TrackingLog trackingLog = TrackingLog.builder()
-                .order(order)
-                .fromStatus(orderStatus)
-                .toStatus(order.getStatus())
-                .note("order confirmed")
-                .location("init location")
-                .build();
-        trackingLogRepo.save(trackingLog);
 
         int updated = discountRepo.decreaseReservedCount(order.getDiscount().getId());
         if (updated == 0) {
             throw new BusinessException(ErrorCode.RESERVED_COUNT_NEGATIVE);
         }
-        //TODO: nếu user trả tiền rồi thì hoàn tiền ?
-        //TODO: thêm tracking log
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(OrderStatus.PENDING)
+                .toStatus(order.getStatus())
+                .note(request.getNote())
+                .location("init location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
         return orderMapper.toOrderRes(order);
     }
 

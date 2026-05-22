@@ -87,6 +87,8 @@ public enum ErrorCode {
     CARRIER_EXISTS(2067, "Carrier already exists", HttpStatus.CONFLICT),
     CATEGORY_NOT_FOUND(2068, "Category not found", HttpStatus.NOT_FOUND),
     SLUG_EXISTED(2069, "Slug is already existed", HttpStatus.CONFLICT),
+    ORDER_CAN_NOT_REJECT(2070, "Order cannot reject", HttpStatus.BAD_REQUEST),
+    ORDER_CAN_NOT_APPROVE(2071,  "Order cannot approve", HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

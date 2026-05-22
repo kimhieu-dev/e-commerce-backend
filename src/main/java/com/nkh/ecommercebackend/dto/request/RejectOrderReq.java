@@ -14,6 +14,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RejectOrderReq implements Serializable {
-    @NotNull
-    private OrderStatus status = OrderStatus.REJECTED;
+    private String note;
 }

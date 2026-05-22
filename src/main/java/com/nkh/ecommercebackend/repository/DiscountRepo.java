@@ -14,7 +14,8 @@ public interface DiscountRepo extends JpaRepository<Discount, String> {
     @Query("update Discount d set d.usedCount = d.usedCount+1 where d.id = :id and d.usageLimit - d.usedCount - d.reservedCount > 0")
     int increaseUsedCount(String id);
 
-    @Modifying
+    //như thế này giúp xoá entity cũ lưu ở cache
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Discount d set d.reservedCount = d.reservedCount+1 where d.id = :id and d.usageLimit - d.usedCount - d.reservedCount > 0")
     int increaseReservedCount(String id);
 
@@ -30,5 +31,16 @@ public interface DiscountRepo extends JpaRepository<Discount, String> {
             and current_timestamp >= d.startDate
             and current_timestamp <= d.endDate""")
     List<Discount> findAllUsableDiscounts();
+
+    @Modifying
+    @Query("""
+            update Discount d
+            set
+                d.usedCount = d.usedCount + 1,
+                d.reservedCount = d.reservedCount - 1
+            where d.id = :id
+            and d.reservedCount > 0
+            """)
+    int updateUsedCountAndReservedCount(String id);
 
 }

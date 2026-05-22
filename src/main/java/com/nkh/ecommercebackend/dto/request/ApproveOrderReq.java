@@ -14,6 +14,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApproveOrderReq implements Serializable {
-    @NotNull
-    private OrderStatus status = OrderStatus.CONFIRMED;
+
 }

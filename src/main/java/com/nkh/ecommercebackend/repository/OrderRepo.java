@@ -4,10 +4,7 @@ import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.UserOrderStatus;
 import com.nkh.ecommercebackend.entity.Order;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -88,4 +85,22 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
                     and o.updatedAt between :start and :end
             """)
     List<Order> findOrdersForSendMail(OrderStatus orderStatus, LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            update Order o
+            set o.status = OrderStatus.REJECTED
+            where o.id = :id
+            and o.status = OrderStatus.PENDING
+            """)
+    int rejectOrder(String id);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+                update Order o
+                set o.status = OrderStatus.CONFIRMED
+                where o.id = :id
+                and o.status = OrderStatus.PENDING
+            """)
+    int approveOrder(String id);
 }

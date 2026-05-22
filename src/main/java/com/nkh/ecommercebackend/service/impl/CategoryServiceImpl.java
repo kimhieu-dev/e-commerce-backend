@@ -73,4 +73,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .description(category.getDescription())
                 .build();
     }
+
+    @Override
+    public void delete(String id) {
+        Category category = categoryRepo.findById(id)
+                .orElseThrow(() -> new  BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+        category.setDeleted(true);
+        categoryRepo.save(category);
+    }
 }

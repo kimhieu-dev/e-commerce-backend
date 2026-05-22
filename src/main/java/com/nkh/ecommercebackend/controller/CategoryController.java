@@ -25,9 +25,17 @@ public class CategoryController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping
     public BaseResponse<CategoryRes> update(@RequestBody @Valid UpdateCategoryReq request){
         CategoryRes response = categoryService.update(request);
         return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public BaseResponse<?> delete(@PathVariable String id){
+        categoryService.delete(id);
+        return BaseResponse.success("Delete successfully");
     }
 }

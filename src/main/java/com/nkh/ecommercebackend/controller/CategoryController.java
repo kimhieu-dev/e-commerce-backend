@@ -2,7 +2,7 @@ package com.nkh.ecommercebackend.controller;
 
 import com.nkh.ecommercebackend.dto.request.CreateCategoryReq;
 import com.nkh.ecommercebackend.dto.request.UpdateCategoryReq;
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.CategoryRes;
 import com.nkh.ecommercebackend.service.CategoryService;
 import jakarta.validation.Valid;

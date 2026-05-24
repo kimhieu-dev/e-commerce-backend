@@ -1,6 +1,6 @@
 package com.nkh.ecommercebackend.controller;
 
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.DiscountRes;
 import com.nkh.ecommercebackend.service.DiscountService;
 import lombok.RequiredArgsConstructor;

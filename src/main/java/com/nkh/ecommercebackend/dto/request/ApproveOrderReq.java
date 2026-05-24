@@ -14,5 +14,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApproveOrderReq implements Serializable {
-
+    String note;
 }

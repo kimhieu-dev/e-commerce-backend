@@ -139,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
                 .order(order)
                 .fromStatus(OrderStatus.PENDING)
                 .toStatus(order.getStatus())
-                .note("order confirmed")
+                .note(request.getNote())
                 .location("init location")
                 .build();
         trackingLogRepo.save(trackingLog);
@@ -171,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
                 .fromStatus(OrderStatus.PENDING)
                 .toStatus(order.getStatus())
                 .note(request.getNote())
-                .location("init location")
+                .location("no location")
                 .build();
         trackingLogRepo.save(trackingLog);
 
@@ -278,18 +278,22 @@ public class OrderServiceImpl implements OrderService {
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
         LocalDateTime toDateTime = toDate.atStartOfDay();
 
-        //TODO dùng overview factory ?
-        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(fromDateTime, toDateTime);
-        Integer totalOrders = orderRepo.countTotalOrders(fromDateTime, toDateTime);
-        Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
-        Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
-        Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
+//        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(fromDateTime, toDateTime);
+//        TODO: I/O quá nhiều
+//        Integer totalOrders = orderRepo.countTotalOrders(fromDateTime, toDateTime);
+//        Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
+//        Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
+//        Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
+
+        OrderOverviewProjection stats = orderRepo.getOverviewStats(fromDateTime, toDateTime);
+
+
         return OrderOverviewRes.builder()
-                .totalRevenue(totalRevenue)
-                .totalOrders(totalOrders)
-                .totalPending(totalPending)
-                .totalShipping(totalShipping)
-                .totalFailed(totalFailed)
+                .totalRevenue(stats.getTotalRevenue())
+                .totalOrders(stats.getTotalOrders())
+                .totalPending(stats.getTotalPending())
+                .totalShipping(stats.getTotalShipping())
+                .totalFailed(stats.getTotalFailed())
                 .build();
     }
 

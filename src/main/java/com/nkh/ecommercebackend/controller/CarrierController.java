@@ -1,7 +1,7 @@
 package com.nkh.ecommercebackend.controller;
 
 import com.nkh.ecommercebackend.dto.request.CreateCarrierReq;
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.CarrierRes;
 import com.nkh.ecommercebackend.service.CarrierService;
 import lombok.RequiredArgsConstructor;

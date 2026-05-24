@@ -1,6 +1,6 @@
 package com.nkh.ecommercebackend.exception;
 
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

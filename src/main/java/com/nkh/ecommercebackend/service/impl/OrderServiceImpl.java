@@ -90,6 +90,7 @@ public class OrderServiceImpl implements OrderService {
 
         //TODO: quên chưa trừ discount , nhỡ đâu 2 user cùng đọc voucher cuối cùng, rồi cùng tạo đơn hàng, lúc
         //TODO: lúc đó Admin sẽ thấy 2 đơn hàng và confirm cả 2 -> die
+        ///updated : đã trừ reserved discount
         return orderFactory.generateOrder(trackingNumber, user, cart, discount, carrier, address, paymentMethod, summary);
     }
 
@@ -134,12 +135,11 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
 
-
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
                 .fromStatus(OrderStatus.PENDING)
                 .toStatus(order.getStatus())
-                .note("order confirmed")
+                .note(request.getNote())
                 .location("init location")
                 .build();
         trackingLogRepo.save(trackingLog);
@@ -171,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
                 .fromStatus(OrderStatus.PENDING)
                 .toStatus(order.getStatus())
                 .note(request.getNote())
-                .location("init location")
+                .location("no location")
                 .build();
         trackingLogRepo.save(trackingLog);
 
@@ -180,6 +180,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes pickupOrder(String id, PickupOrderReq request) {
+        //TODO refactor lại
+
         request.setStatus(OrderStatus.PICKING);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -205,6 +207,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes shipOrder(String id, ShipOrderReq request) {
+        //TODO refactor lại
+
         request.setStatus(OrderStatus.SHIPPING);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -230,6 +234,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes deliverOrder(String id, DeliverOrderReq request) {
+        //TODO refactor lại
+
         request.setStatus(OrderStatus.DELIVERED);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -255,6 +261,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes refundOrder(String id, RefundOrderReq request) {
+
+        //TODO refactor lại
         request.setStatus(UserOrderStatus.RETURNED);
         User user = currentUserService.getUser();
         Optional<Order> order = orderRepo.findById(id);
@@ -278,18 +286,21 @@ public class OrderServiceImpl implements OrderService {
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
         LocalDateTime toDateTime = toDate.atStartOfDay();
 
-        //TODO dùng overview factory ?
-        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(fromDateTime, toDateTime);
-        Integer totalOrders = orderRepo.countTotalOrders(fromDateTime, toDateTime);
-        Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
-        Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
-        Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
+//        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(fromDateTime, toDateTime);
+//        TODO: I/O quá nhiều
+//        Integer totalOrders = orderRepo.countTotalOrders(fromDateTime, toDateTime);
+//        Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
+//        Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
+//        Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
+
+        OrderOverviewProjection stats = orderRepo.getOverviewStats(fromDateTime, toDateTime);
+
         return OrderOverviewRes.builder()
-                .totalRevenue(totalRevenue)
-                .totalOrders(totalOrders)
-                .totalPending(totalPending)
-                .totalShipping(totalShipping)
-                .totalFailed(totalFailed)
+                .totalRevenue(stats.getTotalRevenue())
+                .totalOrders(stats.getTotalOrders())
+                .totalPending(stats.getTotalPending())
+                .totalShipping(stats.getTotalShipping())
+                .totalFailed(stats.getTotalFailed())
                 .build();
     }
 

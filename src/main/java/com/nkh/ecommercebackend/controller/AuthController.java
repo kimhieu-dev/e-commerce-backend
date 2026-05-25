@@ -1,7 +1,7 @@
 package com.nkh.ecommercebackend.controller;
 
 import com.nkh.ecommercebackend.dto.request.*;
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.IntrospectRes;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.service.AuthService;

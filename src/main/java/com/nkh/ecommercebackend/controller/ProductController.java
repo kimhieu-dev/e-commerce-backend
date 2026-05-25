@@ -3,17 +3,14 @@ package com.nkh.ecommercebackend.controller;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
-import com.nkh.ecommercebackend.dto.response.BaseResponse;
+import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
-import com.nkh.ecommercebackend.entity.Product;
 import com.nkh.ecommercebackend.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

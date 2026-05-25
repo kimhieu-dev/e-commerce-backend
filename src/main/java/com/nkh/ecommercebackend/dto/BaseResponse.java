@@ -1,4 +1,4 @@
-package com.nkh.ecommercebackend.dto.response;
+package com.nkh.ecommercebackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nkh.ecommercebackend.exception.ErrorCode;

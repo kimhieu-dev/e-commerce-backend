@@ -30,8 +30,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
     //private final JwtAuthConverter jwtAuthConverter;
-    @Value("${app.security.public-endpoints.post}")
-    private String[] PUBLIC_ENDPOINTS;
+//    @Value("${app.security.public-endpoints.post}")
+//    private String[] PUBLIC_ENDPOINTS;
 
 //    @Value("${jwt.secret}")
 //    private String SECRET;
@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+//                                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(Role.ADMIN.name())
                                 .anyRequest().authenticated());
 //        http.

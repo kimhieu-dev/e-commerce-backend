@@ -121,14 +121,16 @@ public class CartServiceImpl implements CartService {
         return cartItemMapper.toCartItemRes(cartItem);
     }
 
-    @Override
-    public SummaryRes getSummary(String discountCode) {
-        User user = currentUserService.getUser();
-        Cart cart = user.getCart();
-        Discount discount = discountRepo.findByCode(discountCode)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-        return summaryService.getSummary(cart, discount);
-    }
+//    @Override
+//    public OrderSummary getSummary(String discountCode) {
+//        User user = currentUserService.getUser();
+//        Cart cart = user.getCart();
+//        Discount discount = discountRepo.findByCode(discountCode)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+////        return summaryService.getSummary(, discount);
+//        //TODO: Sửa api summary
+//
+//    }
 
     private void checkInventory(Product product) {
         Inventory inventory = product.getInventory();

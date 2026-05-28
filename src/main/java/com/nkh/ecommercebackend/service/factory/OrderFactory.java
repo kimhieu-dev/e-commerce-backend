@@ -4,13 +4,14 @@ import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.PaymentStatus;
 import com.nkh.ecommercebackend.dto.response.OrderRes;
-import com.nkh.ecommercebackend.dto.response.SummaryRes;
+import com.nkh.ecommercebackend.dto.response.OrderSummary;
 import com.nkh.ecommercebackend.entity.*;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.repository.*;
 import com.nkh.ecommercebackend.service.PaymentMethodStrategy;
+import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -29,11 +30,19 @@ public class OrderFactory {
     private final OrderMapper orderMapper;
     private final PaymentMethodStrategyFactory paymentMethodStrategyFactory;
     private final TrackingLogRepo trackingLogRepo;
+    private final TrackingNumberGenerator trackingNumberGenerator;
+    private final CarrierRepo carrierRepo;
 
-    public OrderRes generateOrder(String trackingNumber, User user, Cart cart, Discount discount, Carrier carrier, Address address, PaymentMethod paymentMethod, SummaryRes summary) {
+    public OrderRes generateOrder(User user, Discount discount, Address address, PaymentMethod paymentMethod, OrderSummary summary) {
 
         PaymentMethodStrategy strategy = paymentMethodStrategyFactory.create(paymentMethod);
         PaymentStatus paymentStatus = strategy.apply(paymentMethod);
+
+        // trong thuc te se tu dong gan cho don vi van chuyen gan nhat
+        Carrier carrier = carrierRepo.findById("760e4dae-c885-41ba-88b9-ef930dd941a4")
+                .orElseThrow(() -> new BusinessException(ErrorCode.CARRIER_NOT_FOUND));
+
+        String trackingNumber = trackingNumberGenerator.generateTrackingNumber(carrier.getName());
 
         Order order = Order.builder()
                 .trackingNumber(trackingNumber)
@@ -48,55 +57,19 @@ public class OrderFactory {
                 .discount(discount)
                 .estimatedDelivery(LocalDate.now().plusDays(carrier.getEstimatedDays()))
                 .carrier(carrier)
+                .carrierName(carrier.getName())
                 .address(address)
+                .userAddress(String.join(", ",
+                        address.getProvince(),
+                        address.getDistrict(),
+                        address.getWard(),
+                        address.getDetailAddress()))
                 .build();
         orderRepo.save(order);
 
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
-        if (cartItemList.isEmpty()) {
-            throw new BusinessException(ErrorCode.CART_IS_EMPTY);
-        }
+//        orderItemRepo.saveAll(orderItemList);
+//        order.setOrderItems(orderItemList);
 
-        List<OrderItem> orderItemList = new ArrayList<>();
-        List<Inventory> inventories = new ArrayList<>();
-
-        for (CartItem cartItem : cartItemList) {
-            Product product = cartItem.getProduct();
-
-            Inventory inventory = product.getInventory();
-            if (inventory.getQuantityInStock() < cartItem.getQuantity()) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-            inventory.setQuantityInStock(inventory.getQuantityInStock() - cartItem.getQuantity());
-            inventories.add(inventory);
-
-            OrderItem orderItem = OrderItem.builder()
-                    .order(order)
-                    .product(product)
-                    .quantity(cartItem.getQuantity())
-                    .price(product.getBasePrice())
-                    .build();
-            cartItem.setChecked(false);
-            cartItem.setDeleted(true);
-            orderItemList.add(orderItem);
-        }
-
-        inventoryRepo.saveAll(inventories);
-        orderItemRepo.saveAll(orderItemList);
-        order.setOrderItems(orderItemList);
-
-        cartItemRepo.saveAll(cartItemList);
-
-        int updated = discountRepo.increaseReservedCount(discount.getId());
-        if(updated == 0){
-            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-        }
-
-        //TODO: đoạn này mình sẽ tăng reserved count còn used count chỉ tăng khi admin confirm order
-//        int updated = discountRepo.increaseUsedCount(discount.getId());
-//        if (updated == 0) {
-//            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-//        }
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
                 .fromStatus(order.getStatus())

@@ -67,9 +67,15 @@ public class Order extends BaseEntity implements Serializable {
     @JoinColumn(name = "carrier_id",nullable = false)
     private Carrier carrier;
 
+    @Column(name = "carrier_name")
+    private String carrierName;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @Column(name = "user_address")
+    private String userAddress;
 
     @OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;

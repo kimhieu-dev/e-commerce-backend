@@ -2,6 +2,7 @@ package com.nkh.ecommercebackend.controller;
 
 import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.request.AddItemReq;
+import com.nkh.ecommercebackend.dto.request.OrderSummaryReq;
 import com.nkh.ecommercebackend.dto.request.UpdateItemReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.service.CartService;
@@ -26,8 +27,8 @@ public class CartController {
     }
 
     @GetMapping("/summary")
-    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode) {
-        SummaryRes response = cartService.getSummary(discountCode);
+    public BaseResponse<OrderSummary> getSummary(@RequestBody OrderSummaryReq request) {
+        OrderSummary response = summaryService.getSummary(request.getProductQuantityMap(),request.getDiscountCode());
         return BaseResponse.success(response);
     }
 

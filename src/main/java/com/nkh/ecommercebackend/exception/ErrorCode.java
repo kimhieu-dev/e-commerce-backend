@@ -62,7 +62,7 @@ public enum ErrorCode {
     CART_ID_BLANK(2042, "Cart id is blank", HttpStatus.BAD_REQUEST),
     PRODUCT_ID_BLANK(2043, "Product id is blank", HttpStatus.BAD_REQUEST),
     QUANTITY_INVALID(2044, "Quantity is invalid", HttpStatus.BAD_REQUEST),
-    DISCOUNT_NOT_FOUND(2045, "Discount not found", HttpStatus.NOT_FOUND),
+    DISCOUNT_NOT_FOUND(2045, "Discount not found", HttpStatus.CONFLICT),
     DISCOUNT_EXPIRED(2046, "Discount expired", HttpStatus.BAD_REQUEST),
     PAYMENT_METHOD_NULL(2047, "Payment method is null", HttpStatus.BAD_REQUEST),
     DISCOUNT_CODE_BLANK(2048, "Discount code is blank", HttpStatus.BAD_REQUEST),
@@ -89,6 +89,8 @@ public enum ErrorCode {
     SLUG_EXISTED(2069, "Slug is already existed", HttpStatus.CONFLICT),
     ORDER_CAN_NOT_REJECT(2070, "Order cannot reject", HttpStatus.BAD_REQUEST),
     ORDER_CAN_NOT_APPROVE(2071,  "Order cannot approve", HttpStatus.BAD_REQUEST),
+    SOME_PRODUCT_NOT_EXIST(2072,"Some product not exist",HttpStatus.CONFLICT),
+    ITEMS_EMPTY(2073,"There's no item",HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

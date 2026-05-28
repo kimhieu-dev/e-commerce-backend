@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateOrderReq {
 
-    @NotEmpty
+    @NotEmpty(message = "ITEMS_EMPTY")
     @Valid
     List<OrderItemReq> orderItems;
 

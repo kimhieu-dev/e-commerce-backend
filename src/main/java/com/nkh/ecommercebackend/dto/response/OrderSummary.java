@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SummaryRes {
+public class OrderSummary {
     private BigDecimal subtotal;
     BigDecimal shippingFee;
     BigDecimal discountAmount;

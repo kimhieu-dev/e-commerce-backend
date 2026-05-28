@@ -102,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
         OrderSummary summary = summaryService.getSummary(productQuantityMap, discount.getCode());
-
+        //TODO: clear gio hang
         return orderFactory.generateOrder(user, discount, address, paymentMethod, summary);
     }
 

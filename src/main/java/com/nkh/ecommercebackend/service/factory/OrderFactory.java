@@ -69,6 +69,12 @@ public class OrderFactory {
 
 //        orderItemRepo.saveAll(orderItemList);
 //        order.setOrderItems(orderItemList);
+//TODO: tao order items va save db
+//        List<OrderItem> orderItems = new ArrayList<>();
+//        for (OrderItem orderItem : orderItems){
+//            orderItem.g
+//        }
+
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)

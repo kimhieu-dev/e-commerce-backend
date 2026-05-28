@@ -1,57 +1,61 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.common.DiscountType;
-import com.nkh.ecommercebackend.dto.response.SummaryRes;
+import com.nkh.ecommercebackend.dto.response.OrderSummary;
 import com.nkh.ecommercebackend.entity.Cart;
 import com.nkh.ecommercebackend.entity.CartItem;
 import com.nkh.ecommercebackend.entity.Discount;
-import com.nkh.ecommercebackend.entity.User;
+import com.nkh.ecommercebackend.entity.Product;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.repository.CartItemRepo;
-import com.nkh.ecommercebackend.repository.CartRepo;
 import com.nkh.ecommercebackend.repository.DiscountRepo;
+import com.nkh.ecommercebackend.repository.ProductRepo;
 import com.nkh.ecommercebackend.service.DiscountStrategy;
 import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.service.factory.DiscountStrategyFactory;
-import com.nkh.ecommercebackend.util.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class SummaryServiceImpl implements SummaryService {
     private final CartItemRepo cartItemRepo;
     private final DiscountStrategyFactory discountStrategyFactory;
+    private final ProductRepo productRepo;
+    private final DiscountRepo discountRepo;
 
     @Override
-    public SummaryRes getSummary(Cart cart, Discount discount) {
+    public OrderSummary getSummary(Map<String, Integer> productQuantityMap, String discountCode) {
 
-        List<CartItem> cartItemList = cartItemRepo.findAllByCartIdAndCheckedTrueWithProduct(cart.getId());
+        List<Product> products = productRepo.findAllById(productQuantityMap.keySet());
+        if (products.size() != productQuantityMap.size()){
+            throw new BusinessException(ErrorCode.SOME_PRODUCT_NOT_EXIST);
+        }
 
-        BigDecimal subtotal = cartItemList.stream()
-                .map(item -> item
-                        .getProduct()
-                        .getBasePrice()
-                        .multiply(BigDecimal.valueOf(item.getQuantity())))
+        Discount discount = discountRepo.findByCode(discountCode)
+                .orElseThrow(()->new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+        BigDecimal subtotal = products.stream()
+                .map(product -> product.getBasePrice()
+                        .multiply(BigDecimal.valueOf(productQuantityMap.get(product.getId()))))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal shippingFee = BigDecimal.valueOf(30.00);
 
         DiscountStrategy strategy = discountStrategyFactory.create(discount.getType(), discount.getValue());
 
-        BigDecimal discountValue = strategy.calculate(subtotal);
+        BigDecimal discountAmount = strategy.calculate(subtotal);
 
-        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountValue);
+        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
 
-        return SummaryRes.builder()
+        return OrderSummary.builder()
                 .subtotal(subtotal)
                 .shippingFee(shippingFee)
-                .discountAmount(discountValue)
+                .discountAmount(discountAmount)
                 .totalAmount(totalAmount)
                 .build();
     }

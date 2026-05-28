@@ -2,7 +2,6 @@ package com.nkh.ecommercebackend.service.impl;
 
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
-import com.nkh.ecommercebackend.common.PaymentStatus;
 import com.nkh.ecommercebackend.common.UserOrderStatus;
 import com.nkh.ecommercebackend.dto.request.*;
 import com.nkh.ecommercebackend.dto.response.*;
@@ -28,11 +27,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -53,45 +52,58 @@ public class OrderServiceImpl implements OrderService {
     private final AddressMapper addressMapper;
     private final OrderItemRepo orderItemRepo;
     private final OrderItemMapper orderItemMapper;
+    private final ProductRepo productRepo;
+    private final InventoryRepo inventoryRepo;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderRes createOrder(CreateOrderReq request) {
 
+        //1. lay ra tt user
+        //2. validate tt product (check ton tai), discount code (check ton tai), so sanh address trong request va cua user
+        //3. tao order save xuong db (generacte order, generate sku, validate ton kho,...)
+        //4. tao order items save xuong db
+        //5. xoa cart items (neu co)
+
         User user = currentUserService.getUser();
 
-        Cart cart = cartRepo.findByUsername(user.getUsername())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+        Map<String, Integer> productQuantityMap = request.getOrderItems().stream()
+                .collect(Collectors.toMap(OrderItemReq::getProductId, OrderItemReq::getQuantity));
 
-        //atomic update
-        int updatedReservedCount = discountRepo.increaseReservedCount(request.getDiscountId());
-        if (updatedReservedCount == 0) {
-            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
+        List<Product> products = productRepo.findAllByIds(productQuantityMap.keySet());
+        if (products.size() != productQuantityMap.size()) {
+            throw new BusinessException(ErrorCode.SOME_PRODUCT_NOT_EXIST);
         }
-
-        Discount discount = discountRepo.findById(request.getDiscountId())
+        Discount discount = discountRepo.findByCode(request.getDiscountCode())
                 .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-
         if (discount.getEndDate().isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
         }
-
-        Carrier carrier = carrierRepo.findById(request.getCarrierId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.CARRIER_NOT_FOUND));
+        discount.setReservedCount(discount.getReservedCount() + 1);
+        discountRepo.save(discount);
 
         Address address = addressRepo.findById(request.getAddressId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
-        SummaryRes summary = summaryService.getSummary(cart, discount);
-
-        String trackingNumber = trackingNumberGenerator.generateTrackingNumber(carrier.getName());
+        //check ton kho va tang reserved count
+        List<Inventory> inventories = new ArrayList<>();
+        for (Product product : products) {
+            Inventory inventory = product.getInventory();
+            if (inventory.getQuantityInStock() - inventory.getReservedQuantity()
+                    >= productQuantityMap.get(product.getId())) {
+                inventory.setReservedQuantity(inventory.getReservedQuantity() + productQuantityMap.get(product.getId()));
+                inventories.add(inventory);
+            } else {
+                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+            }
+        }
+        inventoryRepo.saveAll(inventories);
 
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
-        //TODO: quên chưa trừ discount , nhỡ đâu 2 user cùng đọc voucher cuối cùng, rồi cùng tạo đơn hàng, lúc
-        //TODO: lúc đó Admin sẽ thấy 2 đơn hàng và confirm cả 2 -> die
-        ///updated : đã trừ reserved discount
-        return orderFactory.generateOrder(trackingNumber, user, cart, discount, carrier, address, paymentMethod, summary);
+        OrderSummary summary = summaryService.getSummary(productQuantityMap, discount.getCode());
+        //TODO: clear gio hang
+        return orderFactory.generateOrder(user, discount, address, paymentMethod, summary);
     }
 
     @Override

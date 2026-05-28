@@ -1,7 +1,9 @@
 package com.nkh.ecommercebackend.repository;
 
 import com.nkh.ecommercebackend.entity.Discount;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,6 +25,7 @@ public interface DiscountRepo extends JpaRepository<Discount, String> {
     @Query("update Discount d set d.reservedCount = d.reservedCount-1 where d.id = :id and d.reservedCount>0")
     int decreaseReservedCount(String id);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Discount> findByCode(String code);
 
     @Query("""

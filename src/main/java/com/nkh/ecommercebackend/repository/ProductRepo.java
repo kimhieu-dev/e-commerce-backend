@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 public interface ProductRepo extends JpaRepository<Product,String>, JpaSpecificationExecutor<Product> {
     Boolean existsBySku(String sku);
@@ -30,4 +32,11 @@ public interface ProductRepo extends JpaRepository<Product,String>, JpaSpecifica
                                    and i.updatedAt between :fromDateTime and :toDateTime
             """)
     Integer getTotalLimitedStock(LocalDateTime fromDateTime, LocalDateTime toDateTime);
+
+    @Query("""
+    select p from Product p
+    left join fetch p.inventory
+    where p.id in :productIds
+""")
+    List<Product> findAllByIds(Set<String> productIds);
 }

@@ -14,11 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddItemReq implements Serializable {
-
     @NotBlank(message = "PRODUCT_ID_BLANK")
     private String productId;
-
-    @Min(value = 1,message = "QUANTITY_INVALID")
-    private Integer quantity;
-
 }

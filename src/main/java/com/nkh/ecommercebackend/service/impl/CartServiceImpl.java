@@ -28,16 +28,12 @@ public class CartServiceImpl implements CartService {
     private final CurrentUserService currentUserService;
     private final ProductRepo productRepo;
     private final InventoryRepo inventoryRepo;
-    private final DiscountMapper discountMapper;
-    private final DiscountRepo discountRepo;
-    private final CarrierRepo carrierRepo;
-    private final SummaryService summaryService;
 
     @Override
     public CartRes getCurrentCart() {
         User user = currentUserService.getUser();
-        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() ->
-                new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
         List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cart.getCartItems());
 
@@ -52,43 +48,33 @@ public class CartServiceImpl implements CartService {
         User user = currentUserService.getUser();
         Cart cart = cartRepo.findByUsername(user.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
-
+        //1. validate request: check ton tai product id : ok di tiep
+        //2. check xem da co cart item voi product nay chua: co roi thi +1, chua co thi tao moi;
+        //3. save xuong db;
         Product product = productRepo.findById(request.getProductId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        checkInventory(product);
-
         CartItem existingItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
-
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-            if (existingItem.getProduct().getInventory().getQuantityInStock() == 0) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-            if (existingItem.getQuantity() > existingItem.getProduct().getInventory().getQuantityInStock()) {
+            existingItem.setQuantity(existingItem.getQuantity() + 1);
+            Inventory inventoryOfExistingItem = existingItem.getProduct().getInventory();
+            int availableQuantity = inventoryOfExistingItem.getQuantityInStock() - inventoryOfExistingItem.getReservedQuantity();
+            if (availableQuantity < existingItem.getQuantity()) {
                 throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
             }
             cartItemRepo.save(existingItem);
-
             return cartItemMapper.toCartItemRes(existingItem);
         }
-
         CartItem newItem = CartItem.builder()
                 .cart(cart)
                 .product(product)
-                .quantity(request.getQuantity())
-                .checked(false)
+                .quantity(1)
                 .build();
-
-        if (newItem.getProduct().getInventory().getQuantityInStock() == 0) {
-            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-        }
-        if (newItem.getQuantity() > newItem.getProduct().getInventory().getQuantityInStock()) {
+        Inventory inventoryOfNewItem = newItem.getProduct().getInventory();
+        int availableQuantity = inventoryOfNewItem.getQuantityInStock() - inventoryOfNewItem.getReservedQuantity();
+        if (availableQuantity < newItem.getQuantity()) {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
         }
         cartItemRepo.save(newItem);
-
-
         return cartItemMapper.toCartItemRes(newItem);
     }
 
@@ -103,6 +89,8 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CartItemRes updateItem(String id, UpdateItemReq request) {
+
+        //TODO REFACTOR
         User user = currentUserService.getUser();
         CartItem cartItem = cartItemRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
@@ -112,7 +100,6 @@ public class CartServiceImpl implements CartService {
         }
 
         //trang thai inventory
-        checkInventory(cartItem.getProduct());
         Product product = cartItem.getProduct();
         productRepo.save(product);
 
@@ -121,29 +108,4 @@ public class CartServiceImpl implements CartService {
         return cartItemMapper.toCartItemRes(cartItem);
     }
 
-//    @Override
-//    public OrderSummary getSummary(String discountCode) {
-//        User user = currentUserService.getUser();
-//        Cart cart = user.getCart();
-//        Discount discount = discountRepo.findByCode(discountCode)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-////        return summaryService.getSummary(, discount);
-//        //TODO: Sửa api summary
-//
-//    }
-
-    private void checkInventory(Product product) {
-        Inventory inventory = product.getInventory();
-        if (inventory == null) {
-            throw new BusinessException(ErrorCode.PRODUCT_DO_NOT_HAVE_INVENTORY);
-        }
-        if (product.getInventory().getQuantityInStock() == 0) {
-            inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
-        } else if (product.getInventory().getQuantityInStock() <= 10) {
-            inventory.setStatus(InventoryStatus.LIMITED_STOCK);
-        } else {
-            inventory.setStatus(InventoryStatus.IN_STOCK);
-        }
-        inventoryRepo.save(inventory);
-    }
 }

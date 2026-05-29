@@ -30,6 +30,4 @@ public class CartItem extends BaseEntity implements Serializable {
     @Column(name = "quantity",nullable = false)
     private Integer quantity;
 
-    @Column(name = "checked",nullable = false)
-    private Boolean checked;
 }

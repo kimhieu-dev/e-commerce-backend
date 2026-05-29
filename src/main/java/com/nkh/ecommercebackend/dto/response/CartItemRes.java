@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class CartItemRes implements Serializable {
-    private String id;
-
     private ProductRes product;
-
     private Integer quantity;
 }

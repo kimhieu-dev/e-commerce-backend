@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public IntrospectRes introspect(IntrospectReq request) {
         String token = request.getToken();
-        Boolean verified = Boolean.TRUE;
+        boolean verified = Boolean.TRUE;
         Date expiredDay = Date.from(Instant.EPOCH);
         try {
             JWSVerifier verifier = new MACVerifier(SECRET.getBytes());

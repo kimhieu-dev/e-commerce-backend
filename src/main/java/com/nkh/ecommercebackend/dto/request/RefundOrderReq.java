@@ -13,6 +13,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundOrderReq implements Serializable {
-    private UserOrderStatus status;
-    private String reason;
+    private String note;
 }

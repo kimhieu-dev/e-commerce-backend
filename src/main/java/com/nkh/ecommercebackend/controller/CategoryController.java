@@ -6,10 +6,14 @@ import com.nkh.ecommercebackend.dto.BaseResponse;
 import com.nkh.ecommercebackend.dto.response.CategoryRes;
 import com.nkh.ecommercebackend.service.CategoryService;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.core.ObjectReadContext;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -17,6 +21,12 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class CategoryController {
     private final CategoryService categoryService;
+
+    @GetMapping()
+    public BaseResponse<List<CategoryRes>> get(){
+        List<CategoryRes> response = categoryService.get();
+        return BaseResponse.success(response);
+    }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping

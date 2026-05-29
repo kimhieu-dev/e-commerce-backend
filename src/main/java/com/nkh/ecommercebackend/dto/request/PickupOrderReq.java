@@ -13,5 +13,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PickupOrderReq implements Serializable {
-    private OrderStatus status =  OrderStatus.PICKING;
+    private String note;
 }

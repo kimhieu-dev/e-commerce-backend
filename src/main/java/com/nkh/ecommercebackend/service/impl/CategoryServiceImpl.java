@@ -14,6 +14,8 @@ import com.nkh.ecommercebackend.service.SlugGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -80,5 +82,11 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new  BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
         category.setDeleted(true);
         categoryRepo.save(category);
+    }
+
+    @Override
+    public List<CategoryRes> get() {
+        List<Category> categories = categoryRepo.findAll();
+        return categoryMapper.toCategoryRes(categories);
     }
 }

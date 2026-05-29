@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemMapper orderItemMapper;
     private final ProductRepo productRepo;
     private final InventoryRepo inventoryRepo;
+    private final CartItemRepo cartItemRepo;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -101,7 +102,6 @@ public class OrderServiceImpl implements OrderService {
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
         OrderSummary summary = summaryService.getSummary(productQuantityMap, discount.getCode());
-        //TODO: clear gio hang
         Order order = orderFactory.generateOrder(
                 new GenerateOrderReq(user,
                         products,
@@ -111,6 +111,11 @@ public class OrderServiceImpl implements OrderService {
                         paymentMethod,
                         summary)
         );
+
+        if (user.getCart() != null) {
+            Set<String> purchasedProductIds = productQuantityMap.keySet();
+            cartItemRepo.softDeletePurchasedItems(user.getCart().getId(), purchasedProductIds);
+        }
 
         return orderMapper.toOrderRes(order);
     }

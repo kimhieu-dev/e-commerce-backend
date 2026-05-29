@@ -1,13 +1,10 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateItemReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
-import com.nkh.ecommercebackend.mapper.DiscountMapper;
 import com.nkh.ecommercebackend.repository.*;
-import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
@@ -53,29 +50,27 @@ public class CartServiceImpl implements CartService {
         //3. save xuong db;
         Product product = productRepo.findById(request.getProductId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
-        CartItem existingItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
-        if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + 1);
-            Inventory inventoryOfExistingItem = existingItem.getProduct().getInventory();
-            int availableQuantity = inventoryOfExistingItem.getQuantityInStock() - inventoryOfExistingItem.getReservedQuantity();
-            if (availableQuantity < existingItem.getQuantity()) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
-            }
-            cartItemRepo.save(existingItem);
-            return cartItemMapper.toCartItemRes(existingItem);
+        CartItem cartItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
+
+        if (cartItem != null) {
+            cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
+        } else {
+            cartItem = CartItem.builder()
+                    .cart(cart)
+                    .product(product)
+                    .quantity(request.getQuantity())
+                    .build();
         }
-        CartItem newItem = CartItem.builder()
-                .cart(cart)
-                .product(product)
-                .quantity(1)
-                .build();
-        Inventory inventoryOfNewItem = newItem.getProduct().getInventory();
-        int availableQuantity = inventoryOfNewItem.getQuantityInStock() - inventoryOfNewItem.getReservedQuantity();
-        if (availableQuantity < newItem.getQuantity()) {
+        Inventory inventory = product.getInventory();
+        if (inventory == null) {
+            throw new BusinessException(ErrorCode.INVENTORY_NOT_FOUND);
+        }
+        int availableQuantity = inventory.getQuantityInStock() - inventory.getReservedQuantity();
+        if (availableQuantity < request.getQuantity()) {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
         }
-        cartItemRepo.save(newItem);
-        return cartItemMapper.toCartItemRes(newItem);
+        cartItemRepo.save(cartItem);
+        return cartItemMapper.toCartItemRes(cartItem);
     }
 
     @Override

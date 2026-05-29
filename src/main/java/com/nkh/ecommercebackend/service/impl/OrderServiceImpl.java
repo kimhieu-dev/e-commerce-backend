@@ -39,18 +39,14 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final CurrentUserService currentUserService;
     private final DiscountRepo discountRepo;
-    private final CarrierRepo carrierRepo;
     private final AddressRepo addressRepo;
     private final SummaryService summaryService;
-    private final CartRepo cartRepo;
     private final OrderFactory orderFactory;
-    private final TrackingNumberGenerator trackingNumberGenerator;
     private final OrderRepo orderRepo;
     private final OrderMapper orderMapper;
     private final TrackingLogRepo trackingLogRepo;
     private final TrackingLogMapper trackingLogMapper;
-    private final AddressMapper addressMapper;
-    private final OrderItemRepo orderItemRepo;
+
     private final OrderItemMapper orderItemMapper;
     private final ProductRepo productRepo;
     private final InventoryRepo inventoryRepo;
@@ -60,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderRes createOrder(CreateOrderReq request) {
 
         //1. lay ra tt user
-        //2. validate tt product (check ton tai), discount code (check ton tai), so sanh address trong request va cua user
+        //2. validate tt product (check ton tai), discount code (check ton tai),..., so sanh address trong request va cua user
         //3. tao order save xuong db (generacte order, generate sku, validate ton kho,...)
         //4. tao order items save xuong db
         //5. xoa cart items (neu co)
@@ -78,6 +74,9 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
         if (discount.getEndDate().isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
+        }
+        if (discount.getReservedCount() + discount.getUsedCount() > discount.getUsageLimit()) {
+            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
         discount.setReservedCount(discount.getReservedCount() + 1);
         discountRepo.save(discount);
@@ -139,61 +138,55 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResList(orders);
     }
 
-    /// Đã sửa lại API approve order
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderRes approveOrder(String id, ApproveOrderReq request) {
-
-        int approved = orderRepo.approveOrder(id);
-        if (approved == 0) {
-            throw new BusinessException(ErrorCode.ORDER_CAN_NOT_APPROVE);
-        }
-
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.CONFIRMED);
+        orderRepo.save(order);
 
-        int updatedUsedCountAndReservedCount = discountRepo.updateUsedCountAndReservedCount(order.getDiscount().getId());
-        if (updatedUsedCountAndReservedCount == 0) {
-            throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
-        }
+        Discount discount = discountRepo.findById(order.getDiscount().getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+        discount.setReservedCount(discount.getReservedCount() - 1);
+        discount.setUsedCount(discount.getUsedCount() + 1);
+        //da su dung version optimistic lock
+        discountRepo.save(discount);
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
-                .fromStatus(OrderStatus.PENDING)
+                .fromStatus(oldStatus)
                 .toStatus(order.getStatus())
                 .note(request.getNote())
-                .location("init location")
+                .location("admin confirmed")
                 .build();
         trackingLogRepo.save(trackingLog);
 
         return orderMapper.toOrderRes(order);
     }
 
-    /// đã sửa lại api reject
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderRes rejectOrder(String id, RejectOrderReq request) {
-
-        //atomic update để nhỡ 2 admin cùng đọc và cùng reject 1 order pending thì reserved count bị trừ tận 2 lần
-        int rejected = orderRepo.rejectOrder(id);
-        if (rejected == 0) {
-            throw new BusinessException(ErrorCode.ORDER_CAN_NOT_REJECT);
-        }
-
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.REJECTED);
+        orderRepo.save(order);
 
-        int updated = discountRepo.decreaseReservedCount(order.getDiscount().getId());
-        if (updated == 0) {
-            throw new BusinessException(ErrorCode.RESERVED_COUNT_NEGATIVE);
-        }
+        Discount discount = discountRepo.findById(order.getDiscount().getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+        discount.setReservedCount(discount.getReservedCount() - 1);
+        //da su dung version optimistic lock
+        discountRepo.save(discount);
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
-                .fromStatus(OrderStatus.PENDING)
+                .fromStatus(oldStatus)
                 .toStatus(order.getStatus())
                 .note(request.getNote())
-                .location("no location")
+                .location("admin rejected")
                 .build();
         trackingLogRepo.save(trackingLog);
 
@@ -202,25 +195,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes pickupOrder(String id, PickupOrderReq request) {
-        //TODO refactor lại
-
-        request.setStatus(OrderStatus.PICKING);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getStatus() == OrderStatus.PICKING) {
-            throw new BusinessException(ErrorCode.ORDER_ALREADY_PICKING);
-        }
-        OrderStatus orderStatus = order.getStatus();
-
-        order.setStatus(request.getStatus());
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.PICKING);
         orderRepo.save(order);
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
-                .fromStatus(orderStatus)
+                .fromStatus(oldStatus)
                 .toStatus(order.getStatus())
-                .note("order picked up")
-                .location("init location")
+                .note("order picking up")
+                .location("shipper pinking up order")
                 .build();
         trackingLogRepo.save(trackingLog);
 
@@ -229,24 +215,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes shipOrder(String id, ShipOrderReq request) {
-        //TODO refactor lại
-
-        request.setStatus(OrderStatus.SHIPPING);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getStatus() == OrderStatus.SHIPPING) {
-            throw new BusinessException(ErrorCode.ORDER_ALREADY_SHIPPING);
-        }
-        OrderStatus orderStatus = order.getStatus();
-
-        order.setStatus(request.getStatus());
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.SHIPPING);
         orderRepo.save(order);
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
-                .fromStatus(orderStatus)
+                .fromStatus(oldStatus)
                 .toStatus(order.getStatus())
-                .note("order shipping")
+                .note(request.getNote())
                 .location("shipping location")
                 .build();
         trackingLogRepo.save(trackingLog);
@@ -256,25 +235,38 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes deliverOrder(String id, DeliverOrderReq request) {
-        //TODO refactor lại
-
-        request.setStatus(OrderStatus.DELIVERED);
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getStatus() == OrderStatus.DELIVERED) {
-            throw new BusinessException(ErrorCode.ORDER_ALREADY_DELIVERED);
-        }
-        OrderStatus orderStatus = order.getStatus();
-
-        order.setStatus(request.getStatus());
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.SHIPPING);
         orderRepo.save(order);
 
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
-                .fromStatus(orderStatus)
+                .fromStatus(oldStatus)
                 .toStatus(order.getStatus())
-                .note("order delivered")
-                .location("user address location")
+                .note(request.getNote())
+                .location(order.getUserAddress())
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OrderRes failOrder(String id, FailOrderReq request) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.FAILED);
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(oldStatus)
+                .toStatus(order.getStatus())
+                .note(request.getNote())
+                .location(order.getUserAddress())
                 .build();
         trackingLogRepo.save(trackingLog);
 
@@ -283,20 +275,42 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderRes refundOrder(String id, RefundOrderReq request) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.REFUND);
+        orderRepo.save(order);
 
-        //TODO refactor lại
-        request.setStatus(UserOrderStatus.RETURNED);
-        User user = currentUserService.getUser();
-        Optional<Order> order = orderRepo.findById(id);
-        if (order.isEmpty()) {
-            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
-        }
-        if (!order.get().getUser().getId().equals(user.getId())) {
-            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
-        }
-        order.get().setStatus(OrderStatus.RETURNING);
-        orderRepo.save(order.get());
-        return orderMapper.toOrderRes(order.get());
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(oldStatus)
+                .toStatus(order.getStatus())
+                .note(request.getNote())
+                .location(order.getUserAddress())
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
+    }
+
+    @Override
+    public OrderRes returnOrder(String id, ReturnOrderReq request) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus oldStatus = order.getStatus();
+        order.setStatus(OrderStatus.RETURNING);
+        orderRepo.save(order);
+
+        TrackingLog trackingLog = TrackingLog.builder()
+                .order(order)
+                .fromStatus(oldStatus)
+                .toStatus(order.getStatus())
+                .note(request.getNote())
+                .location("Returning location")
+                .build();
+        trackingLogRepo.save(trackingLog);
+
+        return orderMapper.toOrderRes(order);
     }
 
     @Override
@@ -308,7 +322,7 @@ public class OrderServiceImpl implements OrderService {
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
         LocalDateTime toDateTime = toDate.atStartOfDay();
 
-        return  orderRepo.getOverviewStats(fromDateTime, toDateTime);
+        return orderRepo.getOverviewStats(fromDateTime, toDateTime);
     }
 
     @Override

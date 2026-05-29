@@ -13,5 +13,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeliverOrderReq implements Serializable {
-    private OrderStatus status = OrderStatus.DELIVERED;
+    private String note;
 }

@@ -90,10 +90,24 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/fail")
+    public BaseResponse<OrderRes> failOrder(@PathVariable String id, @RequestBody @Valid FailOrderReq request){
+        OrderRes response = orderService.failOrder(id, request);
+        return BaseResponse.success(response);
+    }
+
     @PreAuthorize("hasAnyRole('USER')")
     @PostMapping("/{id}/refund")
     public BaseResponse<OrderRes> refundOrder(@PathVariable String id, RefundOrderReq request) {
         OrderRes response = orderService.refundOrder(id,request);
+        return BaseResponse.success(response);
+    }
+
+    @PreAuthorize("hasAnyRole('SHIPPER')")
+    @PatchMapping("/{id}/return")
+    public BaseResponse<OrderRes> returnOrder(@PathVariable String id, @RequestBody @Valid ReturnOrderReq request){
+        OrderRes response = orderService.returnOrder(id, request);
         return BaseResponse.success(response);
     }
 

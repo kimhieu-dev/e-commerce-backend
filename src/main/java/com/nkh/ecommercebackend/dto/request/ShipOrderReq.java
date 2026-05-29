@@ -13,5 +13,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShipOrderReq implements Serializable {
-    private OrderStatus status = OrderStatus.SHIPPING;
+    private String note;
 }

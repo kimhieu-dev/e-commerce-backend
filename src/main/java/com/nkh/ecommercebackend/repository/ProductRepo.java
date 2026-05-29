@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.repository;
 
+import com.nkh.ecommercebackend.dto.response.ProductOverviewStats;
 import com.nkh.ecommercebackend.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -39,4 +40,15 @@ public interface ProductRepo extends JpaRepository<Product,String>, JpaSpecifica
     where p.id in :productIds
 """)
     List<Product> findAllByIds(Set<String> productIds);
+
+    @Query("""
+                select ProductOverviewStats(
+                sum(i.quantityInStock),
+                count(i.product.id),
+                sum(case when (i.quantityInStock - i.reservedQuantity) <= 10 then 1 else 0 end)
+                ) from Inventory i
+                where i.deleted = false
+                and i.createdAt between :fromDateTime and :toDateTime
+            """)
+    ProductOverviewStats getOverviewStats(LocalDateTime fromDateTime, LocalDateTime toDateTime);
 }

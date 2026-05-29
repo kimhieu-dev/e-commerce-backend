@@ -4,7 +4,7 @@ import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
 import com.nkh.ecommercebackend.dto.BaseResponse;
-import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
+import com.nkh.ecommercebackend.dto.response.ProductOverviewStats;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.service.ProductService;
 import jakarta.validation.Valid;
@@ -37,9 +37,9 @@ public class ProductController {
     }
 
     @GetMapping("/overview")
-    public BaseResponse<ProductOverviewRes> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,
-                                                        @RequestParam(value = "toDate", required = false) LocalDate toDate) {
-        ProductOverviewRes response = productService.getOverview(fromDate,toDate);
+    public BaseResponse<ProductOverviewStats> getOverview(@RequestParam(value = "fromDate", required = false) LocalDate fromDate,
+                                                          @RequestParam(value = "toDate", required = false) LocalDate toDate) {
+        ProductOverviewStats response = productService.getOverview(fromDate,toDate);
         return BaseResponse.success(response);
     }
 

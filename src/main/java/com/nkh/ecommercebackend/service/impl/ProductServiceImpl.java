@@ -4,7 +4,7 @@ import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
-import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
+import com.nkh.ecommercebackend.dto.response.ProductOverviewStats;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
 import com.nkh.ecommercebackend.dto.response.InventoryRes;
@@ -26,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -69,11 +68,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductRes createProduct(CreateProductReq request) {
+        //1. validate sku exist
+
         Boolean checkSku = productRepo.existsBySku(request.getSku());
         if (checkSku) {
             throw new BusinessException(ErrorCode.SKU_EXISTED);
         }
-
         Product product = Product.builder()
                 .sku(request.getSku())
                 .name(request.getName())
@@ -97,7 +97,6 @@ public class ProductServiceImpl implements ProductService {
                 .quantityInStock(request.getQuantityInStock())
                 .reservedQuantity(request.getReservedQuantity())
                 .build();
-
         if (request.getQuantityInStock() == 0) {
             inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
         } else if (request.getQuantityInStock() <= 10) {
@@ -105,39 +104,19 @@ public class ProductServiceImpl implements ProductService {
         } else {
             inventory.setStatus(InventoryStatus.IN_STOCK);
         }
-
         inventoryRepo.save(inventory);
-
-        InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);
-
-        return ProductRes.builder()
-                .sku(product.getSku())
-                .name(product.getName())
-                .basePrice(product.getBasePrice())
-                .thumbnailUrl(product.getThumbnailUrl())
-                .inventory(inventoryRes)
-                .build();
+        return productMapper.toProductRes(product);
     }
 
     @Override
-    public ProductOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
+    public ProductOverviewStats getOverview(LocalDate fromDate, LocalDate toDate) {
         if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
         if (toDate == null) toDate = LocalDate.now();
 
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
         LocalDateTime toDateTime = toDate.atStartOfDay();
 
-        BigDecimal inventoryValue = productRepo.getInventoryValue(fromDateTime, toDateTime);
-
-        Integer totalProducts = productRepo.getTotalProducts(fromDateTime, toDateTime);
-
-        Integer totalLimitedStock = productRepo.getTotalLimitedStock(fromDateTime, toDateTime);
-
-        return ProductOverviewRes.builder()
-                .inventoryValue(inventoryValue)
-                .totalProducts(totalProducts)
-                .totalLimitedStock(totalLimitedStock)
-                .build();
+        return productRepo.getOverviewStats(fromDateTime, toDateTime);
     }
 
     @Override
@@ -187,7 +166,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(String id) {
-        Product product =  productRepo.findById(id)
+        Product product = productRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         product.setDeleted(true);
         productRepo.save(product);

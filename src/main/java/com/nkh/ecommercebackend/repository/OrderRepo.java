@@ -1,14 +1,12 @@
 package com.nkh.ecommercebackend.repository;
 
 import com.nkh.ecommercebackend.common.OrderStatus;
-import com.nkh.ecommercebackend.common.UserOrderStatus;
-import com.nkh.ecommercebackend.dto.request.OrderOverviewProjection;
+import com.nkh.ecommercebackend.dto.request.OrderOverviewStats;
 import com.nkh.ecommercebackend.entity.Order;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -104,7 +102,7 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
     int approveOrder(String id);
 
     @Query("""
-    SELECT OrderOverviewProjection(
+    SELECT OrderOverviewStats(
         SUM(CASE WHEN o.status = OrderStatus.DELIVERED THEN o.grandTotal ELSE 0 END),
         COUNT(o.id),
         SUM(CASE WHEN o.status = OrderStatus.PENDING  THEN 1 ELSE 0 END),
@@ -115,5 +113,5 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
     WHERE o.deleted = false
       AND o.createdAt BETWEEN :from AND :to
 """)
-    OrderOverviewProjection getOverviewStats(LocalDateTime from, LocalDateTime to);
+    OrderOverviewStats getOverviewStats(LocalDateTime from, LocalDateTime to);
 }

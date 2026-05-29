@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @AllArgsConstructor
 @Getter
-public class OrderOverviewProjection {
+public class OrderOverviewStats {
     private BigDecimal totalRevenue;
     private Integer totalOrders;
     private Integer totalPending;

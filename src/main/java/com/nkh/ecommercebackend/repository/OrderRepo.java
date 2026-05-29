@@ -120,8 +120,8 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
     @Query("""
                 select TodayStatistics(
                 count(o.id),
-                sum(case when o.status == OrderStatus.CONFIRMED then 1 else 0 end),
-                sum(case when o.status == OrderStatus.PENDING then 1 else 0 end)
+                sum(case when o.status = OrderStatus.CONFIRMED then 1 else 0 end),
+                sum(case when o.status = OrderStatus.PENDING then 1 else 0 end)
                 )
                 from Order o
                 where o.deleted = false

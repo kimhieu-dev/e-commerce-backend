@@ -42,10 +42,10 @@ public class AuthController {
         return BaseResponse.success("Logout successfully");
     }
 
-    @PostMapping("/refresh-token")
-    BaseResponse<?> logout(@RequestBody @Valid RefreshTokenReq request) {
-        //authService.logout(request);
-        return BaseResponse.success("Logout successfully");
-    }
+//    @PostMapping("/refresh-token")
+//    BaseResponse<?> logout(@RequestBody @Valid RefreshTokenReq request) {
+//        //authService.logout(request);
+//        return BaseResponse.success("Logout successfully");
+//    }
 
 }

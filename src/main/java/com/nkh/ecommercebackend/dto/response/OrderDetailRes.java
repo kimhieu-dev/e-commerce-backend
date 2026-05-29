@@ -28,9 +28,7 @@ public class OrderDetailRes implements Serializable {
 
     private LocalDate estimatedDelivery;
 
-    private AddressRes address;
+    private String address;
 
     private List<OrderItemRes> orderItems;
-
-    private List<TrackingLogRes> trackingLogs;
 }

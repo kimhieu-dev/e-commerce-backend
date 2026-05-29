@@ -1,6 +1,7 @@
 package com.nkh.ecommercebackend.dto.request;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateItemReq implements Serializable {
-    @Min(value = 1,message = "quantity must greater than or equals to 1")
+    @NotNull(message = "QUANTITY_NULL")
     private int quantity;
 }

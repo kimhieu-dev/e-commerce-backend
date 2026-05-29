@@ -1,13 +1,10 @@
 package com.nkh.ecommercebackend.service.impl;
 
-import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.AddItemReq;
 import com.nkh.ecommercebackend.dto.request.UpdateItemReq;
 import com.nkh.ecommercebackend.dto.response.*;
 import com.nkh.ecommercebackend.entity.*;
-import com.nkh.ecommercebackend.mapper.DiscountMapper;
 import com.nkh.ecommercebackend.repository.*;
-import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.util.CurrentUserService;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,16 +26,12 @@ public class CartServiceImpl implements CartService {
     private final CurrentUserService currentUserService;
     private final ProductRepo productRepo;
     private final InventoryRepo inventoryRepo;
-    private final DiscountMapper discountMapper;
-    private final DiscountRepo discountRepo;
-    private final CarrierRepo carrierRepo;
-    private final SummaryService summaryService;
 
     @Override
     public CartRes getCurrentCart() {
         User user = currentUserService.getUser();
-        Cart cart = cartRepo.findByUsername(user.getUsername()).orElseThrow(() ->
-                new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
         List<CartItemRes> cartItemResList = cartItemMapper.toCartItemResList(cart.getCartItems());
 
@@ -52,50 +46,47 @@ public class CartServiceImpl implements CartService {
         User user = currentUserService.getUser();
         Cart cart = cartRepo.findByUsername(user.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
-
+        //1. validate request: check ton tai product id : ok di tiep
+        //2. check xem da co cart item voi product nay chua: co roi thi +1, chua co thi tao moi;
+        //3. save xuong db;
         Product product = productRepo.findById(request.getProductId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+        CartItem cartItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
 
-        checkInventory(product);
-
-        CartItem existingItem = cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
-
-        if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
-            if (existingItem.getProduct().getInventory().getQuantityInStock() == 0) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-            if (existingItem.getQuantity() > existingItem.getProduct().getInventory().getQuantityInStock()) {
-                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
-            }
-            cartItemRepo.save(existingItem);
-
-            return cartItemMapper.toCartItemRes(existingItem);
+        if (cartItem != null) {
+            cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
+        } else {
+            cartItem = CartItem.builder()
+                    .cart(cart)
+                    .product(product)
+                    .quantity(request.getQuantity())
+                    .build();
         }
-
-        CartItem newItem = CartItem.builder()
-                .cart(cart)
-                .product(product)
-                .quantity(request.getQuantity())
-                .checked(false)
-                .build();
-
-        if (newItem.getProduct().getInventory().getQuantityInStock() == 0) {
-            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+        Inventory inventory = product.getInventory();
+        if (inventory == null) {
+            throw new BusinessException(ErrorCode.INVENTORY_NOT_FOUND);
         }
-        if (newItem.getQuantity() > newItem.getProduct().getInventory().getQuantityInStock()) {
+        int availableQuantity = inventory.getQuantityInStock() - inventory.getReservedQuantity();
+        if (availableQuantity < request.getQuantity()) {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
         }
-        cartItemRepo.save(newItem);
-
-
-        return cartItemMapper.toCartItemRes(newItem);
+        cartItemRepo.save(cartItem);
+        return cartItemMapper.toCartItemRes(cartItem);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteItem(String id) {
-        CartItem cartItem = cartItemRepo.findByIdAndDeletedFalse(id).orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        User user = currentUserService.getUser();
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+
+        CartItem cartItem = cartItemRepo.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        if (!cart.getId().equals(cartItem.getCart().getId())) {
+            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
+        }
         cartItem.setDeleted(true);
         cartItemRepo.save(cartItem);
     }
@@ -103,47 +94,35 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CartItemRes updateItem(String id, UpdateItemReq request) {
+        if (request.getQuantity() < 0) {
+            throw new BusinessException(ErrorCode.QUANTITY_INVALID);
+        }
         User user = currentUserService.getUser();
-        CartItem cartItem = cartItemRepo.findById(id)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        if (!user.getId().equals(id)) {
+        CartItem cartItem = cartItemRepo.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        if (!cart.getId().equals(cartItem.getCart().getId())) {
             throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
         }
+        if (request.getQuantity() == 0) {
+            cartItem.setDeleted(true);
+            cartItemRepo.save(cartItem);
+        }
+        int newQuantity = request.getQuantity();
+        if (newQuantity > cartItem.getQuantity()) {
+            Product product = cartItem.getProduct();
+            Inventory inventory = product.getInventory();
+            int availableQuantity = inventory.getQuantityInStock() - inventory.getReservedQuantity();
 
-        //trang thai inventory
-        checkInventory(cartItem.getProduct());
-        Product product = cartItem.getProduct();
-        productRepo.save(product);
-
-        cartItem.setQuantity(request.getQuantity());
+            if (availableQuantity < newQuantity) {
+                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
+            }
+        }
+        cartItem.setQuantity(newQuantity);
         cartItemRepo.save(cartItem);
         return cartItemMapper.toCartItemRes(cartItem);
     }
 
-//    @Override
-//    public OrderSummary getSummary(String discountCode) {
-//        User user = currentUserService.getUser();
-//        Cart cart = user.getCart();
-//        Discount discount = discountRepo.findByCode(discountCode)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
-////        return summaryService.getSummary(, discount);
-//        //TODO: Sửa api summary
-//
-//    }
-
-    private void checkInventory(Product product) {
-        Inventory inventory = product.getInventory();
-        if (inventory == null) {
-            throw new BusinessException(ErrorCode.PRODUCT_DO_NOT_HAVE_INVENTORY);
-        }
-        if (product.getInventory().getQuantityInStock() == 0) {
-            inventory.setStatus(InventoryStatus.OUT_OF_STOCK);
-        } else if (product.getInventory().getQuantityInStock() <= 10) {
-            inventory.setStatus(InventoryStatus.LIMITED_STOCK);
-        } else {
-            inventory.setStatus(InventoryStatus.IN_STOCK);
-        }
-        inventoryRepo.save(inventory);
-    }
 }

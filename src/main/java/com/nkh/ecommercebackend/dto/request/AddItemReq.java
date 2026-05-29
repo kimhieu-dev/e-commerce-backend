@@ -2,6 +2,7 @@ package com.nkh.ecommercebackend.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +15,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddItemReq implements Serializable {
-
     @NotBlank(message = "PRODUCT_ID_BLANK")
     private String productId;
 
-    @Min(value = 1,message = "QUANTITY_INVALID")
+    @NotNull(message = "QUANTITY_INVALID")
     private Integer quantity;
-
 }

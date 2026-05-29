@@ -348,6 +348,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
         if (!order.getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.YOU_DO_NOT_HAVE_PRIVILEGE);
         }
@@ -367,18 +368,16 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getUser().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.YOU_DO_NOT_HAVE_PRIVILEGE);
         }
-        List<OrderItem> orderItemList = order.getOrderItems();
-        if (orderItemList == null || orderItemList.isEmpty()) {
-            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
-        }
-        List<OrderItemRes> orderItemResList = orderItemMapper.toOrderItemResList(orderItemList);
+        List<OrderItem> orderItems = order.getOrderItems();
+        List<OrderItemRes> orderItemResList = orderItemMapper.toOrderItemResList(orderItems);
+
         return OrderDetailRes.builder()
                 .trackingNumber(order.getTrackingNumber())
                 .paymentMethod(order.getPaymentMethod())
                 .status(order.getStatus())
                 .grandTotal(order.getGrandTotal())
                 .estimatedDelivery(order.getEstimatedDelivery())
-                .address(addressMapper.toAddressRes(order.getAddress()))
+                .address(order.getUserAddress())
                 .orderItems(orderItemResList)
                 .build();
     }

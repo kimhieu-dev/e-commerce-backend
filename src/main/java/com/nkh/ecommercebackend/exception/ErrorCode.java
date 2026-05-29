@@ -56,7 +56,7 @@ public enum ErrorCode {
     QUANTITY_IN_STOCK_NULL(2036, "Quantity in stock is null", HttpStatus.BAD_REQUEST),
     RESERVED_QUANTITY_NULL(2037, "Reserved quantity is null", HttpStatus.BAD_REQUEST),
     SKU_EXISTED(2038, "SKU is already existed", HttpStatus.CONFLICT),
-    PRODUCT_DO_NOT_HAVE_INVENTORY(2039, "Product does not have a inventory", HttpStatus.BAD_REQUEST),
+    INVENTORY_NOT_FOUND(2039, "Product does not have inventory", HttpStatus.BAD_REQUEST),
     PRODUCT_OUT_OF_STOCK(2040, "Product out of stock", HttpStatus.BAD_REQUEST),
     PRODUCT_OUT_OF_RANGE(2041, "Product out of range", HttpStatus.BAD_REQUEST),
     CART_ID_BLANK(2042, "Cart id is blank", HttpStatus.BAD_REQUEST),
@@ -91,6 +91,8 @@ public enum ErrorCode {
     ORDER_CAN_NOT_APPROVE(2071,  "Order cannot approve", HttpStatus.BAD_REQUEST),
     SOME_PRODUCT_NOT_EXIST(2072,"Some product not exist",HttpStatus.CONFLICT),
     ITEMS_EMPTY(2073,"There's no item",HttpStatus.BAD_REQUEST),
+    QUANTITY_NULL(2074,"Quantity is null",HttpStatus.BAD_REQUEST),
+    ORDER_ITEMS_NOT_FOUND(2075,"Order item not found",HttpStatus.BAD_REQUEST),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

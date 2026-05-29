@@ -2,11 +2,13 @@ package com.nkh.ecommercebackend.repository;
 
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.dto.request.OrderOverviewStats;
+import com.nkh.ecommercebackend.dto.request.TodayStatistics;
 import com.nkh.ecommercebackend.entity.Order;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -114,4 +116,16 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
       AND o.createdAt BETWEEN :from AND :to
 """)
     OrderOverviewStats getOverviewStats(LocalDateTime from, LocalDateTime to);
+
+    @Query("""
+                select TodayStatistics(
+                count(o.id),
+                sum(case when o.status == OrderStatus.CONFIRMED then 1 else 0 end),
+                sum(case when o.status == OrderStatus.PENDING then 1 else 0 end)
+                )
+                from Order o
+                where o.deleted = false
+                and o.createdAt between :from and :to
+            """)
+    TodayStatistics getTodayStats(LocalDateTime from, LocalDateTime to);
 }

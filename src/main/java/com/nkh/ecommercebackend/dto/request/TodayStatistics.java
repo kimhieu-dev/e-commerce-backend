@@ -1,9 +1,16 @@
 package com.nkh.ecommercebackend.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 
+import java.io.Serializable;
+
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class TodayStatistics {
+public class TodayStatistics implements Serializable {
+    private Integer totalOrdersToday;
+    private Integer totalOrdersConfirmedToday;
+    private Integer totalOrdersPendingToday;
 }

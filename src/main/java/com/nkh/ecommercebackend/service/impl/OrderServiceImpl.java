@@ -335,14 +335,12 @@ public class OrderServiceImpl implements OrderService {
         LocalDateTime fromDateTime = LocalDate.now().atStartOfDay();
         LocalDateTime toDateTime = LocalDate.now().plusDays(1).atStartOfDay();
 
-        Integer totalOrdersToday = orderRepo.countTotalOrders(fromDateTime, toDateTime);
-        Integer totalOrdersConfirmedToday = orderRepo.countTotalConfirmedOrders(fromDateTime, toDateTime);
-        Integer totalOrdersPendingToday = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
+        TodayStatistics todayStats = orderRepo.getTodayStats(fromDateTime, toDateTime);
 
         return TodayStatisticsRes.builder()
-                .totalOrdersToday(totalOrdersToday)
-                .totalOrdersConfirmedToday(totalOrdersConfirmedToday)
-                .totalOrdersPendingToday(totalOrdersPendingToday)
+                .totalOrdersToday(todayStats.getTotalOrdersToday())
+                .totalOrdersConfirmedToday(todayStats.getTotalOrdersConfirmedToday())
+                .totalOrdersPendingToday(todayStats.getTotalOrdersPendingToday())
                 .build();
     }
 

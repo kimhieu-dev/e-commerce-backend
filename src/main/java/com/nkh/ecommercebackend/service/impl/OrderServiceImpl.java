@@ -103,7 +103,17 @@ public class OrderServiceImpl implements OrderService {
 
         OrderSummary summary = summaryService.getSummary(productQuantityMap, discount.getCode());
         //TODO: clear gio hang
-        return orderFactory.generateOrder(user, discount, address, paymentMethod, summary);
+        Order order = orderFactory.generateOrder(
+                new GenerateOrderReq(user,
+                        products,
+                        productQuantityMap,
+                        discount,
+                        address,
+                        paymentMethod,
+                        summary)
+        );
+
+        return orderMapper.toOrderRes(order);
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.nkh.ecommercebackend.service;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
-import com.nkh.ecommercebackend.dto.response.ProductOverviewRes;
+import com.nkh.ecommercebackend.dto.response.ProductOverviewStats;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Product;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ public interface ProductService {
 
     ProductRes createProduct(CreateProductReq request);
 
-    ProductOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
+    ProductOverviewStats getOverview(LocalDate fromDate, LocalDate toDate);
 
     ProductRes updateProduct(String id, UpdateProductReq request);
 

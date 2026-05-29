@@ -26,7 +26,7 @@ public interface OrderService {
 
     OrderRes refundOrder(String id, RefundOrderReq request);
 
-    OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate);
+    OrderOverviewStats getOverview(LocalDate fromDate, LocalDate toDate);
 
     TodayStatisticsRes getTodayStatistics();
 

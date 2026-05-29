@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductOverviewRes implements Serializable {
-    private BigDecimal inventoryValue;
+public class ProductOverviewStats implements Serializable {
+    private Integer inventoryQuantity;
     private Integer totalProducts;
     private Integer totalLimitedStock;
 }

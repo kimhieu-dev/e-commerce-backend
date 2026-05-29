@@ -300,7 +300,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderOverviewRes getOverview(LocalDate fromDate, LocalDate toDate) {
+    public OrderOverviewStats getOverview(LocalDate fromDate, LocalDate toDate) {
 
         if (fromDate == null) fromDate = LocalDate.now().minusDays(30);
         if (toDate == null) toDate = LocalDate.now();
@@ -308,22 +308,7 @@ public class OrderServiceImpl implements OrderService {
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
         LocalDateTime toDateTime = toDate.atStartOfDay();
 
-//        BigDecimal totalRevenue = orderRepo.calculateTotalRevenue(fromDateTime, toDateTime);
-//        TODO: I/O quá nhiều
-//        Integer totalOrders = orderRepo.countTotalOrders(fromDateTime, toDateTime);
-//        Integer totalPending = orderRepo.countTotalPendingOrders(fromDateTime, toDateTime);
-//        Integer totalShipping = orderRepo.countTotalShippingOrders(fromDateTime, toDateTime);
-//        Integer totalFailed = orderRepo.countTotalFailedOrders(fromDateTime, toDateTime);
-
-        OrderOverviewProjection stats = orderRepo.getOverviewStats(fromDateTime, toDateTime);
-
-        return OrderOverviewRes.builder()
-                .totalRevenue(stats.getTotalRevenue())
-                .totalOrders(stats.getTotalOrders())
-                .totalPending(stats.getTotalPending())
-                .totalShipping(stats.getTotalShipping())
-                .totalFailed(stats.getTotalFailed())
-                .build();
+        return  orderRepo.getOverviewStats(fromDateTime, toDateTime);
     }
 
     @Override

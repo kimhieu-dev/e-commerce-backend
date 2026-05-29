@@ -77,7 +77,16 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteItem(String id) {
-        CartItem cartItem = cartItemRepo.findByIdAndDeletedFalse(id).orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+        User user = currentUserService.getUser();
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+
+        CartItem cartItem = cartItemRepo.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        if (!cart.getId().equals(cartItem.getCart().getId())) {
+            throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
+        }
         cartItem.setDeleted(true);
         cartItemRepo.save(cartItem);
     }
@@ -92,7 +101,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepo.findByUsername(user.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
 
-        CartItem cartItem = cartItemRepo.findById(id)
+        CartItem cartItem = cartItemRepo.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
         if (!cart.getId().equals(cartItem.getCart().getId())) {
             throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);

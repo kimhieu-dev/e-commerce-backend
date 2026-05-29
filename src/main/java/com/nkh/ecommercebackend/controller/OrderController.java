@@ -37,6 +37,24 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
+    @GetMapping("/{id}")
+    public BaseResponse<OrderDetailRes> getOrderDetail(@PathVariable String id) {
+        OrderDetailRes response = orderService.getOrderDetail(id);
+        return BaseResponse.success(response);
+    }
+
+    @GetMapping("/{id}/tracking-logs")
+    public BaseResponse<List<TrackingLogRes>> getTrackingLogs(@PathVariable String id) {
+        List<TrackingLogRes> response = orderService.getTrackingLogs(id);
+        return BaseResponse.success(response);
+    }
+
+    @GetMapping("/my")
+    public BaseResponse<List<MyOrdersRes>> getMyOrders(MyOrderFilterReq request, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+        List<MyOrdersRes> response = orderService.getMyOrders(request, pageable);
+        return BaseResponse.success(response);
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PatchMapping("/{id}/approve")
     public BaseResponse<OrderRes> approveOrder(@PathVariable String id, @RequestBody @Valid ApproveOrderReq request) {
@@ -94,22 +112,5 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
-    @GetMapping("/{id}/tracking-logs")
-    public BaseResponse<List<TrackingLogRes>> getTrackingLogs(@PathVariable String id) {
-        List<TrackingLogRes> response = orderService.getTrackingLogs(id);
-        return BaseResponse.success(response);
-    }
-
-    @GetMapping("/{id}")
-    public BaseResponse<OrderDetailRes> getOrderDetail(@PathVariable String id) {
-        OrderDetailRes response = orderService.getOrderDetail(id);
-        return BaseResponse.success(response);
-    }
-
-    @GetMapping("/my")
-    public BaseResponse<List<MyOrdersRes>> getMyOrders(MyOrderFilterReq request, @PageableDefault(size = 5, page = 0) Pageable pageable) {
-        List<MyOrdersRes> response = orderService.getMyOrders(request, pageable);
-        return BaseResponse.success(response);
-    }
 
 }

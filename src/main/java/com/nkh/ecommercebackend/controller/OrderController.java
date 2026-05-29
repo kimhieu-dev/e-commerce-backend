@@ -30,12 +30,6 @@ public class OrderController {
         return BaseResponse.success(response);
     }
 
-//    @GetMapping("/summary")
-//    public BaseResponse<SummaryRes> getSummary(@RequestBody String discountCode, @RequestBody String cartId) {
-//        SummaryRes response = orderService.getSummary(discountCode);
-//        return BaseResponse.success(response);
-//    }
-
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     public BaseResponse<List<OrderRes>> getOrders(OrderFilterReq request, @PageableDefault(size = 5, page = 0) Pageable pageable) {

@@ -32,17 +32,21 @@ public class SummaryServiceImpl implements SummaryService {
     public OrderSummary getSummary(Map<String, Integer> productQuantityMap, String discountCode) {
 
         List<Product> products = productRepo.findAllById(productQuantityMap.keySet());
-        if (products.size() != productQuantityMap.size()){
+        if (products.size() != productQuantityMap.size()) {
             throw new BusinessException(ErrorCode.SOME_PRODUCT_NOT_EXIST);
         }
 
         Discount discount = discountRepo.findByCode(discountCode)
-                .orElseThrow(()->new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
 
-        BigDecimal subtotal = products.stream()
-                .map(product -> product.getBasePrice()
-                        .multiply(BigDecimal.valueOf(productQuantityMap.get(product.getId()))))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal subtotal = products.stream().map(
+                product -> product.getBasePrice()
+                        .multiply(
+                                BigDecimal.valueOf(
+                                        productQuantityMap.get(product.getId())
+                                )
+                        )
+        ).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal shippingFee = BigDecimal.valueOf(30.00);
 

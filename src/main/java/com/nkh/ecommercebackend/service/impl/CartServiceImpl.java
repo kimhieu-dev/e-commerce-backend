@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -84,21 +85,33 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CartItemRes updateItem(String id, UpdateItemReq request) {
-
-        //TODO REFACTOR
+        if (request.getQuantity() < 0) {
+            throw new BusinessException(ErrorCode.QUANTITY_INVALID);
+        }
         User user = currentUserService.getUser();
+        Cart cart = cartRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_CART));
+
         CartItem cartItem = cartItemRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
-
-        if (!user.getId().equals(id)) {
+        if (!cart.getId().equals(cartItem.getCart().getId())) {
             throw new BusinessException(ErrorCode.USER_DOES_NOT_HAVE_PRIVILEGE);
         }
+        if (request.getQuantity() == 0) {
+            cartItem.setDeleted(true);
+            cartItemRepo.save(cartItem);
+        }
+        int newQuantity = request.getQuantity();
+        if (newQuantity > cartItem.getQuantity()) {
+            Product product = cartItem.getProduct();
+            Inventory inventory = product.getInventory();
+            int availableQuantity = inventory.getQuantityInStock() - inventory.getReservedQuantity();
 
-        //trang thai inventory
-        Product product = cartItem.getProduct();
-        productRepo.save(product);
-
-        cartItem.setQuantity(request.getQuantity());
+            if (availableQuantity < newQuantity) {
+                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_RANGE);
+            }
+        }
+        cartItem.setQuantity(newQuantity);
         cartItemRepo.save(cartItem);
         return cartItemMapper.toCartItemRes(cartItem);
     }

@@ -26,7 +26,7 @@ public class CartController {
         return BaseResponse.success(response);
     }
 
-    @GetMapping("/summary")
+    @PostMapping("/summary")
     public BaseResponse<OrderSummary> getSummary(@RequestBody OrderSummaryReq request) {
         OrderSummary response = summaryService.getSummary(request.getProductQuantityMap(),request.getDiscountCode());
         return BaseResponse.success(response);
@@ -38,16 +38,13 @@ public class CartController {
         return BaseResponse.success(response);
     }
 
-    ///
-    /// sửa đoạn này để trả về cart, sau khi tăng giảm số lượng thì load lại card
-    ///
     @PatchMapping("/items/{id}")
     public BaseResponse<CartItemRes> updateItem(@PathVariable String id, @Valid @RequestBody UpdateItemReq request) {
         CartItemRes response = cartService.updateItem(id, request);
         return BaseResponse.success(response);
     }
 
-    @DeleteMapping("/cart/items/{id}")
+    @DeleteMapping("/items/{id}")
     public BaseResponse<?> deleteItem(@PathVariable String id) {
         cartService.deleteItem(id);
         return BaseResponse.success("Delete item successfully");

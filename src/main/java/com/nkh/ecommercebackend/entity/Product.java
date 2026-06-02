@@ -21,9 +21,6 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private String id;
 
-    @Column(name = "category_id")
-    private String categoryId;
-
     @Column(name = "sku", nullable = false)
     private String sku;
 

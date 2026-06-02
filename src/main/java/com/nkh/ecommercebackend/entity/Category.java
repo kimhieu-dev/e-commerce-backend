@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,5 +32,4 @@ public class Category extends BaseEntity implements Serializable {
 
     @Column(name = "description")
     private String description;
-
 }

@@ -21,6 +21,7 @@ public class ProductSpec {
             }
         };
     }
+
     public static Specification<Product> likeSku(String sku) {
         return new Specification<Product>() {
             @Override
@@ -29,6 +30,18 @@ public class ProductSpec {
                     return criteriaBuilder.conjunction();
                 }
                 return criteriaBuilder.like(root.get("sku"), "%" + sku + "%");
+            }
+        };
+    }
+
+    public static Specification<Product> equalCategoryId(String categoryId) {
+        return new Specification<Product>() {
+            @Override
+            public @Nullable Predicate toPredicate(@NonNull Root<Product> root, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder criteriaBuilder) {
+                if (categoryId == null || categoryId.isEmpty()) {
+                    return criteriaBuilder.conjunction();
+                }
+                return criteriaBuilder.equal(root.get("categoryId"), categoryId);
             }
         };
     }

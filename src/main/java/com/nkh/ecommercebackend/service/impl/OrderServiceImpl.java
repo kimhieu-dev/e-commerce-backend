@@ -346,12 +346,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<TrackingLogRes> getTrackingLogs(String id) {
-        User user = currentUserService.getUser();
+        String currentUserId = currentUserService.getCurrentUserId();
 
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (!order.getUser().getId().equals(user.getId())) {
+        if (!order.getUser().getId().equals(currentUserId)) {
             throw new BusinessException(ErrorCode.YOU_DO_NOT_HAVE_PRIVILEGE);
         }
 
@@ -364,10 +364,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailRes getOrderDetail(String id) {
-        User user = currentUserService.getUser();
+        String currentUserId = currentUserService.getCurrentUserId();
         Order order = orderRepo.findByIdTrackingLog(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
-        if (!order.getUser().getId().equals(user.getId())) {
+        if (!order.getUser().getId().equals(currentUserId)) {
             throw new BusinessException(ErrorCode.YOU_DO_NOT_HAVE_PRIVILEGE);
         }
         List<OrderItem> orderItems = order.getOrderItems();
@@ -386,22 +386,22 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<MyOrdersRes> getMyOrders(MyOrderFilterReq request, Pageable pageable) {
-        User user = currentUserService.getUser();
+        String currentUserId = currentUserService.getCurrentUserId();
         List<Order> orders;
         switch (request.getStatus()) {
             case PENDING ->
-                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.PENDING, pageable);
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.PENDING, pageable);
             case PICKING ->
-                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.PICKING, pageable);
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.PICKING, pageable);
             case SHIPPING ->
-                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.SHIPPING, pageable);
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.SHIPPING, pageable);
             case DELIVERED ->
-                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.DELIVERED, pageable);
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.DELIVERED, pageable);
             case FAILED ->
-                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.FAILED, pageable);
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.FAILED, pageable);
             case RETURNED ->
-                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(user.getId(), OrderStatus.RETURNING, pageable);
-            default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(user.getId());
+                    orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.RETURNING, pageable);
+            default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(currentUserId);
         }
         return orderMapper.toMyOrders(orders);
     }

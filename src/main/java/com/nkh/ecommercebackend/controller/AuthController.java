@@ -38,14 +38,18 @@ public class AuthController {
 
     @PostMapping("/logout")
     BaseResponse<?> logout(@RequestBody @Valid LogoutReq request) {
-        //authService.logout(request);
+        authService.logout(request);
         return BaseResponse.success("Logout successfully");
     }
 
-//    @PostMapping("/refresh-token")
-//    BaseResponse<?> logout(@RequestBody @Valid RefreshTokenReq request) {
-//        //authService.logout(request);
-//        return BaseResponse.success("Logout successfully");
-//    }
+    @PostMapping("/refresh-token")
+    BaseResponse<LoginRes> refreshToken(@RequestBody @Valid RefreshTokenReq request) {
+        return BaseResponse.success(authService.refreshToken(request));
+    }
 
+    @PostMapping("/forgot-password")
+    BaseResponse<?> forgotPassword(@RequestBody @Valid ForgotPasswordReq request) {
+        authService.forgotPassword(request);
+        return BaseResponse.success("Password reset instructions sent to your email");
+    }
 }

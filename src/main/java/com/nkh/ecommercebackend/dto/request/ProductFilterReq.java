@@ -14,5 +14,4 @@ import java.io.Serializable;
 public class ProductFilterReq implements Serializable {
     private String sku;
     private String name;
-    private String categoryId;
 }

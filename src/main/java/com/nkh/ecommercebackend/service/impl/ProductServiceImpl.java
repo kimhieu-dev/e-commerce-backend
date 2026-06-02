@@ -60,11 +60,6 @@ public class ProductServiceImpl implements ProductService {
         if (request.getSku() != null && !request.getSku().isEmpty()) {
             specification = specification.and(ProductSpec.likeSku(request.getSku()));
         }
-
-        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
-            specification = specification.and(ProductSpec.equalCategoryId(request.getCategoryId()));
-        }
-
         Page<Product> products = productRepo.findAll(specification, pageable);
         List<Product> productList = products.getContent();
         return productMapper.toProductResList(productList);
@@ -74,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(rollbackFor = Exception.class)
     public ProductRes createProduct(CreateProductReq request) {
         //1. validate sku exist
+
         Boolean checkSku = productRepo.existsBySku(request.getSku());
         if (checkSku) {
             throw new BusinessException(ErrorCode.SKU_EXISTED);

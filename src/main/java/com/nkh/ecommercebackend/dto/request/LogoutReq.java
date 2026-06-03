@@ -8,5 +8,5 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class LogoutReq implements Serializable {
-
+    String token;
 }

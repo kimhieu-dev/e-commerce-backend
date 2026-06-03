@@ -10,7 +10,6 @@ import com.nkh.ecommercebackend.dto.response.IntrospectRes;
 import com.nkh.ecommercebackend.dto.response.LoginRes;
 import com.nkh.ecommercebackend.entity.InvalidatedToken;
 import com.nkh.ecommercebackend.entity.User;
-import com.nkh.ecommercebackend.entity.UserRole;
 import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.repository.InvalidatedTokenRepo;
@@ -22,13 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -54,11 +53,13 @@ public class AuthServiceImpl implements AuthService {
     protected String ISSUER;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void register(RegisterReq userReq) {
         userRoleService.createUser(userReq);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LoginRes login(LoginReq request) {
         User user = userService.checkIfUsernameExists(request.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -76,16 +77,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public IntrospectRes introspect(IntrospectReq request) {
         try {
             verifyToken(request.getToken(), false);
             return IntrospectRes.builder().valid(true).build();
         } catch (Exception e) {
+            log.error("Introspect Ex: ", e);
             return IntrospectRes.builder().valid(false).build();
         }
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void logout(LogoutReq request) {
         try {
             SignedJWT signedJWT = verifyToken(request.getToken(), true);
@@ -104,6 +108,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LoginRes refreshToken(RefreshTokenReq request) {
         try {
             SignedJWT signedJWT = verifyToken(request.getRefreshToken(), true);
@@ -131,12 +136,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void forgotPassword(ForgotPasswordReq request) {
         // Implementation for forgot password (e.g., send email with reset link/code)
         // For now, we'll just log it or throw an error if user not found
 //        userService.findByEmail(request.getEmail())
 //                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        
+
         log.info("Forgot password requested for email: {}", request.getEmail());
         // TODO: Integrate with an email service
     }

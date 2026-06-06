@@ -24,7 +24,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public BaseResponse<List<ProductRes>> getProducts(ProductFilterReq request, @PageableDefault(size = 4, page = 0) Pageable pageable) {
+    public BaseResponse<List<ProductRes>> getProducts(ProductFilterReq request, @PageableDefault(size = 12, page = 0) Pageable pageable) {
         List<ProductRes> response = productService.getProducts(request, pageable);
         return BaseResponse.success(response);
     }

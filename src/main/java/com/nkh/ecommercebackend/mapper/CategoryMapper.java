@@ -13,5 +13,6 @@ public interface CategoryMapper {
     Category toCategory(CreateCategoryReq request);
     Category toCategory(UpdateCategoryReq request);
 
+    CategoryRes toCategoryRes(Category category);
     List<CategoryRes> toCategoryRes(List<Category> categories);
 }

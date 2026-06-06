@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class ProductRes implements Serializable {
+    private String id;
+
     private String sku;
 
     private String name;
@@ -19,6 +21,8 @@ public class ProductRes implements Serializable {
     private BigDecimal basePrice;
 
     private String thumbnailUrl;
+
+    private String categoryId;
 
     private InventoryRes inventory;
 }

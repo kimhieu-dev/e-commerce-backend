@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryRes update(UpdateCategoryReq request) {
 
         Category category = categoryRepo.findById(request.getId())
-                .orElseThrow(() -> new  BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
 
         if (request.getParentId() != null) {
             Boolean isExisted = categoryRepo.existsByParentId(request.getParentId());
@@ -79,14 +79,39 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(String id) {
         Category category = categoryRepo.findById(id)
-                .orElseThrow(() -> new  BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
         category.setDeleted(true);
         categoryRepo.save(category);
     }
 
     @Override
     public List<CategoryRes> get() {
-        List<Category> categories = categoryRepo.findAll();
-        return categoryMapper.toCategoryRes(categories);
+        List<Category> allCategories = categoryRepo.findAll();
+        if (allCategories.isEmpty()) return List.of();
+        
+        List<CategoryRes> allDtos = categoryMapper.toCategoryRes(allCategories);
+        if (allDtos == null || allDtos.isEmpty()) return List.of();
+
+        List<CategoryRes> rootCategories = allDtos.stream()
+                .filter(category -> category.getParentId() == null 
+                        || category.getParentId().isEmpty() 
+                        || "null".equalsIgnoreCase(category.getParentId().trim()))
+                .peek(category -> category.setChildren(getChildren(category, allDtos)))
+                .toList();
+        
+        // Fallback: Nếu logic phân cấp trả về rỗng nhưng có data, trả về list phẳng
+        if (rootCategories.isEmpty() && !allDtos.isEmpty()) {
+            return allDtos;
+        }
+        
+        return rootCategories;
+    }
+
+    private List<CategoryRes> getChildren(CategoryRes parent, List<CategoryRes> allDtos) {
+        if (parent.getId() == null) return List.of();
+        return allDtos.stream()
+                .filter(category -> parent.getId().equals(category.getParentId()))
+                .peek(category -> category.setChildren(getChildren(category, allDtos)))
+                .toList();
     }
 }

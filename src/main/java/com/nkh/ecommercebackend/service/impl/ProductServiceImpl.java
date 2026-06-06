@@ -14,6 +14,7 @@ import com.nkh.ecommercebackend.exception.BusinessException;
 import com.nkh.ecommercebackend.exception.ErrorCode;
 import com.nkh.ecommercebackend.mapper.InventoryMapper;
 import com.nkh.ecommercebackend.mapper.ProductMapper;
+import com.nkh.ecommercebackend.repository.CategoryRepo;
 import com.nkh.ecommercebackend.repository.InventoryRepo;
 import com.nkh.ecommercebackend.repository.ProductDetailRepo;
 import com.nkh.ecommercebackend.repository.ProductRepo;
@@ -39,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
     private final InventoryRepo inventoryRepo;
     private final ProductDetailRepo productDetailRepo;
     private final InventoryMapper inventoryMapper;
+    private final CategoryRepo categoryRepo;
 
     @Override
     public Product getProductById(String id) {
@@ -60,6 +62,19 @@ public class ProductServiceImpl implements ProductService {
         if (request.getSku() != null && !request.getSku().isEmpty()) {
             specification = specification.and(ProductSpec.likeSku(request.getSku()));
         }
+
+        if (request.getMinPrice()!=null){
+            specification = specification.and(ProductSpec.greatThanOrEqualTo(request.getMinPrice()));
+        }
+
+        if (request.getMaxPrice()!=null){
+            specification = specification.and(ProductSpec.lessThanOrEqualTo(request.getMaxPrice()));
+        }
+
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            specification = specification.and(ProductSpec.equalCategoryId(request.getCategoryId()));
+        }
+
         Page<Product> products = productRepo.findAll(specification, pageable);
         List<Product> productList = products.getContent();
         return productMapper.toProductResList(productList);
@@ -80,6 +95,12 @@ public class ProductServiceImpl implements ProductService {
                 .basePrice(request.getBasePrice())
                 .thumbnailUrl(request.getThumbnailUrl())
                 .build();
+        
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            product.setCategory(categoryRepo.findById(request.getCategoryId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND)));
+        }
+        
         productRepo.save(product);
 
         ProductDetail productDetail = ProductDetail.builder()
@@ -128,6 +149,14 @@ public class ProductServiceImpl implements ProductService {
         product.setName(request.getName());
         product.setBasePrice(request.getBasePrice());
         product.setThumbnailUrl(request.getThumbnailUrl());
+        
+        if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
+            product.setCategory(categoryRepo.findById(request.getCategoryId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND)));
+        } else {
+            product.setCategory(null);
+        }
+        
         productRepo.save(product);
 
 
@@ -153,15 +182,7 @@ public class ProductServiceImpl implements ProductService {
         }
         inventoryRepo.save(inventory);
 
-        InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);
-
-        return ProductRes.builder()
-                .sku(product.getSku())
-                .name(product.getName())
-                .basePrice(product.getBasePrice())
-                .thumbnailUrl(product.getThumbnailUrl())
-                .inventory(inventoryRes)
-                .build();
+        return productMapper.toProductRes(product);
     }
 
     @Override

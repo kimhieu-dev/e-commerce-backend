@@ -4,6 +4,7 @@ import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
 import com.nkh.ecommercebackend.dto.BaseResponse;
+import com.nkh.ecommercebackend.dto.response.ProductDetailRes;
 import com.nkh.ecommercebackend.dto.response.ProductOverviewStats;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.service.ProductService;
@@ -26,6 +27,12 @@ public class ProductController {
     @GetMapping
     public BaseResponse<List<ProductRes>> getProducts(ProductFilterReq request, @PageableDefault(size = 12, page = 0) Pageable pageable) {
         List<ProductRes> response = productService.getProducts(request, pageable);
+        return BaseResponse.success(response);
+    }
+
+    @GetMapping("/{id}")
+    public BaseResponse<ProductDetailRes> getProductDetail(@PathVariable String id) {
+        ProductDetailRes response = productService.getProductDetail(id);
         return BaseResponse.success(response);
     }
 

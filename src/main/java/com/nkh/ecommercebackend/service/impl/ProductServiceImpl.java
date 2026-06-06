@@ -4,6 +4,7 @@ import com.nkh.ecommercebackend.common.InventoryStatus;
 import com.nkh.ecommercebackend.dto.request.CreateProductReq;
 import com.nkh.ecommercebackend.dto.request.ProductFilterReq;
 import com.nkh.ecommercebackend.dto.request.UpdateProductReq;
+import com.nkh.ecommercebackend.dto.response.ProductDetailRes;
 import com.nkh.ecommercebackend.dto.response.ProductOverviewStats;
 import com.nkh.ecommercebackend.dto.response.ProductRes;
 import com.nkh.ecommercebackend.entity.Inventory;
@@ -43,12 +44,27 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepo categoryRepo;
 
     @Override
-    public Product getProductById(String id) {
-        Optional<Product> productOptional = productRepo.findById(id);
-        if (productOptional.isEmpty()) {
-            throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
-        }
-        return productOptional.get();
+    public ProductDetailRes getProductDetail(String id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+        Inventory inventory = product.getInventory();
+        InventoryRes inventoryRes = inventoryMapper.toInventoryRes(inventory);
+
+        return ProductDetailRes.builder()
+                .id(product.getProductDetail().getId())
+                .sku(product.getSku())
+                .name(product.getName())
+                .basePrice(product.getBasePrice())
+                .thumbnailUrl(product.getThumbnailUrl())
+                .categoryId(product.getCategory().getId())
+                .categoryName(product.getCategory().getName())
+                .inventory(inventoryRes)
+                .description(product.getProductDetail().getDescription())
+                .weight(product.getProductDetail().getWeight())
+                .length(product.getProductDetail().getLength())
+                .width(product.getProductDetail().getWidth())
+                .height(product.getProductDetail().getHeight())
+                .build();
     }
 
     @Override
@@ -63,11 +79,11 @@ public class ProductServiceImpl implements ProductService {
             specification = specification.and(ProductSpec.likeSku(request.getSku()));
         }
 
-        if (request.getMinPrice()!=null){
+        if (request.getMinPrice() != null) {
             specification = specification.and(ProductSpec.greatThanOrEqualTo(request.getMinPrice()));
         }
 
-        if (request.getMaxPrice()!=null){
+        if (request.getMaxPrice() != null) {
             specification = specification.and(ProductSpec.lessThanOrEqualTo(request.getMaxPrice()));
         }
 
@@ -95,12 +111,12 @@ public class ProductServiceImpl implements ProductService {
                 .basePrice(request.getBasePrice())
                 .thumbnailUrl(request.getThumbnailUrl())
                 .build();
-        
+
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             product.setCategory(categoryRepo.findById(request.getCategoryId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND)));
         }
-        
+
         productRepo.save(product);
 
         ProductDetail productDetail = ProductDetail.builder()
@@ -149,14 +165,14 @@ public class ProductServiceImpl implements ProductService {
         product.setName(request.getName());
         product.setBasePrice(request.getBasePrice());
         product.setThumbnailUrl(request.getThumbnailUrl());
-        
+
         if (request.getCategoryId() != null && !request.getCategoryId().isEmpty()) {
             product.setCategory(categoryRepo.findById(request.getCategoryId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND)));
         } else {
             product.setCategory(null);
         }
-        
+
         productRepo.save(product);
 
 

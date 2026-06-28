@@ -186,6 +186,24 @@ public class OrderServiceImpl implements OrderService {
         //da su dung version optimistic lock
         discountRepo.save(discount);
 
+        List<String> productIds = order.getOrderItems().stream()
+                .map(item -> item.getProduct().getId())
+                .toList();
+
+        List<Inventory> inventories = inventoryRepo.findByProductIdIn(productIds);
+
+        Map<String, Inventory> inventoryMap = inventories.stream()
+                .collect(Collectors.toMap(i -> i.getProduct().getId(), i -> i));
+
+        for (OrderItem item : order.getOrderItems()) {
+            Inventory inventory = inventoryMap.get(item.getProduct().getId());
+            if (inventory == null) {
+                throw new BusinessException(ErrorCode.INVENTORY_NOT_FOUND);
+            }
+            inventory.setReservedQuantity(inventory.getReservedQuantity() + item.getQuantity());
+        }
+
+
         TrackingLog trackingLog = TrackingLog.builder()
                 .order(order)
                 .fromStatus(oldStatus)

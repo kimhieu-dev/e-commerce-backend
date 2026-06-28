@@ -243,7 +243,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         OrderStatus oldStatus = order.getStatus();
-        order.setStatus(OrderStatus.SHIPPING);
+        order.setStatus(OrderStatus.DELIVERED);
         orderRepo.save(order);
 
         TrackingLog trackingLog = TrackingLog.builder()

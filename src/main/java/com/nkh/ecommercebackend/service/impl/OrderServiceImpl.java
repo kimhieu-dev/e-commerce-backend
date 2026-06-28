@@ -217,6 +217,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes pickupOrder(String id, PickupOrderReq request) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -237,6 +238,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes shipOrder(String id, ShipOrderReq request) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -257,6 +259,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes deliverOrder(String id, DeliverOrderReq request) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -277,6 +280,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes failOrder(String id, FailOrderReq request) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -297,6 +301,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes refundOrder(String id, RefundOrderReq request) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -317,6 +322,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderRes returnOrder(String id, ReturnOrderReq request) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));

@@ -48,6 +48,7 @@ public class Discount extends BaseEntity implements Serializable {
     @Column(name = "reserved_count",nullable = false)
     private Integer reservedCount;
 
+    @Version
     @Column(name = "version",nullable = false)
     private Long version;
 }

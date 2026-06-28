@@ -84,6 +84,9 @@ public class Order extends BaseEntity implements Serializable {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @Column(name = "is_sent_mail",nullable = false)
+    private Boolean isSentMail;
+
     @OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
     private List<TrackingLog> trackingLogs;
 }

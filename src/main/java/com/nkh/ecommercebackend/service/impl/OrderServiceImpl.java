@@ -1,5 +1,6 @@
 package com.nkh.ecommercebackend.service.impl;
 
+import com.mysql.cj.log.Log;
 import com.nkh.ecommercebackend.common.OrderStatus;
 import com.nkh.ecommercebackend.common.PaymentMethod;
 import com.nkh.ecommercebackend.common.UserOrderStatus;
@@ -13,6 +14,7 @@ import com.nkh.ecommercebackend.mapper.OrderItemMapper;
 import com.nkh.ecommercebackend.mapper.OrderMapper;
 import com.nkh.ecommercebackend.mapper.TrackingLogMapper;
 import com.nkh.ecommercebackend.repository.*;
+import com.nkh.ecommercebackend.service.NotificationService;
 import com.nkh.ecommercebackend.service.OrderService;
 import com.nkh.ecommercebackend.service.SummaryService;
 import com.nkh.ecommercebackend.service.TrackingNumberGenerator;
@@ -52,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
     private final InventoryRepo inventoryRepo;
     private final CartItemRepo cartItemRepo;
 
+    private final NotificationService notificationService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderRes createOrder(CreateOrderReq request) {
@@ -82,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
         discount.setReservedCount(discount.getReservedCount() + 1);
         discountRepo.save(discount);
 
-        Address address = addressRepo.findById(request.getAddressId())
+        Address address = addressRepo.findByIdAndUserId(request.getAddressId(), user.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADDRESS_NOT_FOUND));
 
         //check ton kho va tang reserved count
@@ -101,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
 
         PaymentMethod paymentMethod = request.getPaymentMethod();
 
-        OrderSummary summary = summaryService.getSummary(productQuantityMap, discount.getCode());
+        OrderSummary summary = summaryService.getSummary(productQuantityMap, discount.getCode(), products, discount);
         Order order = orderFactory.generateOrder(
                 new GenerateOrderReq(user,
                         products,
@@ -272,7 +276,8 @@ public class OrderServiceImpl implements OrderService {
                 .fromStatus(oldStatus)
                 .toStatus(order.getStatus())
                 .note(request.getNote())
-                .location(order.getUserAddress())
+                .location("test")
+//                .location(order.getUserAddress())
                 .build();
         trackingLogRepo.save(trackingLog);
 
@@ -349,7 +354,7 @@ public class OrderServiceImpl implements OrderService {
         if (toDate == null) toDate = LocalDate.now();
 
         LocalDateTime fromDateTime = fromDate.atStartOfDay();
-        LocalDateTime toDateTime = toDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atTime(LocalTime.MAX); // da fix
 
         return orderRepo.getOverviewStats(fromDateTime, toDateTime);
     }
@@ -425,28 +430,41 @@ public class OrderServiceImpl implements OrderService {
                     orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.FAILED, pageable);
             case RETURNED ->
                     orders = orderRepo.findAllByUserIdAndStatusAndDeletedFalse(currentUserId, OrderStatus.RETURNING, pageable);
-            default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(currentUserId);
+            default -> orders = orderRepo.findAllByUserIdAndDeletedFalse(currentUserId, pageable);
         }
         return orderMapper.toMyOrders(orders);
     }
 
     @Override
     public void sendMail() {
+        int pageSize = 200;
         LocalDate today = LocalDate.now();
 
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        Pageable pageable = PageRequest.of(0, 100);
-        List<Order> orders = orderRepo.findOrdersForSendMail(OrderStatus.DELIVERED, startOfDay, endOfDay, pageable);
-
-        for (Order order : orders) {
-            try {
-                System.out.println("Sending mail...");
-//                NotificationService.sendMail(order);
-            } catch (Exception e) {
-                log.error("Error:{}", e.getMessage());
+        long totalOrders = orderRepo.countOrdersForSendMail(
+                OrderStatus.DELIVERED, startOfDay, endOfDay, false
+        );
+        if (totalOrders == 0) {
+            return;
+        }
+        int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+        for (int i = 0; i < totalPages; i++) {
+            Pageable pageable = PageRequest.of(0, pageSize);
+            List<Order> orders = orderRepo.findOrdersForSendMail(OrderStatus.DELIVERED, startOfDay, endOfDay, false, pageable);
+            if (orders.isEmpty()) {
+                break;
             }
+            for (Order order : orders) {
+                try {
+                    notificationService.sendMail(order);
+                    order.setIsSentMail(true);
+                } catch (Exception e) {
+                    log.error("Error processing mail for order {}: {}", order.getId(), e.getMessage());
+                }
+            }
+            orderRepo.saveAll(orders);
         }
     }
 

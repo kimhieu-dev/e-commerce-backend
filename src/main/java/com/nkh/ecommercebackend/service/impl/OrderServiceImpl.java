@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
         if (discount.getEndDate().isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXPIRED);
         }
-        if (discount.getReservedCount() + discount.getUsedCount() > discount.getUsageLimit()) {
+        if (discount.getReservedCount() + discount.getUsedCount() >= discount.getUsageLimit()) {
             throw new BusinessException(ErrorCode.DISCOUNT_EXCEED);
         }
         discount.setReservedCount(discount.getReservedCount() + 1);

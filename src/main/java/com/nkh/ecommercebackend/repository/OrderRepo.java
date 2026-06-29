@@ -22,6 +22,11 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
             """)
     BigDecimal calculateTotalRevenue(LocalDateTime from, LocalDateTime to);
 
+    @Query("select count (o) from Order o where o.status = :status " +
+            "and o.updatedAt >= :start AND o.updatedAt <= :end " +
+            "and o.isSentMail = :isSentMail")
+    long countOrdersForSendMail(OrderStatus status, LocalDateTime start, LocalDateTime end, boolean isSentMail);
+
     @Query("""
             select count (o.id) from Order o
                         where o.deleted = false
@@ -76,14 +81,15 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
 
     List<Order> findAllByUserIdAndStatusAndDeletedFalse(String userId, OrderStatus status, Pageable pageable);
 
-    List<Order> findAllByUserIdAndDeletedFalse(String userId);
+    List<Order> findAllByUserIdAndDeletedFalse(String userId, Pageable pageable);
 
     @Query("""
                 select o from Order o
                 where o.status = :orderStatus
                     and o.updatedAt between :start and :end
+                    and o.isSentMail = :isSentMail
             """)
-    List<Order> findOrdersForSendMail(OrderStatus orderStatus, LocalDateTime start, LocalDateTime end, Pageable pageable);
+    List<Order> findOrdersForSendMail(OrderStatus orderStatus, LocalDateTime start, LocalDateTime end, Boolean isSentMail, Pageable pageable);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""
@@ -104,17 +110,17 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
     int approveOrder(String id);
 
     @Query("""
-    SELECT OrderOverviewStats(
-        SUM(CASE WHEN o.status = OrderStatus.DELIVERED THEN o.grandTotal ELSE 0 END),
-        COUNT(o.id),
-        SUM(CASE WHEN o.status = OrderStatus.PENDING  THEN 1 ELSE 0 END),
-        SUM(CASE WHEN o.status = OrderStatus.SHIPPING THEN 1 ELSE 0 END),
-        SUM(CASE WHEN o.status = OrderStatus.FAILED   THEN 1 ELSE 0 END)
-    )
-    FROM Order o
-    WHERE o.deleted = false
-      AND o.createdAt BETWEEN :from AND :to
-""")
+                SELECT OrderOverviewStats(
+                    SUM(CASE WHEN o.status = OrderStatus.DELIVERED THEN o.grandTotal ELSE 0 END),
+                    COUNT(o.id),
+                    SUM(CASE WHEN o.status = OrderStatus.PENDING  THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN o.status = OrderStatus.SHIPPING THEN 1 ELSE 0 END),
+                    SUM(CASE WHEN o.status = OrderStatus.FAILED   THEN 1 ELSE 0 END)
+                )
+                FROM Order o
+                WHERE o.deleted = false
+                  AND o.createdAt BETWEEN :from AND :to
+            """)
     OrderOverviewStats getOverviewStats(LocalDateTime from, LocalDateTime to);
 
     @Query("""

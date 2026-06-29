@@ -25,9 +25,11 @@ public class TrackingLog extends BaseEntity implements Serializable {
     private Order order;
 
     @Column(name = "from_status",nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus fromStatus;
 
     @Column(name = "to_status",nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus toStatus;
 
     @Column(name = "note")

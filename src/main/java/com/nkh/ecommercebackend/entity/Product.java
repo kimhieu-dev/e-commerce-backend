@@ -48,4 +48,8 @@ public class Product extends BaseEntity implements Serializable {
 
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

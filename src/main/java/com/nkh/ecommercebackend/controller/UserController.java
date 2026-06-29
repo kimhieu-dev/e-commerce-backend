@@ -30,6 +30,7 @@ public class UserController {
     private final UserMapper userMapper;
     private final UserRepo userRepo;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CreateUserRes> createUser(@RequestBody @Valid CreateUserReq request){
         User user = userService.createUser(request);
@@ -43,4 +44,6 @@ public class UserController {
         List<UserRes> response = userService.getUsers(request,pageable);
         return BaseResponse.success(response);
     }
+
+
 }

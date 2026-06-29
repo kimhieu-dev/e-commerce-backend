@@ -93,6 +93,7 @@ public enum ErrorCode {
     ITEMS_EMPTY(2073,"There's no item",HttpStatus.BAD_REQUEST),
     QUANTITY_NULL(2074,"Quantity is null",HttpStatus.BAD_REQUEST),
     ORDER_ITEMS_NOT_FOUND(2075,"Order item not found",HttpStatus.BAD_REQUEST),
+    SEND_MAIL_FAIL(2076,"Send mail failed",HttpStatus.CONFLICT),
     //SYSTEM
     UNCATEGORIZED_ERROR(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 

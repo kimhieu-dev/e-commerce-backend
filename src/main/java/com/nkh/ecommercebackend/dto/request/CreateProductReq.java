@@ -56,4 +56,6 @@ public class CreateProductReq implements Serializable {
     @NotNull(message = "RESERVED_QUANTITY_NULL")
     @Min(value = 0, message = "RESERVED_QUANTITY_INVALID")
     private Integer reservedQuantity;
+
+    private String categoryId;
 }

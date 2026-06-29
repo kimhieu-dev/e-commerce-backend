@@ -3,6 +3,7 @@ package com.nkh.ecommercebackend.dto.response;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Setter
 @Getter
@@ -10,8 +11,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class CategoryRes implements Serializable {
+    private String id;
     private String parentId;
     private String name;
     private String slug;
     private String description;
+    private List<CategoryRes> children;
 }

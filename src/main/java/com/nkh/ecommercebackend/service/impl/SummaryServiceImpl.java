@@ -29,9 +29,44 @@ public class SummaryServiceImpl implements SummaryService {
     private final DiscountRepo discountRepo;
 
     @Override
-    public OrderSummary getSummary(Map<String, Integer> productQuantityMap, String discountCode) {
+    public OrderSummary getSummary(Map<String, Integer> productQuantityMap, String discountCode, List<Product> products, Discount discount) {
 
-        List<Product> products = productRepo.findAllById(productQuantityMap.keySet());
+//        List<Product> products = productRepo.findAllById(productQuantityMap.keySet());
+        if (products.size() != productQuantityMap.size()) {
+            throw new BusinessException(ErrorCode.SOME_PRODUCT_NOT_EXIST);
+        }
+
+//        Discount discount = discountRepo.findByCode(discountCode)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.DISCOUNT_NOT_FOUND));
+
+        BigDecimal subtotal = products.stream().map(
+                product -> product.getBasePrice()
+                        .multiply(
+                                BigDecimal.valueOf(
+                                        productQuantityMap.get(product.getId())
+                                )
+                        )
+        ).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal shippingFee = BigDecimal.valueOf(30.00);
+
+        DiscountStrategy strategy = discountStrategyFactory.create(discount.getType(), discount.getValue());
+
+        BigDecimal discountAmount = strategy.calculate(subtotal);
+
+        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
+
+        return OrderSummary.builder()
+                .subtotal(subtotal)
+                .shippingFee(shippingFee)
+                .discountAmount(discountAmount)
+                .totalAmount(totalAmount)
+                .build();
+    }
+
+    @Override
+    public OrderSummary getSummary(Map<String, Integer> productQuantityMap, String discountCode) {
+                List<Product> products = productRepo.findAllById(productQuantityMap.keySet());
         if (products.size() != productQuantityMap.size()) {
             throw new BusinessException(ErrorCode.SOME_PRODUCT_NOT_EXIST);
         }

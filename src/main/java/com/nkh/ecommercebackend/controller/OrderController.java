@@ -99,7 +99,7 @@ public class OrderController {
 
     @PreAuthorize("hasAnyRole('USER')")
     @PostMapping("/{id}/refund")
-    public BaseResponse<OrderRes> refundOrder(@PathVariable String id, RefundOrderReq request) {
+    public BaseResponse<OrderRes> refundOrder(@PathVariable String id, @RequestBody @Valid RefundOrderReq request) {
         OrderRes response = orderService.refundOrder(id,request);
         return BaseResponse.success(response);
     }

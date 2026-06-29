@@ -138,8 +138,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void forgotPassword(ForgotPasswordReq request) {
-        // Implementation for forgot password (e.g., send email with reset link/code)
-        // For now, we'll just log it or throw an error if user not found
+        // Implementation for forgot password (send email with reset link/code)
 //        userService.findByEmail(request.getEmail())
 //                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 

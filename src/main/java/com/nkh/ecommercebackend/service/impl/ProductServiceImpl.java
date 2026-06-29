@@ -93,14 +93,13 @@ public class ProductServiceImpl implements ProductService {
 
         Page<Product> products = productRepo.findAll(specification, pageable);
         List<Product> productList = products.getContent();
+        //n+1
         return productMapper.toProductResList(productList);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductRes createProduct(CreateProductReq request) {
-        //1. validate sku exist
-
         Boolean checkSku = productRepo.existsBySku(request.getSku());
         if (checkSku) {
             throw new BusinessException(ErrorCode.SKU_EXISTED);

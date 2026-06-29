@@ -18,17 +18,17 @@ public class NotificationServiceImpl implements NotificationService {
     private final JavaMailSender mailSender;
 
     @Override
-    public void sendMail(Order order) {
+    public void sendMail(String email, String trackingNumber) {
         try{
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("nguyenkimhieu.dev@gmail.com");
-            message.setTo(order.getUser().getEmail());
-            message.setSubject("Confirmed: Order #" + order.getId() + " deliver succeed!");
+            message.setTo(email);
+            message.setSubject("Confirmed: Order #" + trackingNumber + " deliver succeed!");
             message.setText("Hi,\n\nYour order is delivered. Thank for purchasing!");
             mailSender.send(message);
-            log.info("Send mail success for order: {}", order.getId());
+            log.info("Send mail success for order: {}", trackingNumber);
         }catch (Exception e){
-            log.error("Error sending mail: {}: {}", order.getId(), e.getMessage());
+            log.error("Error sending mail: {}: {}", trackingNumber, e.getMessage());
             throw new BusinessException(ErrorCode.SEND_MAIL_FAIL);
         }
     }

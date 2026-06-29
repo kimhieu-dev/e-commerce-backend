@@ -23,7 +23,7 @@ public interface OrderRepo extends JpaRepository<Order, String>, JpaSpecificatio
     BigDecimal calculateTotalRevenue(LocalDateTime from, LocalDateTime to);
 
     @Query("select count (o) from Order o where o.status = :status " +
-            "and o.createdAt >= :start AND o.createdAt <= :end " +
+            "and o.updatedAt >= :start AND o.updatedAt <= :end " +
             "and o.isSentMail = :isSentMail")
     long countOrdersForSendMail(OrderStatus status, LocalDateTime start, LocalDateTime end, boolean isSentMail);
 

@@ -436,29 +436,38 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void sendMail() {
+        log.info("start sending mail");
         int pageSize = 200;
         LocalDate today = LocalDate.now();
 
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        log.info("start of day {} , end of day {}", startOfDay,endOfDay);
 
         long totalOrders = orderRepo.countOrdersForSendMail(
                 OrderStatus.DELIVERED, startOfDay, endOfDay, false
         );
+        log.info("total orders {}",totalOrders);
         if (totalOrders == 0) {
+            log.info("finish flow find total orders");
             return;
         }
         int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+        log.info("total pages {}", totalPages);
         for (int i = 0; i < totalPages; i++) {
+            log.info("start handing page number {}",i);
             Pageable pageable = PageRequest.of(0, pageSize);
             List<Order> orders = orderRepo.findOrdersForSendMail(OrderStatus.DELIVERED, startOfDay, endOfDay, false, pageable);
+            log.info("total records: {}",orders.size());
             if (orders.isEmpty()) {
+                log.info("finish find orders for sending mail");
                 break;
             }
             for (Order order : orders) {
                 try {
-                    notificationService.sendMail(order);
+                    notificationService.sendMail(order.getUser().getEmail(),order.getTrackingNumber());
                     order.setIsSentMail(true);
                 } catch (Exception e) {
                     log.error("Error processing mail for order {}: {}", order.getId(), e.getMessage());
